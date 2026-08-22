@@ -1,0 +1,41 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.fps.calculadora'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.fps.calculadora"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // Necessário para o arquivo HTML grande não ser comprimido duas vezes
+    aaptOptions {
+        noCompress 'html', 'js', 'css'
+    }
+}
+
+dependencies {
+    // Nenhuma dependência externa — app totalmente auto-contido
+}

@@ -1,0 +1,3550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Estimador de FPS — PC Gaming</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0d0c0a" />
+<meta name="description" content="Calculadora de FPS para PCs — Ryzen, Intel Core, GeForce e Radeon" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Fps" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" href="favicon.png" />
+<style>
+/* ============================================================
+   ESTIMADOR DE FPS — redesign mobile dark
+   ============================================================ */
+:root {
+  --bg0: #0d0c0a;
+  --bg1: #161511;
+  --bg2: #1e1d18;
+  --bg3: #27261f;
+  --line:  rgba(244, 240, 228, 0.07);
+  --line2: rgba(244, 240, 228, 0.14);
+  --tx1: #f2f0e6;
+  --tx2: #b3b0a2;
+  --tx3: #7d7a70;
+  --acc: #e8825a;
+  --acc-deep: #c26033;
+  --acc-soft: rgba(232, 130, 90, 0.14);
+  --ok:   #a9d562;  --ok-bg:   rgba(150, 200, 70, 0.13);
+  --bad:  #f48a8a;  --bad-bg:  rgba(235, 100, 100, 0.13);
+  --warn: #f0a836;  --warn-bg: rgba(240, 168, 54, 0.12);
+  --info: #6cb3ef;  --info-bg: rgba(90, 155, 230, 0.13);
+  --mono: 'Roboto Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --r-lg: 22px;
+  --r-md: 14px;
+  --r-sm: 10px;
+  --nav-h: 62px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background:
+    radial-gradient(120% 46% at 50% -6%, rgba(232, 130, 90, 0.10) 0%, transparent 60%),
+    var(--bg0);
+  color: var(--tx1);
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+
+button { font-family: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+button:active { opacity: 0.9; }
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 14px 16px calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 26px);
+}
+
+/* ── Topbar ─────────────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 2px 16px;
+}
+.topbar-tt { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.topbar-sub {
+  font-size: 10.5px; color: var(--tx3); font-weight: 500;
+  letter-spacing: 0.04em; margin-top: 2px;
+}
+.topbar-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--acc); margin-right: 7px; vertical-align: 1px;
+  box-shadow: 0 0 10px 1px rgba(232, 130, 90, 0.55); }
+
+/* ── Botões de ícone ────────────────────────────────────── */
+.icbtn {
+  width: 40px; height: 40px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  color: var(--tx2);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+}
+.icbtn:active { transform: scale(0.94); background: var(--bg3); }
+.icbtn.accent { color: var(--acc); }
+.icbtn svg { width: 19px; height: 19px; }
+
+/* ── Barra mini (sticky quando o hero sai da tela) ──────── */
+.mini {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  display: flex; align-items: center; gap: 10px;
+  max-width: 480px; margin: 0 auto;
+  padding: 10px 16px calc(10px);
+  background: rgba(13, 12, 10, 0.86);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-110%);
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+}
+.mini.on { transform: translateY(0); }
+.mini-num { font-family: var(--mono); font-size: 19px; font-weight: 700; }
+.mini-num small { font-size: 10px; color: var(--tx3); font-weight: 500; margin-left: 3px; }
+.mini-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 3px 9px; border-radius: 100px; }
+.mini-game { font-size: 11px; color: var(--tx3); margin-left: auto;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 45%; }
+
+/* ── Painéis (abas) ─────────────────────────────────────── */
+.panel { display: none; }
+.panel.on { display: block; animation: panelIn 0.26s ease both; }
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pg-hd { padding: 4px 2px 16px; }
+.pg-hd h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.pg-hd p { font-size: 12px; color: var(--tx3); margin-top: 4px; line-height: 1.5; }
+
+/* ── Seções ─────────────────────────────────────────────── */
+.sec {
+  font-size: 10px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin: 22px 2px 10px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+.card {
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+/* ── HERO — resultado ───────────────────────────────────── */
+.hero {
+  position: relative;
+  background:
+    radial-gradient(90% 70% at 50% 0%, var(--acc-soft) 0%, transparent 62%),
+    var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px 16px 14px;
+  overflow: hidden;
+}
+.hero-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.hero-game { font-size: 13.5px; font-weight: 650; letter-spacing: -0.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hero-game span { display: block; font-size: 10px; color: var(--tx3); font-weight: 500; margin-top: 2px; }
+.hero-acts { display: flex; gap: 8px; flex-shrink: 0; }
+
+.gauge-wrap { position: relative; margin: 4px auto 0; max-width: 320px; }
+.gauge-wrap svg { display: block; width: 100%; height: auto; }
+.g-track { fill: none; stroke: var(--bg3); stroke-width: 13; stroke-linecap: round; }
+.g-fill  { fill: none; stroke: var(--ok); stroke-width: 13; stroke-linecap: round;
+  transition: stroke-dasharray 0.55s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.4s ease;
+  filter: drop-shadow(0 0 7px rgba(0, 0, 0, 0.35)); }
+.g-tick { stroke: var(--line2); stroke-width: 1.5; }
+.g-tick.hz { stroke: var(--tx3); }
+.g-ticklb { fill: var(--tx3); font-size: 9.5px; font-family: var(--mono); font-weight: 500; }
+
+.gauge-center {
+  position: absolute; left: 0; right: 0; top: 27%;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  pointer-events: none;
+}
+.gauge-num-row { position: relative; display: flex; align-items: baseline; justify-content: center; }
+#gDelta { position: absolute; left: 100%; top: 50%; transform: translateY(-50%); margin-left: 7px; white-space: nowrap; }
+.gauge-num {
+  font-family: var(--mono); font-size: 54px; font-weight: 700;
+  line-height: 1; letter-spacing: -0.03em;
+}
+.gauge-cap { font-size: 9.5px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.14em; }
+.gauge-rng { font-size: 11px; color: var(--tx3); font-family: var(--mono); }
+
+.badge {
+  display: inline-block; padding: 4px 13px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  margin-top: 5px;
+}
+.badge.glow { animation: badgePulse 2.8s ease-in-out infinite; }
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%      { box-shadow: 0 0 18px -2px currentColor; }
+}
+
+.delta {
+  font-family: var(--mono); font-size: 14px; font-weight: 700;
+  animation: deltaFade 2.4s ease-out forwards;
+}
+.delta.up { color: var(--ok); }
+.delta.dn { color: var(--bad); }
+@keyframes deltaFade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-3px); }
+}
+
+/* Estatísticas sob o gauge */
+.stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-top: 2px;
+}
+.stat {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 9px 6px 8px;
+  text-align: center;
+}
+.stat-l { display: block; font-size: 8.5px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+.stat-v { display: block; font-family: var(--mono); font-size: 20px; font-weight: 700; line-height: 1; }
+.stat-v.bad { color: var(--bad); }
+.stat-v.ok  { color: var(--ok); }
+.stat-r { display: block; font-size: 9px; color: var(--tx3); font-family: var(--mono); margin-top: 4px; }
+
+/* Barras vs monitor */
+.bars {
+  margin-top: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 12px 6px;
+}
+.brow { margin-bottom: 8px; }
+.bhd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.bname { font-size: 10px; font-weight: 600; color: var(--tx2); }
+.bval  { font-size: 10px; font-weight: 700; font-family: var(--mono); }
+.btrack {
+  position: relative; height: 7px;
+  background: var(--bg0);
+  border-radius: 100px; overflow: hidden;
+}
+.bfill {
+  position: absolute; inset: 0 auto 0 0;
+  border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bmk { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line2); }
+.bmk.hz { background: var(--tx3); }
+.axis { position: relative; height: 14px; margin-top: 4px; }
+.axlbl { position: absolute; transform: translateX(-50%);
+  font-size: 8.5px; color: var(--tx3); font-family: var(--mono); }
+
+.hero-meta {
+  margin-top: 10px; font-size: 10.5px; color: var(--tx3);
+  text-align: center; letter-spacing: 0.02em;
+}
+.hero-meta b { color: var(--tx2); font-weight: 600; }
+
+/* ── Avisos ─────────────────────────────────────────────── */
+.warns { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+.warn {
+  display: flex; gap: 9px; align-items: flex-start;
+  background: var(--warn-bg);
+  border: 1px solid rgba(240, 168, 54, 0.25);
+  color: var(--warn);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  font-size: 11px; line-height: 1.5; font-weight: 500;
+}
+.warn svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* ── Builds prontos (scroll horizontal) ─────────────────── */
+.pscroll {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 2px 2px 6px;
+  margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+  scrollbar-width: none;
+}
+.pscroll::-webkit-scrollbar { display: none; }
+.pcard {
+  flex: 0 0 auto; scroll-snap-align: start;
+  min-width: 138px;
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 10px 12px 11px;
+  text-align: left;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.12s ease;
+}
+.pcard:active { transform: scale(0.97); }
+.pcard-res { font-size: 9px; font-weight: 700; color: var(--acc);
+  letter-spacing: 0.1em; font-family: var(--mono); }
+.pcard-tier { font-size: 13.5px; font-weight: 700; margin-top: 3px; }
+.pcard-hw { font-size: 9.5px; color: var(--tx3); margin-top: 4px; line-height: 1.45; }
+
+/* ── Linhas de configuração ─────────────────────────────── */
+.rows { display: flex; flex-direction: column; }
+.row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 56px;
+  padding: 9px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.15s ease;
+}
+.row:last-child { border-bottom: none; }
+.row:active { background: var(--bg2); }
+.row-ic {
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  background: var(--acc-soft);
+  color: var(--acc);
+}
+.row-ic svg { width: 17px; height: 17px; }
+.row-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.row-lb { font-size: 10px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.08em; }
+.row-vl { font-size: 13.5px; font-weight: 600; color: var(--tx1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row-ch { color: var(--tx3); flex-shrink: 0; }
+.row-ch svg { width: 15px; height: 15px; display: block; }
+
+/* Linha com controle embutido (segmented) */
+.inrow {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 14px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.inrow:last-child { border-bottom: none; }
+.inrow-lb { font-size: 10px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ── Segmented ──────────────────────────────────────────── */
+.seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: 3px;
+  background: var(--bg0);
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 3px;
+}
+.seg-b {
+  min-height: 34px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600; color: var(--tx3);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.seg-b.on { background: var(--bg3); color: var(--tx1); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+/* ── Chips (opções roláveis) ────────────────────────────── */
+.cblk { padding: 12px 14px 13px; border-bottom: 1px solid var(--line); }
+.cblk:last-child { border-bottom: none; }
+.cblk-lb { font-size: 10px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.chips {
+  display: flex; gap: 7px; overflow-x: auto;
+  scrollbar-width: none;
+  margin: 0 -14px; padding: 1px 14px 3px;
+}
+.chips::-webkit-scrollbar { display: none; }
+.pill {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 100px;
+  background: var(--bg0);
+  border: 1px solid var(--line2);
+  font-size: 12px; font-weight: 600; color: var(--tx2);
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.pill.on {
+  background: var(--acc-soft);
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.pill:active { transform: scale(0.96); }
+
+/* ── PSU ────────────────────────────────────────────────── */
+.psu { padding: 14px; }
+.psu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.psu-tile {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 12px 10px;
+  text-align: center;
+}
+.psu-lb { font-size: 8.5px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.psu-v { font-family: var(--mono); font-size: 24px; font-weight: 700; line-height: 1; }
+.psu-v.ok { color: var(--ok); }
+.psu-cert { font-size: 9.5px; color: var(--tx3); margin-top: 5px; font-weight: 500; }
+.psu-bd {
+  margin-top: 11px; padding-top: 10px;
+  border-top: 1px dashed var(--line2);
+  font-size: 10px; color: var(--tx3);
+  font-family: var(--mono); text-align: center;
+}
+.psu-bd b { color: var(--tx2); font-weight: 600; }
+
+/* ── Latência ───────────────────────────────────────────── */
+.latbox {
+  margin-top: 12px;
+  background: var(--info-bg);
+  border: 1px solid rgba(108, 179, 239, 0.22);
+  border-radius: var(--r-md);
+  padding: 11px 13px;
+  font-size: 11px; color: var(--tx2); line-height: 1.6;
+}
+.latbox b { color: var(--info); font-weight: 650; }
+
+footer {
+  margin-top: 24px;
+  font-size: 9.5px; color: var(--tx3);
+  text-align: center; line-height: 1.6;
+  letter-spacing: 0.01em;
+  padding: 0 8px;
+}
+
+/* ── Bottom nav ─────────────────────────────────────────── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 35;
+  max-width: 480px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: rgba(15, 14, 12, 0.92);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--line);
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+}
+.nav-b {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 0 4px;
+  border-radius: 12px;
+  color: var(--tx3);
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+  transition: color 0.18s ease;
+  position: relative;
+}
+.nav-b svg { width: 21px; height: 21px; }
+.nav-b.on { color: var(--acc); }
+.nav-b .nav-pip {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%) scaleX(0);
+  width: 22px; height: 3px; border-radius: 100px;
+  background: var(--acc);
+  transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.nav-b.on .nav-pip { transform: translateX(-50%) scaleX(1); }
+
+/* ── Bottom sheet ───────────────────────────────────────── */
+.backdrop {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.backdrop.on { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
+  max-width: 480px; margin: 0 auto;
+  max-height: 86vh;
+  display: flex; flex-direction: column;
+  background: var(--bg1);
+  border: 1px solid var(--line2); border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  transform: translateY(104%);
+  transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.5);
+}
+.sheet.on { transform: translateY(0); }
+.sheet-grab {
+  width: 40px; height: 4px; border-radius: 100px;
+  background: var(--line2);
+  margin: 10px auto 2px;
+  flex-shrink: 0;
+}
+.sheet-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px 10px 20px;
+  flex-shrink: 0;
+}
+.sheet-tt { font-size: 15px; font-weight: 700; }
+.sheet-x {
+  width: 32px; height: 32px; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg2); color: var(--tx3);
+}
+.sheet-x svg { width: 14px; height: 14px; }
+.sheet-search {
+  position: relative;
+  margin: 0 16px 10px;
+  flex-shrink: 0;
+}
+.sheet-search svg {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px; color: var(--tx3);
+}
+.sheet-search input {
+  width: 100%;
+  background: var(--bg0);
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  padding: 11px 12px 11px 36px;
+  font-family: inherit; font-size: 14px; color: var(--tx1);
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+.sheet-search input:focus { border-color: var(--acc); }
+.sheet-search input::placeholder { color: var(--tx3); }
+.sheet-body {
+  overflow-y: auto;
+  padding: 0 10px calc(14px + env(safe-area-inset-bottom, 0px));
+  overscroll-behavior: contain;
+}
+.opt-grp {
+  font-size: 9.5px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 14px 12px 7px;
+  position: sticky; top: 0;
+  background: var(--bg1);
+  z-index: 1;
+}
+.opt {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: left;
+  transition: background 0.14s ease;
+}
+.opt:active { background: var(--bg2); }
+.opt-tx { flex: 1; min-width: 0; }
+.opt-nm { font-size: 14px; font-weight: 550; color: var(--tx1); }
+.opt-sb { font-size: 10.5px; color: var(--tx3); margin-top: 1px; }
+.opt.sel .opt-nm { color: var(--acc); font-weight: 700; }
+.opt-ck { width: 20px; height: 20px; flex-shrink: 0; color: var(--acc); opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease; transform: scale(0.6); }
+.opt.sel .opt-ck { opacity: 1; transform: scale(1); }
+.opt-empty { padding: 26px 12px; text-align: center; color: var(--tx3); font-size: 12.5px; }
+
+/* ── Comparar ───────────────────────────────────────────── */
+.vs-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: stretch; }
+.vs-slot {
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 12px;
+  text-align: left;
+  min-height: 78px;
+}
+.vs-slot.pick { border-style: dashed; border-color: var(--line2); transition: border-color .18s ease; }
+.vs-slot.pick:active { border-color: var(--acc); }
+.vs-tag {
+  display: inline-block;
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 100px;
+  margin-bottom: 6px;
+}
+.vs-tag.a { background: var(--acc-soft); color: var(--acc); }
+.vs-tag.b { background: var(--info-bg); color: var(--info); }
+.vs-nm { font-size: 12px; font-weight: 650; line-height: 1.35; }
+.vs-hw { font-size: 9.5px; color: var(--tx3); margin-top: 3px; line-height: 1.45; }
+.vs-x {
+  align-self: center;
+  font-size: 11px; font-weight: 800; color: var(--tx3);
+  font-family: var(--mono); letter-spacing: 0.04em;
+}
+.vs-empty-hint { font-size: 11px; color: var(--tx3); line-height: 1.5; margin-top: 4px; }
+
+.cmp-row {
+  padding: 12px 14px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.cmp-row:last-child { border-bottom: none; }
+.cmp-lb {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10px; font-weight: 700; color: var(--tx3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 7px;
+}
+.cmp-delta { font-family: var(--mono); font-size: 10.5px; font-weight: 700; text-transform: none; letter-spacing: 0; }
+.cmp-delta.up { color: var(--ok); }
+.cmp-delta.dn { color: var(--bad); }
+.cmp-pair { display: flex; flex-direction: column; gap: 6px; }
+.cmp-line { display: grid; grid-template-columns: 14px 1fr 52px; gap: 9px; align-items: center; }
+.cmp-tag { font-size: 9px; font-weight: 800; color: var(--tx3); font-family: var(--mono); }
+.cmp-track { position: relative; height: 8px; background: var(--bg0); border-radius: 100px; overflow: hidden; }
+.cmp-fill { position: absolute; inset: 0 auto 0 0; border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.cmp-val { font-family: var(--mono); font-size: 12.5px; font-weight: 700; text-align: right; }
+.cmp-win .cmp-val { color: var(--ok); }
+
+/* ── Histórico ──────────────────────────────────────────── */
+.hist-list { display: flex; flex-direction: column; gap: 10px; }
+.hcard {
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 13px 14px 11px;
+  animation: panelIn 0.25s ease both;
+}
+.hcard-top { display: flex; align-items: flex-start; gap: 12px; }
+.hcard-tx { flex: 1; min-width: 0; }
+.hcard-game { font-size: 14px; font-weight: 700; letter-spacing: -0.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hcard-hw { font-size: 10.5px; color: var(--tx3); margin-top: 3px; line-height: 1.5; }
+.hcard-fps { text-align: right; flex-shrink: 0; }
+.hcard-num { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
+.hcard-num small { font-size: 10px; color: var(--tx3); font-weight: 500; }
+.hcard-badge { display: inline-block; font-size: 8.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 2px 8px; border-radius: 100px; margin-top: 5px; }
+.hcard-meta { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+.htag {
+  font-size: 9.5px; font-weight: 650; color: var(--tx2);
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  padding: 3px 9px; border-radius: 100px;
+  font-family: var(--mono);
+}
+.hcard-acts {
+  display: flex; gap: 6px;
+  margin-top: 11px; padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.hbtn {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 36px;
+  border-radius: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  font-size: 11px; font-weight: 650; color: var(--tx2);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.hbtn svg { width: 13px; height: 13px; }
+.hbtn:active { background: var(--bg3); }
+.hbtn.primary { background: var(--acc-soft); border-color: rgba(232,130,90,0.3); color: var(--acc); }
+.hbtn.danger { flex: 0 0 42px; color: var(--bad); }
+
+.empty {
+  text-align: center;
+  padding: 44px 24px;
+  color: var(--tx3);
+}
+.empty svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.6; }
+.empty-tt { font-size: 14px; font-weight: 700; color: var(--tx2); margin-bottom: 5px; }
+.empty p { font-size: 12px; line-height: 1.6; }
+
+/* ── Toast ──────────────────────────────────────────────── */
+.toast {
+  position: fixed; left: 50%; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 16px);
+  transform: translateX(-50%) translateY(16px);
+  z-index: 50;
+  background: #2e2d26;
+  border: 1px solid var(--line2);
+  color: var(--tx1);
+  font-size: 12.5px; font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 100px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.24s ease, transform 0.24s cubic-bezier(0.34, 1.3, 0.64, 1);
+  white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+}
+.toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Entrada inicial (stagger) */
+.first-load > * { animation: fadeUp 0.34s ease both; }
+.first-load > *:nth-child(2) { animation-delay: 0.05s; }
+.first-load > *:nth-child(3) { animation-delay: 0.09s; }
+.first-load > *:nth-child(4) { animation-delay: 0.13s; }
+.first-load > *:nth-child(5) { animation-delay: 0.17s; }
+.first-load > *:nth-child(6) { animation-delay: 0.21s; }
+.first-load > *:nth-child(7) { animation-delay: 0.25s; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Gargalo CPU × GPU ──────────────────────────────────── */
+.bneck {
+  margin-top: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 12px 12px;
+}
+.bneck-hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.bneck-tt { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.1em; }
+.bneck-verdict { font-size: 10.5px; font-weight: 700; }
+.bnrow { display: grid; grid-template-columns: 30px 1fr 40px; gap: 9px; align-items: center; margin-top: 7px; }
+.bnlb { font-size: 9px; font-weight: 800; color: var(--tx3); font-family: var(--mono); }
+.bntrack { position: relative; height: 8px; background: var(--bg0); border-radius: 100px; overflow: hidden; display: block; }
+.bnfill { position: absolute; inset: 0 auto 0 0; border-radius: 100px; display: block; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.bnpct { font-family: var(--mono); font-size: 11px; font-weight: 700; text-align: right; }
+.bneck-note { margin-top: 9px; font-size: 10px; color: var(--tx3); line-height: 1.55; }
+.how {
+  display: flex; align-items: center; gap: 6px;
+  margin: 10px auto 0;
+  font-size: 11px; font-weight: 650; color: var(--tx3);
+  padding: 7px 13px; border-radius: 100px;
+  border: 1px dashed var(--line2);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.how:active { color: var(--acc); border-color: var(--acc); }
+.how svg { width: 13px; height: 13px; }
+
+/* ── Waterfall "como calculamos" ────────────────────────── */
+.wf { padding: 2px 6px 8px; }
+.wf-row { display: grid; grid-template-columns: 1fr 56px 52px; gap: 10px; align-items: center; padding: 9px 8px; border-bottom: 1px solid var(--line); }
+.wf-row:last-of-type { border-bottom: none; }
+.wf-nm { font-size: 12px; font-weight: 550; color: var(--tx2); line-height: 1.35; }
+.wf-nm small { display: block; font-size: 9.5px; color: var(--tx3); margin-top: 1px; }
+.wf-mult { font-family: var(--mono); font-size: 11px; font-weight: 700; text-align: right; }
+.wf-mult.up { color: var(--ok); }
+.wf-mult.dn { color: var(--bad); }
+.wf-mult.nt { color: var(--tx3); }
+.wf-fps { font-family: var(--mono); font-size: 13px; font-weight: 700; text-align: right; }
+.wf-final { display: flex; justify-content: space-between; align-items: center; margin: 10px 8px 0; padding: 12px 14px; background: var(--acc-soft); border: 1px solid rgba(232, 130, 90, 0.3); border-radius: var(--r-md); }
+.wf-final-lb { font-size: 10px; font-weight: 800; color: var(--acc); text-transform: uppercase; letter-spacing: 0.08em; }
+.wf-final-v { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--acc); }
+.wf-note { margin: 10px 8px 0; font-size: 10px; color: var(--tx3); line-height: 1.6; text-align: center; }
+
+/* ── Aba Jogos ──────────────────────────────────────────── */
+.grow { display: flex; align-items: center; gap: 11px; width: 100%; padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); transition: background 0.14s ease; }
+.grow:last-child { border-bottom: none; }
+.grow:active { background: var(--bg2); }
+.grow-rank { font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--tx3); width: 20px; flex-shrink: 0; text-align: right; }
+.grow-tx { flex: 1; min-width: 0; }
+.grow-nm { display: block; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grow-bar { position: relative; height: 4px; background: var(--bg0); border-radius: 100px; overflow: hidden; margin-top: 6px; display: block; }
+.grow-fill { position: absolute; inset: 0 auto 0 0; border-radius: 100px; display: block; }
+.grow-fps { flex-shrink: 0; text-align: right; }
+.grow-num { display: block; font-family: var(--mono); font-size: 16px; font-weight: 700; line-height: 1; }
+.grow-num small { font-size: 9px; color: var(--tx3); font-weight: 500; }
+.grow-cap { display: block; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+
+/* ── Aba Upgrade ────────────────────────────────────────── */
+.verdict { display: flex; gap: 11px; align-items: flex-start; background: var(--acc-soft); border: 1px solid rgba(232, 130, 90, 0.28); border-radius: var(--r-lg); padding: 13px 14px; }
+.verdict-ic { width: 34px; height: 34px; border-radius: 10px; background: rgba(232, 130, 90, 0.18); color: var(--acc); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.verdict-ic svg { width: 17px; height: 17px; }
+.verdict-tt { font-size: 13px; font-weight: 700; }
+.verdict-tx { font-size: 11px; color: var(--tx2); line-height: 1.55; margin-top: 3px; }
+.uprow { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 56px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+.uprow:last-child { border-bottom: none; }
+.uprow-tx { flex: 1; min-width: 0; }
+.uprow-nm { font-size: 13px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.uprow-sb { font-size: 10px; color: var(--tx3); margin-top: 2px; }
+.uptag { display: inline-block; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 2px 7px; border-radius: 100px; margin-left: 6px; vertical-align: 1px; }
+.uptag.drop { background: var(--ok-bg); color: var(--ok); }
+.uptag.plat { background: var(--warn-bg); color: var(--warn); }
+.upgain { flex-shrink: 0; text-align: right; }
+.upgain-d { display: block; font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--ok); line-height: 1; }
+.upgain-r { display: block; font-size: 9.5px; color: var(--tx3); font-family: var(--mono); margin-top: 3px; }
+
+/* ── Onboarding ─────────────────────────────────────────── */
+.onbd {
+  position: fixed; inset: 0; z-index: 60;
+  background:
+    radial-gradient(120% 40% at 50% -4%, rgba(232, 130, 90, 0.12) 0%, transparent 60%),
+    var(--bg0);
+  overflow-y: auto;
+  padding: 34px 20px 30px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.onbd.on { opacity: 1; pointer-events: auto; }
+.onbd-in { max-width: 480px; margin: 0 auto; }
+.onbd h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin-top: 14px; }
+.onbd-sub { font-size: 12.5px; color: var(--tx3); line-height: 1.6; margin-top: 6px; }
+.onbd-lb { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 20px; }
+.onbd-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 9px; }
+.onbd-grid .pcard { min-width: 0; }
+.onbd-skip { display: block; width: 100%; margin-top: 22px; min-height: 48px; border-radius: 14px; border: 1px solid var(--line2); background: var(--bg1); color: var(--tx1); font-size: 13.5px; font-weight: 650; }
+
+/* ── Perfis de PC ─────────────────────────────────────── */
+.profbar { display: inline-flex; align-items: center; gap: 7px; margin: 10px 0 2px; padding: 7px 13px; border-radius: 100px; background: var(--bg1); border: 1px solid var(--line2); color: var(--tx1); font-size: 11.5px; font-weight: 700; max-width: 100%; }
+.profbar svg { width: 13px; height: 13px; color: var(--acc); flex-shrink: 0; }
+.profbar svg.caret { color: var(--tx3); width: 11px; height: 11px; }
+.profbar span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.prow:last-child { border-bottom: none; }
+.prow-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line2); flex-shrink: 0; }
+.prow.on .prow-dot { background: var(--acc); box-shadow: 0 0 8px rgba(232, 130, 90, 0.7); }
+.prow-tx { flex: 1; min-width: 0; text-align: left; background: none; border: none; padding: 0; color: inherit; font: inherit; }
+.prow-nm { display: block; font-size: 13px; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow-sb { display: block; font-size: 10px; color: var(--tx3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prow-act { display: flex; gap: 6px; flex-shrink: 0; }
+.pico { width: 36px; height: 36px; border-radius: 10px; background: var(--bg2); border: 1px solid var(--line); color: var(--tx2); display: inline-flex; align-items: center; justify-content: center; }
+.pico svg { width: 14px; height: 14px; }
+.pico.danger { color: var(--bad); }
+.pnew { display: flex; align-items: center; justify-content: center; gap: 7px; width: calc(100% - 32px); margin: 12px 16px 8px; min-height: 46px; border-radius: 12px; border: 1px dashed var(--line2); color: var(--tx2); font-size: 12.5px; font-weight: 650; background: none; }
+.pin { flex: 1; min-width: 0; background: var(--bg0); border: 1px solid var(--acc); border-radius: 9px; color: var(--tx1); font-size: 13px; padding: 8px 10px; font-family: inherit; }
+
+/* ── Comparativo de resoluções ─────────────────────────── */
+.rescmp { padding: 12px; margin-top: 12px; }
+.rc-hd { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 9px; }
+.rc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.rc-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px 9px; border-radius: 12px; background: var(--bg2); border: 1px solid var(--line); transition: border-color 0.15s ease, background 0.15s ease; }
+.rc-cell.on { border-color: var(--acc); background: var(--acc-soft); }
+.rc-res { font-size: 10px; font-weight: 800; color: var(--tx3); letter-spacing: 0.04em; }
+.rc-cell.on .rc-res { color: var(--acc); }
+.rc-fps { font-family: var(--mono); font-size: 22px; font-weight: 700; line-height: 1; }
+.rc-cap { font-size: 8.5px; color: var(--tx3); font-weight: 700; letter-spacing: 0.08em; }
+
+/* ── Meta de FPS ─────────────────────────────────────── */
+.goal-tgts { display: flex; flex-wrap: wrap; gap: 7px; padding: 2px 16px 10px; }
+.gt { padding: 8px 13px; border-radius: 100px; background: var(--bg2); border: 1px solid var(--line); color: var(--tx2); font-size: 12px; font-weight: 650; }
+.gt.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc); }
+.goal-cur { text-align: center; font-size: 11px; color: var(--tx3); margin: 0 16px 12px; }
+.gopt { display: flex; align-items: center; gap: 11px; width: 100%; padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+.gopt:last-child { border-bottom: none; }
+.gopt-tx { flex: 1; min-width: 0; }
+.gopt-nm { display: block; font-size: 13px; font-weight: 650; }
+.gopt-sb { display: block; font-size: 10px; color: var(--tx3); margin-top: 2px; line-height: 1.45; }
+.gopt-fps { font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--ok); text-align: right; flex-shrink: 0; }
+.gopt-fps small { display: block; font-size: 8.5px; color: var(--tx3); font-weight: 600; }
+.gbest { margin: 4px 16px 10px; padding: 11px 13px; border-radius: 12px; background: var(--warn-bg); color: var(--warn); font-size: 11px; line-height: 1.55; }
+.gbtn { display: block; width: calc(100% - 32px); margin: 8px 16px 10px; min-height: 46px; border-radius: 12px; background: var(--acc-soft); border: 1px solid rgba(232, 130, 90, 0.3); color: var(--acc); font-weight: 700; font-size: 13px; }
+
+/* ── Custo de energia ────────────────────────────────── */
+.energy { margin-top: 11px; padding-top: 11px; border-top: 1px dashed var(--line); }
+.en-hd { display: flex; justify-content: space-between; align-items: baseline; }
+.en-tt { font-size: 10px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: 0.1em; }
+.en-out { font-size: 13px; font-weight: 700; color: var(--tx1); font-family: var(--mono); }
+.en-row { display: flex; align-items: center; gap: 8px; margin-top: 9px; flex-wrap: wrap; }
+.en-lb { font-size: 10px; color: var(--tx3); font-weight: 650; }
+.en-ch { display: flex; gap: 5px; flex-wrap: wrap; }
+.en-c { min-width: 34px; padding: 6px 8px; border-radius: 9px; background: var(--bg2); border: 1px solid var(--line); color: var(--tx2); font-size: 11px; font-weight: 650; font-family: var(--mono); }
+.en-c.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc); }
+.en-in { width: 64px; background: var(--bg0); border: 1px solid var(--line2); border-radius: 9px; color: var(--tx1); font-size: 12px; font-family: var(--mono); padding: 7px 8px; text-align: right; }
+.en-note { font-size: 9.5px; color: var(--tx3); margin-top: 8px; line-height: 1.5; }
+
+/* ── Comparar em todos os jogos ────────────────────────── */
+.ca-sum { font-size: 11px; color: var(--tx2); text-align: center; margin: 2px 0 12px; line-height: 1.5; }
+.ca-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.ca-row:last-child { border-bottom: none; }
+.ca-nm { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ca-ab { font-size: 10px; color: var(--tx3); font-family: var(--mono); margin-top: 3px; }
+.ca-d { font-family: var(--mono); font-size: 13px; font-weight: 700; text-align: right; }
+.ca-d.up { color: var(--ok); }
+.ca-d.dn { color: var(--bad); }
+.ca-d.eq { color: var(--tx3); }
+
+/* ── Código de build ─────────────────────────────────── */
+.codebox { width: 100%; min-height: 86px; background: var(--bg0); border: 1px solid var(--line2); border-radius: 12px; color: var(--tx1); font-family: var(--mono); font-size: 11px; padding: 11px 12px; resize: vertical; box-sizing: border-box; }
+
+/* ── Prévia de compartilhamento ─────────────────────────── */
+.shprev { padding: 0 16px 8px; }
+.shprev img { width: 100%; border-radius: 14px; border: 1px solid var(--line); display: block; }
+.shrow { display: flex; gap: 8px; margin-top: 10px; }
+.shbtn { flex: 1; min-height: 44px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-size: 12.5px; font-weight: 650; background: var(--bg2); border: 1px solid var(--line); color: var(--tx1); text-decoration: none; }
+.shbtn.primary { background: var(--acc-soft); border-color: rgba(232, 130, 90, 0.3); color: var(--acc); }
+.shbtn svg { width: 15px; height: 15px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app" id="appRoot">
+
+  <!-- ═══ Barra mini (aparece ao rolar) ═══ -->
+  <div class="mini" id="mini" aria-hidden="true">
+    <span class="mini-num"><span id="miniNum">—</span><small>FPS</small></span>
+    <span class="mini-badge" id="miniBadge">—</span>
+    <span class="mini-game" id="miniGame"></span>
+  </div>
+
+  <!-- ═══════════════ ABA: CALCULADORA ═══════════════ -->
+  <main class="panel on" id="panel-calc" data-screen-label="Calculadora">
+    <div id="calcInner" class="first-load">
+
+      <div class="topbar">
+        <div>
+          <div class="topbar-tt">Estimador de FPS</div>
+          <div class="topbar-sub"><span class="topbar-dot"></span>Ryzen · Core · GeForce · Radeon</div>
+        </div>
+        <div class="hero-acts">
+          <button class="icbtn" id="btnPresets" title="Builds prontos" aria-label="Builds prontos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H13L13 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="profbar" id="btnProf" type="button" aria-label="Trocar perfil de PC">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M9 20h6M12 16.5V20"/></svg>
+        <span id="profName">Meu PC</span>
+        <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 10 5 5 5-5"/></svg>
+      </button>
+
+      <!-- HERO: resultado -->
+      <section class="hero" id="hero" aria-live="polite">
+        <div class="hero-top">
+          <div class="hero-game" id="heroGame">—<span id="heroBuild">—</span></div>
+          <div class="hero-acts">
+            <button class="icbtn" id="btnSave" title="Salvar no histórico" aria-label="Salvar no histórico">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4-7 4V4.5a1 1 0 0 1 1-1z"/></svg>
+            </button>
+            <button class="icbtn" id="btnShare" title="Compartilhar" aria-label="Compartilhar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.6"/><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="M8.4 10.8 15.1 6.9M8.4 13.2l6.7 3.9"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="gauge-wrap">
+          <svg id="gaugeSvg" viewBox="0 0 320 212" aria-hidden="true">
+            <path class="g-track" id="gTrack" d="" />
+            <path class="g-fill" id="gFill" d="" pathLength="100" />
+            <g id="gTicks"></g>
+          </svg>
+          <div class="gauge-center">
+            <div class="gauge-num-row">
+              <span class="gauge-num" id="gNum">—</span>
+              <span id="gDelta"></span>
+            </div>
+            <div class="gauge-cap">FPS médio</div>
+            <div class="gauge-rng" id="gRng"></div>
+            <div class="badge" id="gBadge">—</div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-l">1% low</span>
+            <span class="stat-v bad" id="stMin">—</span>
+            <span class="stat-r" id="stMinR"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-l">vs monitor</span>
+            <span class="stat-v" id="stPct">—</span>
+            <span class="stat-r" id="stHz"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-l">máximo</span>
+            <span class="stat-v ok" id="stMax">—</span>
+            <span class="stat-r" id="stMaxR"></span>
+          </div>
+        </div>
+
+        <div class="bneck" id="bneck"></div>
+
+        <div class="bars" id="bars"></div>
+        <div class="hero-meta" id="latline"></div>
+        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap">
+          <button class="how" id="btnHow" type="button" style="margin:10px 0 0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="0.6" fill="currentColor"/></svg>
+            Como calculamos
+          </button>
+          <button class="how" id="btnGoal" type="button" style="margin:10px 0 0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+            Meta de FPS
+          </button>
+        </div>
+      </section>
+
+      <section class="card rescmp" id="resCmp" aria-label="FPS por resolução"></section>
+
+      <div class="warns" id="warns" style="display:none"></div>
+
+      <!-- Builds prontos -->
+      <p class="sec" id="secPresets">Builds prontos</p>
+      <div class="pscroll" id="presetScroll" role="group" aria-label="Builds pré-configurados"></div>
+
+      <!-- Hardware -->
+      <p class="sec">Monte seu PC</p>
+      <section class="card rows">
+        <button class="row" id="rowCPU">
+          <span class="row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><rect x="10.2" y="10.2" width="3.6" height="3.6" rx="0.8"/><path d="M9.5 7V4M14.5 7V4M9.5 20v-3M14.5 20v-3M7 9.5H4M7 14.5H4M20 9.5h-3M20 14.5h-3"/></svg></span>
+          <span class="row-tx"><span class="row-lb">Processador</span><span class="row-vl" id="vCPU">—</span></span>
+          <span class="row-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></span>
+        </button>
+        <button class="row" id="rowMobo">
+          <span class="row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><rect x="7" y="7" width="5" height="5" rx="1"/><path d="M15.5 7v5M18 7v5M7 16h6M16.5 15.5h1"/></svg></span>
+          <span class="row-tx"><span class="row-lb">Placa-mãe</span><span class="row-vl" id="vMobo">—</span></span>
+          <span class="row-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></span>
+        </button>
+        <button class="row" id="rowRAM">
+          <span class="row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="8" width="18" height="8.5" rx="1.5"/><path d="M6.5 8v5M10.2 8v5M13.8 8v5M17.5 8v5M5 16.5V19M9.5 16.5V19M14.5 16.5V19M19 16.5V19"/></svg></span>
+          <span class="row-tx"><span class="row-lb">Memória RAM</span><span class="row-vl" id="vRAM">—</span></span>
+          <span class="row-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></span>
+        </button>
+        <button class="row" id="rowGPU">
+          <span class="row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 7.5h17.5v9.5H6"/><path d="M3 7.5V19"/><circle cx="12.5" cy="12.2" r="2.9"/><path d="M12.5 10.4v-1M12.5 15v-1M14.3 12.2h1M9.7 12.2h1"/></svg></span>
+          <span class="row-tx"><span class="row-lb">Placa de vídeo</span><span class="row-vl" id="vGPU">—</span></span>
+          <span class="row-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></span>
+        </button>
+        <div class="inrow">
+          <span class="inrow-lb">Monitor · taxa de atualização</span>
+          <div class="seg" id="segHz"></div>
+        </div>
+      </section>
+
+      <!-- Jogo -->
+      <p class="sec">Jogo e gráficos</p>
+      <section class="card">
+        <button class="row" id="rowGame" style="border-bottom:1px solid var(--line)">
+          <span class="row-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.8 6.5h10.4c2.6 0 4.3 2 4.3 5.5s-1.2 6-3 6c-1.3 0-2-.8-2.8-2.1-.6-1-1.1-1.4-2.2-1.4h-3c-1.1 0-1.6.4-2.2 1.4C7.5 17.2 6.8 18 5.5 18c-1.8 0-3-2.5-3-6s1.7-5.5 4.3-5.5z"/><path d="M8 10v3M6.5 11.5h3"/><circle cx="16" cy="10.6" r="0.4" fill="currentColor"/><circle cx="18.2" cy="12.4" r="0.4" fill="currentColor"/></svg></span>
+          <span class="row-tx"><span class="row-lb">Jogo</span><span class="row-vl" id="vGame">—</span></span>
+          <span class="row-ch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg></span>
+        </button>
+        <div class="inrow">
+          <span class="inrow-lb">Resolução</span>
+          <div class="seg" id="segRes"></div>
+        </div>
+        <div class="cblk">
+          <div class="cblk-lb">Qualidade gráfica</div>
+          <div class="chips" id="chipsPre"></div>
+        </div>
+        <div class="cblk" id="blkRT">
+          <div class="cblk-lb" id="lbRT">Ray Tracing</div>
+          <div class="chips" id="chipsRT"></div>
+        </div>
+        <div class="cblk" id="blkFG">
+          <div class="cblk-lb">Frame Generation</div>
+          <div class="chips" id="chipsFG"></div>
+        </div>
+        <div class="cblk">
+          <div class="cblk-lb" id="lbUp">Upscaling / DLSS</div>
+          <div class="chips" id="chipsDLSS"></div>
+        </div>
+      </section>
+
+      <!-- Fonte -->
+      <p class="sec">Fonte de alimentação</p>
+      <section class="card psu">
+        <div class="psu-grid">
+          <div class="psu-tile">
+            <div class="psu-lb">Mínima</div>
+            <div class="psu-v" id="psuMin">—</div>
+            <div class="psu-cert">80 Plus Bronze+</div>
+          </div>
+          <div class="psu-tile">
+            <div class="psu-lb">Recomendada</div>
+            <div class="psu-v ok" id="psuRec">—</div>
+            <div class="psu-cert">80 Plus Gold+</div>
+          </div>
+        </div>
+        <div class="psu-bd" id="psuBd"></div>
+        <div class="energy" id="energy"></div>
+      </section>
+
+      <footer>
+        Referência: RTX 5070 + Ryzen 7 5700X + B550 + DDR4 32GB @ DLSS Balanceado = 1.00×<br/>
+        Base de dados <b id="dbv">v2.0</b> · Ryzen &amp; Intel Core · GeForce &amp; Radeon<br/>
+        Valores estimados — desempenho real varia por jogo e drivers.
+      </footer>
+    </div>
+  </main>
+
+  <!-- ═══════════════ ABA: JOGOS ═══════════════ -->
+  <main class="panel" id="panel-games" data-screen-label="Jogos">
+    <div class="pg-hd">
+      <h2>Seu PC em todos os jogos</h2>
+      <p id="gamesSub">—</p>
+    </div>
+    <div class="seg" id="segGSort" style="margin-bottom:12px"></div>
+    <section class="card rows" id="gamesList"></section>
+  </main>
+
+  <!-- ═══════════════ ABA: UPGRADE ═══════════════ -->
+  <main class="panel" id="panel-upg" data-screen-label="Upgrade">
+    <div class="pg-hd">
+      <h2>O que trocar primeiro?</h2>
+      <p id="upgSub">—</p>
+    </div>
+    <div id="upgBody"></div>
+  </main>
+
+  <!-- ═══════════════ ABA: COMPARAR ═══════════════ -->
+  <main class="panel" id="panel-comp" data-screen-label="Comparar">
+    <div class="pg-hd">
+      <h2>Comparar builds</h2>
+      <p>Build atual (A) contra um build salvo no histórico (B).</p>
+    </div>
+    <div class="vs-grid">
+      <div class="vs-slot">
+        <span class="vs-tag a">A · Atual</span>
+        <div class="vs-nm" id="slotAnm">—</div>
+        <div class="vs-hw" id="slotAhw"></div>
+      </div>
+      <span class="vs-x">VS</span>
+      <button class="vs-slot pick" id="slotB">
+        <span class="vs-tag b">B · Salvo</span>
+        <div class="vs-nm" id="slotBnm">Escolher do histórico</div>
+        <div class="vs-hw" id="slotBhw">Toque para selecionar</div>
+      </button>
+    </div>
+    <div class="seg" id="segCmpMode" style="margin-top:12px; display:none"></div>
+    <div id="compBody" style="margin-top:12px"></div>
+  </main>
+
+  <!-- ═══════════════ ABA: HISTÓRICO ═══════════════ -->
+  <main class="panel" id="panel-hist" data-screen-label="Histórico">
+    <div class="pg-hd">
+      <h2>Histórico</h2>
+      <p>Builds salvos ficam no aparelho. Toque em salvar <svg style="width:11px;height:11px;vertical-align:-1px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4-7 4V4.5a1 1 0 0 1 1-1z"/></svg> na calculadora para adicionar.</p>
+    </div>
+    <div class="shrow" style="margin:0 0 14px">
+      <button class="shbtn" id="btnCode" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copiar código</button>
+      <button class="shbtn" id="btnImport" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5"/><path d="M5 20h14"/></svg>Importar código</button>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </main>
+
+  <!-- ═══ Navegação inferior ═══ -->
+  <nav class="nav" aria-label="Navegação principal">
+    <button class="nav-b on" data-tab="calc">
+      <span class="nav-pip"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 17.5a8.5 8.5 0 1 1 15 0"/><path d="M12 13.5 15.5 9"/><circle cx="12" cy="14.5" r="1.4"/></svg>
+      Calcular
+    </button>
+    <button class="nav-b" data-tab="games">
+      <span class="nav-pip"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg>
+      Jogos
+    </button>
+    <button class="nav-b" data-tab="upg">
+      <span class="nav-pip"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 9.5 10.5l4 4L21 7"/><path d="M15 7h6v6"/></svg>
+      Upgrade
+    </button>
+    <button class="nav-b" data-tab="comp">
+      <span class="nav-pip"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7h12m0 0-3.5-3.5M20 7l-3.5 3.5M16 17H4m0 0 3.5-3.5M4 17l3.5 3.5"/></svg>
+      Comparar
+    </button>
+    <button class="nav-b" data-tab="hist">
+      <span class="nav-pip"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+      Histórico
+    </button>
+  </nav>
+
+  <!-- ═══ Bottom sheet ═══ -->
+  <div class="backdrop" id="backdrop"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true">
+    <div class="sheet-grab"></div>
+    <div class="sheet-hd">
+      <div class="sheet-tt" id="sheetTitle">—</div>
+      <button class="sheet-x" id="sheetClose" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 5l14 14M19 5 5 19"/></svg>
+      </button>
+    </div>
+    <div class="sheet-search" id="sheetSearchWrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-3.8-3.8"/></svg>
+      <input id="sheetSearch" type="search" placeholder="Buscar…" autocomplete="off" />
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <!-- ═══ Onboarding (primeira abertura) ═══ -->
+  <div class="onbd" id="onbd" role="dialog" aria-modal="true" aria-label="Boas-vindas">
+    <div class="onbd-in">
+      <div class="topbar-sub"><span class="topbar-dot"></span>ESTIMADOR DE FPS</div>
+      <h1>Qual é o seu PC?</h1>
+      <p class="onbd-sub">Escolha um ponto de partida para já ver o desempenho estimado — depois dá para ajustar cada peça.</p>
+      <div id="onbdGroups"></div>
+      <button class="onbd-skip" id="onbdSkip" type="button">Montar do zero →</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+</div><!-- /.app -->
+
+<script>
+/* ==== DADOS (portados 1:1 do app original) ==== */
+const G = [
+  // ── Path Tracing / RT Pesado ──────────────────────────────
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: 'Alan Wake 2',
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing', heavy: true,
+    r: { '1080p': { rr: 58,  rt: 86,  off: 142 },
+         '1440p': { rr: 51,  rt: 65,  off: 135 },
+         '4k':    { rr: 46,  rt: 40,  off: 80  } },
+    v: { '1080p': 8, '1440p': 10, '4k': 14 },
+  },
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: 'Black Myth: Wukong',
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing (Lumen)', heavy: false,
+    r: { '1080p': { rr: 55,  rt: 82,  off: 105 },
+         '1440p': { rr: 40,  rt: 62,  off: 78  },
+         '4k':    { rr: 24,  rt: 38,  off: 50  } },
+    v: { '1080p': 8, '1440p': 10, '4k': 14 },
+  },
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: 'Cyberpunk 2077',
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rr: 62,  rt: 102, off: 158 },
+         '1440p': { rr: 43,  rt: 70,  off: 112 },
+         '4k':    { rr: 26,  rt: 70,  off: 72  } },
+    v: { '1080p': 8, '1440p': 10, '4k': 12 },
+  },
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: 'Dying Light 2',
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rr: 112, rt: 88,  off: 148 },
+         '1440p': { rr: 82,  rt: 64,  off: 115 },
+         '4k':    { rr: 52,  rt: 40,  off: 75  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 12 },
+  },
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: "Marvel's Spider-Man 2",
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing', heavy: true,
+    r: { '1080p': { rr: 120, rt: 95,  off: 162 },
+         '1440p': { rr: 90,  rt: 70,  off: 128 },
+         '4k':    { rr: 58,  rt: 44,  off: 84  } },
+    v: { '1080p': 8, '1440p': 10, '4k': 14 },
+  },
+  {
+    grp: '🔥 Path Tracing / RT Pesado',
+    name: 'The Witcher 3 (Next-Gen)',
+    rt: 'pt', rrN: 'Path Tracing + RR', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rr: 108, rt: 85,  off: 142 },
+         '1440p': { rr: 80,  rt: 62,  off: 112 },
+         '4k':    { rr: 50,  rt: 38,  off: 72  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+
+  // ── Ray Tracing Padrão ────────────────────────────────────
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: 'Crimson Desert',
+    rt: 'rt', rtN: 'Ray Tracing + RR', heavy: false,
+    r: { '1080p': { rt: 140, off: 165 },
+         '1440p': { rt: 122, off: 138 },
+         '4k':    { rt: 75,  off: 88  } },
+    v: { '1080p': 8, '1440p': 12, '4k': 14 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: 'Death Stranding 2',
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 118, off: 158 },
+         '1440p': { rt: 90,  off: 122 },
+         '4k':    { rt: 56,  off: 78  } },
+    v: { '1080p': 7, '1440p': 9, '4k': 12 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: "Death Stranding: Director's Cut",
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 158, off: 202 },
+         '1440p': { rt: 122, off: 162 },
+         '4k':    { rt: 78,  off: 108 } },
+    v: { '1080p': 6, '1440p': 7, '4k': 9 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: 'Doom Eternal',
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 195, off: 290 },
+         '1440p': { rt: 155, off: 235 },
+         '4k':    { rt: 100, off: 165 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: "Dragon's Dogma 2",
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 95,  off: 130 },
+         '1440p': { rt: 72,  off: 100 },
+         '4k':    { rt: 45,  off: 65  } },
+    v: { '1080p': 8, '1440p': 10, '4k': 12 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: 'Forza Horizon 5',
+    rt: 'rt', rtN: 'Ray Tracing (reflexos)', heavy: false,
+    r: { '1080p': { rt: 185, off: 205 },
+         '1440p': { rt: 148, off: 165 },
+         '4k':    { rt: 130, off: 145 } },
+    v: { '1080p': 5, '1440p': 6, '4k': 10 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: 'Forza Horizon 6',
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 138, off: 178 },
+         '1440p': { rt: 106, off: 140 },
+         '4k':    { rt: 66,  off: 90  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 11 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: "Marvel's Spider-Man Remastered",
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 130, off: 175 },
+         '1440p': { rt: 100, off: 138 },
+         '4k':    { rt: 62,  off: 88  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+  {
+    grp: '⚡ Ray Tracing Padrão',
+    name: "Marvel's Spider-Man: Miles Morales",
+    rt: 'rt', rtN: 'Ray Tracing', heavy: false,
+    r: { '1080p': { rt: 138, off: 185 },
+         '1440p': { rt: 108, off: 145 },
+         '4k':    { rt: 68,  off: 95  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+
+  // ── UE5 Lumen ─────────────────────────────────────────────
+  {
+    grp: '🎯 UE5 Lumen (Hardware / Software)',
+    name: 'Arc Raiders',
+    rt: 'lumen', rrN: 'Hardware Lumen', rtN: 'Software Lumen', heavy: false,
+    r: { '1080p': { rr: 125, rt: 140, off: 158 },
+         '1440p': { rr: 95,  rt: 108, off: 122 },
+         '4k':    { rr: 60,  rt: 68,  off: 78  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+  {
+    grp: '🎯 UE5 Lumen (Hardware / Software)',
+    name: 'Fortnite',
+    rt: 'lumen', rrN: 'Hardware Lumen', rtN: 'Software Lumen', heavy: false,
+    r: { '1080p': { rr: 150, rt: 168, off: 198 },
+         '1440p': { rr: 115, rt: 128, off: 152 },
+         '4k':    { rr: 72,  rt: 80,  off: 95  } },
+    v: { '1080p': 5, '1440p': 7, '4k': 9 },
+  },
+  {
+    grp: '🎯 UE5 Lumen (Hardware / Software)',
+    name: 'Hell is Us',
+    rt: 'lumen', rrN: 'Hardware Lumen', rtN: 'Software Lumen', heavy: false,
+    r: { '1080p': { rr: 105, rt: 118, off: 132 },
+         '1440p': { rr: 80,  rt: 90,  off: 102 },
+         '4k':    { rr: 50,  rt: 56,  off: 64  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+  {
+    grp: '🎯 UE5 Lumen (Hardware / Software)',
+    name: 'Marvel Rivals',
+    rt: 'lumen', rrN: 'Hardware Lumen', rtN: 'Software Lumen', heavy: false,
+    r: { '1080p': { rr: 140, rt: 158, off: 178 },
+         '1440p': { rr: 108, rt: 122, off: 138 },
+         '4k':    { rr: 68,  rt: 76,  off: 88  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+  {
+    grp: '🎯 UE5 Lumen (Hardware / Software)',
+    name: 'Remnant II',
+    rt: 'lumen', rrN: 'Hardware Lumen', rtN: 'Software Lumen', heavy: false,
+    r: { '1080p': { rr: 118, rt: 132, off: 148 },
+         '1440p': { rr: 90,  rt: 102, off: 115 },
+         '4k':    { rr: 56,  rt: 64,  off: 72  } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+
+  // ── Rasterização Pura ─────────────────────────────────────
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Apex Legends',
+    rt: 'none', heavy: false, cpuCap: 400,
+    r: { '1080p': { off: 350 }, '1440p': { off: 278 }, '4k': { off: 165 } },
+    v: { '1080p': 3, '1440p': 5, '4k': 7 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Counter-Strike 2',
+    rt: 'none', heavy: false, cpuCap: 450,
+    r: { '1080p': { off: 360 }, '1440p': { off: 290 }, '4k': { off: 160 } },
+    v: { '1080p': 3, '1440p': 4, '4k': 6 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Darksiders III',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 190 }, '1440p': { off: 155 }, '4k': { off: 102 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Darksiders Genesis',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 210 }, '1440p': { off: 170 }, '4k': { off: 114 } },
+    v: { '1080p': 3, '1440p': 4, '4k': 6 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Diablo IV',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 168 }, '1440p': { off: 138 }, '4k': { off: 90 } },
+    v: { '1080p': 6, '1440p': 8, '4k': 10 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Dota 2',
+    rt: 'none', heavy: false, cpuCap: 650,
+    r: { '1080p': { off: 450 }, '1440p': { off: 380 }, '4k': { off: 248 } },
+    v: { '1080p': 2, '1440p': 3, '4k': 4 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Dying Light',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 205 }, '1440p': { off: 168 }, '4k': { off: 112 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Grand Theft Auto V',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 235 }, '1440p': { off: 188 }, '4k': { off: 128 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'League of Legends',
+    rt: 'none', heavy: false, cpuCap: 700,
+    r: { '1080p': { off: 500 }, '1440p': { off: 400 }, '4k': { off: 260 } },
+    v: { '1080p': 2, '1440p': 3, '4k': 4 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Overwatch 2',
+    rt: 'none', heavy: false, cpuCap: 450,
+    r: { '1080p': { off: 380 }, '1440p': { off: 290 }, '4k': { off: 170 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'PUBG: Battlegrounds',
+    rt: 'none', heavy: false, cpuCap: 280,
+    r: { '1080p': { off: 210 }, '1440p': { off: 168 }, '4k': { off: 108 } },
+    v: { '1080p': 5, '1440p': 7, '4k': 10 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Rainbow Six Siege',
+    rt: 'none', heavy: false, cpuCap: 400,
+    r: { '1080p': { off: 380 }, '1440p': { off: 290 }, '4k': { off: 165 } },
+    v: { '1080p': 4, '1440p': 6, '4k': 8 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Red Dead Redemption 2',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 152 }, '1440p': { off: 122 }, '4k': { off: 82 } },
+    v: { '1080p': 6, '1440p': 8, '4k': 12 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Rocket League',
+    rt: 'none', heavy: false, cpuCap: 500,
+    r: { '1080p': { off: 500 }, '1440p': { off: 380 }, '4k': { off: 218 } },
+    v: { '1080p': 3, '1440p': 4, '4k': 5 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Slime Rancher 2',
+    rt: 'none', heavy: false,
+    r: { '1080p': { off: 262 }, '1440p': { off: 210 }, '4k': { off: 142 } },
+    v: { '1080p': 3, '1440p': 4, '4k': 6 },
+  },
+  {
+    grp: '🚀 Rasterização Pura (sem RT)',
+    name: 'Valorant',
+    rt: 'none', heavy: false, cpuCap: 600,
+    r: { '1080p': { off: 500 }, '1440p': { off: 400 }, '4k': { off: 230 } },
+    v: { '1080p': 2, '1440p': 3, '4k': 4 },
+  },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   2. BASE DE DADOS DE CPUs (AMD Ryzen AM4 / AM5)
+   m  : multiplicador de gaming relativo ao Ryzen 7 5700X = 1.00
+   s  : socket ('AM4' | 'AM5')
+   ───────────────────────────────────────────────────────────── */
+const C = [
+  // AM4 · Zen (1000)
+  { g: 'AM4 · Zen (1000)',   n: 'Ryzen 5 1600',    m: 0.40, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen (1000)',   n: 'Ryzen 7 1700X',   m: 0.45, s: 'AM4', w: 70 },
+  { g: 'AM4 · Zen (1000)',   n: 'Ryzen 7 1800X',   m: 0.48, s: 'AM4', w: 75 },
+  // AM4 · Zen+ (2000)
+  { g: 'AM4 · Zen+ (2000)',  n: 'Ryzen 5 2600',    m: 0.55, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen+ (2000)',  n: 'Ryzen 5 2600X',   m: 0.58, s: 'AM4', w: 60 },
+  { g: 'AM4 · Zen+ (2000)',  n: 'Ryzen 7 2700X',   m: 0.62, s: 'AM4', w: 85 },
+  // AM4 · Zen 2 (3000)
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 5 3600',    m: 0.72, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 5 3600X',   m: 0.74, s: 'AM4', w: 55 },
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 7 3700X',   m: 0.78, s: 'AM4', w: 65 },
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 7 3800X',   m: 0.80, s: 'AM4', w: 80 },
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 9 3900X',   m: 0.82, s: 'AM4', w: 100 },
+  { g: 'AM4 · Zen 2 (3000)', n: 'Ryzen 9 3950X',   m: 0.83, s: 'AM4', w: 110 },
+  // AM4 · Zen 3 (5000)
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 5 5500',    m: 0.85, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 5 5600',    m: 0.92, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 5 5600X',   m: 0.95, s: 'AM4', w: 60 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 7 5700',    m: 0.98, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 7 5700X',   m: 1.00, s: 'AM4', w: 55 }, // ← referência
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 7 5700X3D', m: 1.18, s: 'AM4', w: 50 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 7 5800X',   m: 1.02, s: 'AM4', w: 90 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 7 5800X3D', m: 1.20, s: 'AM4', w: 55 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 9 5900X',   m: 1.05, s: 'AM4', w: 110 },
+  { g: 'AM4 · Zen 3 (5000)', n: 'Ryzen 9 5950X',   m: 1.06, s: 'AM4', w: 115 },
+  // AM5 · Zen 4 (7000)
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 5 7600',    m: 1.05, s: 'AM5', w: 60 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 5 7600X',   m: 1.08, s: 'AM5', w: 75 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 7 7700',    m: 1.10, s: 'AM5', w: 65 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 7 7700X',   m: 1.12, s: 'AM5', w: 90 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 7 7800X3D', m: 1.30, s: 'AM5', w: 50 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 9 7900X',   m: 1.15, s: 'AM5', w: 120 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 9 7900X3D', m: 1.25, s: 'AM5', w: 90 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 9 7950X',   m: 1.18, s: 'AM5', w: 130 },
+  { g: 'AM5 · Zen 4 (7000)', n: 'Ryzen 9 7950X3D', m: 1.30, s: 'AM5', w: 100 },
+  // AM5 · Zen 5 (9000)
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 5 9600X',   m: 1.12, s: 'AM5', w: 70 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 7 9700X',   m: 1.18, s: 'AM5', w: 85 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 7 9800X3D', m: 1.40, s: 'AM5', w: 70 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 9 9900X',   m: 1.22, s: 'AM5', w: 110 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 9 9900X3D', m: 1.32, s: 'AM5', w: 95 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 9 9950X',   m: 1.25, s: 'AM5', w: 130 },
+  { g: 'AM5 · Zen 5 (9000)', n: 'Ryzen 9 9950X3D', m: 1.42, s: 'AM5', w: 110 },
+  // LGA1700 · Intel 12ª geração (Alder Lake)
+  { g: 'LGA1700 · Intel 12ª ger.', n: 'Core i3-12100F', m: 0.85, s: 'LGA1700', w: 58 },
+  { g: 'LGA1700 · Intel 12ª ger.', n: 'Core i5-12400F', m: 0.93, s: 'LGA1700', w: 65 },
+  { g: 'LGA1700 · Intel 12ª ger.', n: 'Core i5-12600K', m: 1.00, s: 'LGA1700', w: 95 },
+  { g: 'LGA1700 · Intel 12ª ger.', n: 'Core i7-12700K', m: 1.05, s: 'LGA1700', w: 125 },
+  { g: 'LGA1700 · Intel 12ª ger.', n: 'Core i9-12900K', m: 1.10, s: 'LGA1700', w: 145 },
+  // LGA1700 · Intel 13ª/14ª geração (Raptor Lake)
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i5-13400F', m: 0.98, s: 'LGA1700', w: 85 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i5-13600K', m: 1.10, s: 'LGA1700', w: 120 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i7-13700K', m: 1.16, s: 'LGA1700', w: 150 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i9-13900K', m: 1.22, s: 'LGA1700', w: 180 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i5-14600K', m: 1.12, s: 'LGA1700', w: 125 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i7-14700K', m: 1.18, s: 'LGA1700', w: 160 },
+  { g: 'LGA1700 · Intel 13ª/14ª ger.', n: 'Core i9-14900K', m: 1.24, s: 'LGA1700', w: 190 },
+  // LGA1851 · Core Ultra 200S (Arrow Lake)
+  { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 5 245K', m: 1.10, s: 'LGA1851', w: 110 },
+  { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 7 265K', m: 1.15, s: 'LGA1851', w: 125 },
+  { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 9 285K', m: 1.20, s: 'LGA1851', w: 145 },
+];
+
+/* ─────────────────────────────────────────────────────────────
+   3. BASE DE DADOS DE GPUs
+   m   : multiplicador relativo ao RTX 5070 = 1.00
+   v   : VRAM em GB
+   gen : geração ('gtx10'|'gtx16'|'rtx20'|'rtx30'|'rtx40'|'rtx50')
+   ───────────────────────────────────────────────────────────── */
+const GP = [
+  // GTX 10 (Pascal) — sem RT cores
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1050',        m: 0.07, v: 2,  gen: 'gtx10', w: 70 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1050 Ti',     m: 0.09, v: 4,  gen: 'gtx10', w: 75 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1060 3GB',    m: 0.13, v: 3,  gen: 'gtx10', w: 110 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1060 6GB',    m: 0.15, v: 6,  gen: 'gtx10', w: 120 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1070',        m: 0.22, v: 8,  gen: 'gtx10', w: 145 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1070 Ti',     m: 0.26, v: 8,  gen: 'gtx10', w: 175 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1080',        m: 0.28, v: 8,  gen: 'gtx10', w: 185 },
+  { g: 'GTX 10 (Pascal)',        n: 'GTX 1080 Ti',     m: 0.35, v: 11, gen: 'gtx10', w: 220 },
+  // GTX 16 (Turing sem RT cores)
+  { g: 'GTX 16 (Turing sem RT)', n: 'GTX 1650',        m: 0.09, v: 4,  gen: 'gtx16', w: 75 },
+  { g: 'GTX 16 (Turing sem RT)', n: 'GTX 1650 Super',  m: 0.13, v: 4,  gen: 'gtx16', w: 95 },
+  { g: 'GTX 16 (Turing sem RT)', n: 'GTX 1660',        m: 0.15, v: 6,  gen: 'gtx16', w: 110 },
+  { g: 'GTX 16 (Turing sem RT)', n: 'GTX 1660 Super',  m: 0.18, v: 6,  gen: 'gtx16', w: 125 },
+  { g: 'GTX 16 (Turing sem RT)', n: 'GTX 1660 Ti',     m: 0.20, v: 6,  gen: 'gtx16', w: 130 },
+  // RTX 20 (Turing — 1ª geração RT)
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2060',        m: 0.22, v: 6,  gen: 'rtx20', w: 160 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2060 Super',  m: 0.26, v: 8,  gen: 'rtx20', w: 175 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2070',        m: 0.28, v: 8,  gen: 'rtx20', w: 175 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2070 Super',  m: 0.32, v: 8,  gen: 'rtx20', w: 215 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2080',        m: 0.34, v: 8,  gen: 'rtx20', w: 215 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2080 Super',  m: 0.36, v: 8,  gen: 'rtx20', w: 245 },
+  { g: 'RTX 20 (Turing)',        n: 'RTX 2080 Ti',     m: 0.42, v: 11, gen: 'rtx20', w: 270 },
+  // RTX 30 (Ampere)
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3050',        m: 0.25, v: 8,  gen: 'rtx30', w: 130 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3060 8GB',    m: 0.30, v: 8,  gen: 'rtx30', w: 170 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3060 12GB',   m: 0.32, v: 12, gen: 'rtx30', w: 170 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3060 Ti',     m: 0.42, v: 8,  gen: 'rtx30', w: 200 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3070',        m: 0.48, v: 8,  gen: 'rtx30', w: 220 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3070 Ti',     m: 0.52, v: 8,  gen: 'rtx30', w: 290 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3080 10GB',   m: 0.62, v: 10, gen: 'rtx30', w: 320 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3080 12GB',   m: 0.65, v: 12, gen: 'rtx30', w: 350 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3080 Ti',     m: 0.72, v: 12, gen: 'rtx30', w: 350 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3090',        m: 0.75, v: 24, gen: 'rtx30', w: 360 },
+  { g: 'RTX 30 (Ampere)',        n: 'RTX 3090 Ti',     m: 0.85, v: 24, gen: 'rtx30', w: 450 },
+  // RTX 40 (Ada Lovelace)
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4060',        m: 0.48, v: 8,  gen: 'rtx40', w: 115 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4060 Ti 8GB', m: 0.55, v: 8,  gen: 'rtx40', w: 160 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4060 Ti 16GB',m: 0.58, v: 16, gen: 'rtx40', w: 165 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4070',        m: 0.75, v: 12, gen: 'rtx40', w: 200 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4070 Super',  m: 0.88, v: 12, gen: 'rtx40', w: 220 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4070 Ti',     m: 1.02, v: 12, gen: 'rtx40', w: 280 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4070 Ti Super',m:1.12, v: 16, gen: 'rtx40', w: 285 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4080',        m: 1.28, v: 16, gen: 'rtx40', w: 305 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4080 Super',  m: 1.32, v: 16, gen: 'rtx40', w: 320 },
+  { g: 'RTX 40 (Ada Lovelace)',  n: 'RTX 4090',        m: 1.55, v: 24, gen: 'rtx40', w: 425 },
+  // RTX 50 (Blackwell)
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5050',        m: 0.45, v: 8,  gen: 'rtx50', w: 130 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5060',        m: 0.62, v: 8,  gen: 'rtx50', w: 145 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5060 Ti 8GB', m: 0.75, v: 8,  gen: 'rtx50', w: 180 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5060 Ti 16GB',m: 0.78, v: 16, gen: 'rtx50', w: 180 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5070',        m: 1.00, v: 12, gen: 'rtx50', w: 250 }, // ← referência
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5070 Ti',     m: 1.22, v: 16, gen: 'rtx50', w: 300 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5080',        m: 1.50, v: 16, gen: 'rtx50', w: 360 },
+  { g: 'RTX 50 (Blackwell)',     n: 'RTX 5090',        m: 2.05, v: 32, gen: 'rtx50', w: 575 },
+  // RX 6000 (RDNA 2)
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6600',         m: 0.32, v: 8,  gen: 'rdna2', w: 132 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6600 XT',      m: 0.38, v: 8,  gen: 'rdna2', w: 160 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6650 XT',      m: 0.40, v: 8,  gen: 'rdna2', w: 176 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6700 XT',      m: 0.50, v: 12, gen: 'rdna2', w: 230 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6750 XT',      m: 0.53, v: 12, gen: 'rdna2', w: 250 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6800',         m: 0.58, v: 16, gen: 'rdna2', w: 250 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6800 XT',      m: 0.65, v: 16, gen: 'rdna2', w: 300 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6900 XT',      m: 0.72, v: 16, gen: 'rdna2', w: 300 },
+  { g: 'RX 6000 (RDNA 2)',       n: 'RX 6950 XT',      m: 0.78, v: 16, gen: 'rdna2', w: 335 },
+  // RX 7000 (RDNA 3)
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7600',         m: 0.48, v: 8,  gen: 'rdna3', w: 165 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7600 XT',      m: 0.52, v: 16, gen: 'rdna3', w: 190 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7700 XT',      m: 0.68, v: 12, gen: 'rdna3', w: 245 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7800 XT',      m: 0.80, v: 16, gen: 'rdna3', w: 263 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7900 GRE',     m: 0.88, v: 16, gen: 'rdna3', w: 260 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7900 XT',      m: 1.08, v: 20, gen: 'rdna3', w: 315 },
+  { g: 'RX 7000 (RDNA 3)',       n: 'RX 7900 XTX',     m: 1.25, v: 24, gen: 'rdna3', w: 355 },
+  // RX 9000 (RDNA 4)
+  { g: 'RX 9000 (RDNA 4)',       n: 'RX 9060 XT 8GB',  m: 0.72, v: 8,  gen: 'rdna4', w: 160 },
+  { g: 'RX 9000 (RDNA 4)',       n: 'RX 9060 XT 16GB', m: 0.75, v: 16, gen: 'rdna4', w: 165 },
+  { g: 'RX 9000 (RDNA 4)',       n: 'RX 9070',         m: 1.02, v: 16, gen: 'rdna4', w: 220 },
+  { g: 'RX 9000 (RDNA 4)',       n: 'RX 9070 XT',      m: 1.15, v: 16, gen: 'rdna4', w: 304 },
+];
+
+
+/* ─────────────────────────────────────────────────────────────
+   3b. BASE DE DADOS DE PLACAS-MÃE
+   m : multiplicador de sustentação de boost (VRM quality)
+   s : socket compatível ('AM4' | 'AM5')
+   ───────────────────────────────────────────────────────────── */
+const MB = [
+  // AM4 · Série 400
+  { g: 'AM4 · Série 400', n: 'A320 (sem OC)',      s: 'AM4', m: 0.96 },
+  { g: 'AM4 · Série 400', n: 'B450',               s: 'AM4', m: 0.98 },
+  { g: 'AM4 · Série 400', n: 'X470',               s: 'AM4', m: 0.99 },
+  // AM4 · Série 500
+  { g: 'AM4 · Série 500', n: 'B550',               s: 'AM4', m: 1.00 }, // ← referência
+  { g: 'AM4 · Série 500', n: 'X570',               s: 'AM4', m: 1.00 },
+  { g: 'AM4 · Série 500', n: 'X570S',              s: 'AM4', m: 1.00 },
+  // AM5 · Série 600
+  { g: 'AM5 · Série 600', n: 'A620 (sem OC)',      s: 'AM5', m: 0.96 },
+  { g: 'AM5 · Série 600', n: 'B650',               s: 'AM5', m: 0.98 },
+  { g: 'AM5 · Série 600', n: 'B650E (PCIe 5.0)',   s: 'AM5', m: 0.99 },
+  { g: 'AM5 · Série 600', n: 'X670',               s: 'AM5', m: 1.00 },
+  { g: 'AM5 · Série 600', n: 'X670E (PCIe 5.0)',   s: 'AM5', m: 1.00 },
+  // AM5 · Série 800
+  { g: 'AM5 · Série 800', n: 'B850',               s: 'AM5', m: 1.00 },
+  { g: 'AM5 · Série 800', n: 'X870',               s: 'AM5', m: 1.01 },
+  { g: 'AM5 · Série 800', n: 'X870E (PCIe 5.0)',   s: 'AM5', m: 1.01 },
+  // LGA1700 · Intel série 600/700
+  { g: 'LGA1700 · Série 600/700', n: 'H610 (sem OC)',   s: 'LGA1700', m: 0.96 },
+  { g: 'LGA1700 · Série 600/700', n: 'B660',            s: 'LGA1700', m: 0.98 },
+  { g: 'LGA1700 · Série 600/700', n: 'B760',            s: 'LGA1700', m: 0.99 },
+  { g: 'LGA1700 · Série 600/700', n: 'Z690',            s: 'LGA1700', m: 1.00 },
+  { g: 'LGA1700 · Série 600/700', n: 'Z790',            s: 'LGA1700', m: 1.00 },
+  // LGA1851 · Intel série 800
+  { g: 'LGA1851 · Série 800',     n: 'B860',            s: 'LGA1851', m: 1.00 },
+  { g: 'LGA1851 · Série 800',     n: 'Z890',            s: 'LGA1851', m: 1.01 },
+];
+
+// Marcadores por taxa de atualização (Hz) [intermediário, máximo]
+const HZ_MARKERS = {
+   60: [{ v:  30, l: '30' }, { v:  60, l:  '60 Hz' }],
+  144: [{ v:  60, l: '60' }, { v: 120, l: '120' }, { v: 144, l: '144 Hz' }],
+  210: [{ v:  60, l: '60' }, { v: 120, l: '120' }, { v: 210, l: '210 Hz' }],
+  300: [{ v:  60, l: '60' }, { v: 144, l: '144' }, { v: 300, l: '300 Hz' }],
+};
+
+/* ─────────────────────────────────────────────────────────────
+   4. TABELAS DE CONSTANTES
+   ───────────────────────────────────────────────────────────── */
+const PRESETS = [
+  { k: 'max',       n: 'Máximo',    m: 1.00 },
+  { k: 'cinematic', n: 'Cinematic', m: 1.05 },
+  { k: 'veryhigh',  n: 'Very High', m: 1.12 },
+  { k: 'ultra',     n: 'Ultra',     m: 1.20 },
+  { k: 'high',      n: 'High',      m: 1.40 },
+  { k: 'medium',    n: 'Medium',    m: 1.70 },
+  { k: 'low',       n: 'Low',       m: 2.20 },
+];
+
+const DLSS = [
+  { k: 'qual',   n: 'DLSS Qualidade',     m: 0.92, rtx: true  },
+  { k: 'bal',    n: 'DLSS Balanceado',    m: 1.00, rtx: true  },
+  { k: 'perf',   n: 'DLSS Performance',   m: 1.12, rtx: true  },
+  { k: 'dlaa',   n: 'DLAA',              m: 0.65, rtx: true  },
+  { k: 'native', n: 'Nativo (sem DLSS)', m: 0.60, rtx: false },
+];
+
+// Upscaling AMD (Radeon) — mesmos multiplicadores dos níveis DLSS equivalentes
+const FSR = [
+  { k: 'qual',   n: 'FSR Qualidade',    m: 0.92 },
+  { k: 'bal',    n: 'FSR Balanceado',   m: 1.00 },
+  { k: 'perf',   n: 'FSR Performance',  m: 1.12 },
+  { k: 'naa',    n: 'FSR Native AA',    m: 0.65 },
+  { k: 'native', n: 'Nativo (sem FSR)', m: 0.60 },
+];
+
+// Versão da base de dados — atualize ao mexer em G/C/GP/MB
+const DB_META = { v: '2.0', updated: 'julho de 2026' };
+
+// Ajuste de VRAM por preset (relativo ao Ultra como base)
+const VRAM_PRE = {
+  max: 0, cinematic: 0.5, veryhigh: -0.5,
+  ultra: -1, high: -1.5, medium: -2.5, low: -4,
+};
+
+// Nomes legíveis das opções de RAM
+const RAM_LABELS = {
+  ddr4_16:     'DDR4 16GB DC 3200',
+  ddr4_32:     'DDR4 32GB DC 3200',
+  ddr4_64:     'DDR4 64GB DC 3200',
+  ddr5_4800_16:'DDR5 16GB DC 4800',
+  ddr5_4800_32:'DDR5 32GB DC 4800',
+  ddr5_4800_64:'DDR5 64GB DC 4800',
+  ddr5_16:     'DDR5 16GB DC 5200',
+  ddr5_32:     'DDR5 32GB DC 5200',
+  ddr5_64:     'DDR5 64GB DC 5200',
+};
+
+
+
+const PRESETS_BUILD = {
+  // ── 1080p ──────────────────────────────────────────────────
+  '1080p_eco':  { cpu:  6, gpu: 22, mobo:  1, ram: 'ddr4_16', res: '1080p',
+                  preset: 'high',  rt: 'off', dlss: 1.0,  fg: 1    },
+  '1080p_mid':  { cpu: 14, gpu: 31, mobo:  3, ram: 'ddr4_32', res: '1080p',
+                  preset: 'ultra', rt: 'rt',  dlss: 1.0,  fg: 1    },
+  '1080p_max':  { cpu: 19, gpu: 35, mobo:  3, ram: 'ddr4_32', res: '1080p',
+                  preset: 'ultra', rt: 'rt',  dlss: 1.0,  fg: 1    },
+  // ── 1440p ──────────────────────────────────────────────────
+  '1440p_eco':  { cpu: 14, gpu: 33, mobo:  3, ram: 'ddr4_32', res: '1440p',
+                  preset: 'high',  rt: 'off', dlss: 1.0,  fg: 1    },
+  '1440p_mid':  { cpu: 19, gpu: 34, mobo:  3, ram: 'ddr4_32', res: '1440p',
+                  preset: 'ultra', rt: 'rt',  dlss: 1.0,  fg: 1.78 },
+  '1440p_max':  { cpu: 26, gpu: 46, mobo:  8, ram: 'ddr5_32', res: '1440p',
+                  preset: 'ultra', rt: 'rr',  dlss: 1.0,  fg: 1.78 },
+  // ── 4K ─────────────────────────────────────────────────────
+  '4k_eco':     { cpu: 19, gpu: 35, mobo:  3, ram: 'ddr4_32', res: '4k',
+                  preset: 'high',  rt: 'off', dlss: 1.12, fg: 1.78 },
+  '4k_mid':     { cpu: 26, gpu: 39, mobo:  8, ram: 'ddr5_32', res: '4k',
+                  preset: 'ultra', rt: 'rt',  dlss: 1.0,  fg: 1.78 },
+  '4k_max':     { cpu: 33, gpu: 48, mobo: 13, ram: 'ddr5_64', res: '4k',
+                  preset: 'max',   rt: 'rr',  dlss: 1.0,  fg: 3.15 },
+};
+
+const SYSTEM_W = 80;
+
+</script>
+<script>
+/* =============================================================
+   ESTIMADOR DE FPS — lógica do redesign (mobile dark)
+   Cálculo portado 1:1 do app original; UI reescrita.
+   ============================================================= */
+
+/* ── Utilidades ──────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+}[c]));
+const shortCPU = n => n.replace('Ryzen ', 'R').replace('Core Ultra ', 'Ultra ').replace('Core ', '');
+
+/* Capacidades por geração de GPU */
+const isRadeon = gp => gp.gen.indexOf('rdna') === 0;
+const hasRTHW  = gp => gp.gen !== 'gtx10' && gp.gen !== 'gtx16';
+const canRRHW  = gp => gp.gen === 'rtx40' || gp.gen === 'rtx50';
+const hasFGHW  = gp => gp.gen === 'rtx40' || gp.gen === 'rtx50' || gp.gen === 'rdna3' || gp.gen === 'rdna4';
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+function copyText(txt) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(txt).then(() => true).catch(() => legacyCopy(txt));
+  }
+  return Promise.resolve(legacyCopy(txt));
+}
+function legacyCopy(txt) {
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+/* ── Estado ──────────────────────────────────────────────── */
+const ST_KEY = 'fps:state:v2';
+const H_KEY  = 'fps:hist:v1';
+
+const st = {
+  game: 2, cpu: 16, gpu: 45, mobo: 3,
+  ram: 'ddr4_32', res: '1440p', preset: 'ultra',
+  rt: 'off', fg: 1, dlss: 1.0, monHz: 144,
+  hoursDay: 3, tariff: 0.95,
+};
+
+function persistState() {
+  try { localStorage.setItem(ST_KEY, JSON.stringify(st)); } catch (e) {}
+  syncProfile();
+}
+function restoreState() {
+  try {
+    const raw = localStorage.getItem(ST_KEY);
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (typeof s.game === 'number' && G[s.game] &&
+        typeof s.cpu === 'number' && C[s.cpu] &&
+        typeof s.gpu === 'number' && GP[s.gpu] &&
+        typeof s.mobo === 'number' && MB[s.mobo]) {
+      Object.assign(st, s);
+    }
+  } catch (e) {}
+}
+
+/* ── Opções dinâmicas (portadas do original) ─────────────── */
+function ramOptionsFor(sock) {
+  const ddr4 = lbl => [
+    { k: 'ddr4_16', n: 'DDR4 16GB DC 3200', g: lbl },
+    { k: 'ddr4_32', n: 'DDR4 32GB DC 3200', g: lbl },
+    { k: 'ddr4_64', n: 'DDR4 64GB DC 3200', g: lbl },
+  ];
+  const ddr5 = [
+    { k: 'ddr5_4800_16', n: 'DDR5 16GB DC 4800', g: 'DDR5 mínimo — 4800 MT/s' },
+    { k: 'ddr5_4800_32', n: 'DDR5 32GB DC 4800', g: 'DDR5 mínimo — 4800 MT/s' },
+    { k: 'ddr5_4800_64', n: 'DDR5 64GB DC 4800', g: 'DDR5 mínimo — 4800 MT/s' },
+    { k: 'ddr5_16',      n: 'DDR5 16GB DC 5200', g: 'DDR5 padrão — 5200 MT/s' },
+    { k: 'ddr5_32',      n: 'DDR5 32GB DC 5200', g: 'DDR5 padrão — 5200 MT/s' },
+    { k: 'ddr5_64',      n: 'DDR5 64GB DC 5200', g: 'DDR5 padrão — 5200 MT/s' },
+  ];
+  if (sock === 'AM4') return ddr4('DDR4 (AM4)');
+  if (sock === 'LGA1700') return ddr4('DDR4 (LGA1700)').concat(ddr5);
+  return ddr5;
+}
+
+function rtOptionsFor(s = st) {
+  const game = G[s.game], gpu = GP[s.gpu];
+  if (game.rt === 'none') return { show: false, label: 'Ray Tracing', opts: [] };
+  const noRT  = !hasRTHW(gpu);
+  const canRR = canRRHW(gpu);
+  let label = 'Ray Tracing';
+  const opts = [];
+  if (game.rt === 'pt') {
+    if (canRR) opts.push({ k: 'rr',  n: game.rrN || 'Path Tracing + RR' });
+    if (!noRT) opts.push({ k: 'rt',  n: game.rtN || 'Ray Tracing' });
+    opts.push(           { k: 'off', n: 'Desativado' });
+  } else if (game.rt === 'rt') {
+    if (!noRT) opts.push({ k: 'rt',  n: game.rtN || 'Ray Tracing Ligado' });
+    opts.push(           { k: 'off', n: 'RT Desativado' });
+  } else if (game.rt === 'lumen') {
+    label = 'Lumen';
+    if (!noRT) opts.push({ k: 'rr', n: 'Hardware Lumen' });
+    opts.push(           { k: 'rt',  n: 'Software Lumen' });
+    opts.push(           { k: 'off', n: 'Lumen Off' });
+  }
+  return { show: true, label, opts };
+}
+
+function fgOptionsFor(gpu) {
+  const opts = [{ v: 1, n: 'Desativado' }];
+  if (hasFGHW(gpu)) opts.push({ v: 1.78, n: isRadeon(gpu) ? 'FSR 3 Frame Gen 2×' : '2× Frame Gen' });
+  if (gpu.gen === 'rtx50') opts.push({ v: 3.15, n: '4× MFG (RTX 50)' });
+  return opts;
+}
+
+function dlssOptionsFor(gpu) {
+  if (isRadeon(gpu)) return FSR;
+  return hasRTHW(gpu) ? DLSS : DLSS.filter(o => !o.rtx);
+}
+function upscalerName(s) {
+  const list = dlssOptionsFor(GP[s.gpu]);
+  return (list.find(o => o.m === +s.dlss) || {}).n || '';
+}
+
+function normalizeS(s) {
+  const cpu = C[s.cpu], gpu = GP[s.gpu];
+  const ramOpts = ramOptionsFor(cpu.s);
+  if (!ramOpts.find(o => o.k === s.ram)) s.ram = cpu.s === 'AM4' ? 'ddr4_32' : 'ddr5_32';
+  const mFilt = MB.map((m, i) => ({ ...m, idx: i })).filter(m => m.s === cpu.s);
+  if (!mFilt.find(m => m.idx === s.mobo)) s.mobo = mFilt[0].idx;
+  const ro = rtOptionsFor(s);
+  if (!ro.show) s.rt = 'off';
+  else if (!ro.opts.find(o => o.k === s.rt)) s.rt = ro.opts[0].k;
+  const fo = fgOptionsFor(gpu);
+  if (!fo.find(o => o.v == s.fg)) s.fg = 1;
+  const validD = dlssOptionsFor(gpu).map(o => o.m);
+  if (!validD.includes(+s.dlss)) s.dlss = hasRTHW(gpu) ? 1.0 : 0.60;
+}
+function normalizeState() { normalizeS(st); }
+
+/* ── Cálculo (portado 1:1) ───────────────────────────────── */
+function calcPSU(s = st) {
+  const gpu = GP[s.gpu], cpu = C[s.cpu];
+  const total = (gpu.w || 200) + (cpu.w || 80) + SYSTEM_W;
+  const min = Math.ceil(total / 50) * 50;
+  const rec = Math.ceil(total * 1.35 / 50) * 50;
+  return { min, recommended: rec, total };
+}
+
+function vramRT(rtMode, rtKey) {
+  if (rtKey === 'off') return 0;
+  if (rtMode === 'pt'    && rtKey === 'rr') return 2;
+  if (rtMode === 'pt'    && rtKey === 'rt') return 1;
+  if (rtMode === 'rt'    && rtKey === 'rt') return 1;
+  if (rtMode === 'lumen' && rtKey === 'rr') return 1;
+  if (rtMode === 'lumen' && rtKey === 'rt') return 0.5;
+  return 0;
+}
+
+function calc(s = st) {
+  const game = G[s.game], cpu = C[s.cpu], gpu = GP[s.gpu], mobo = MB[s.mobo];
+  const steps = [];
+
+  const noRT      = !hasRTHW(gpu);
+  const canRR     = canRRHW(gpu);
+  const isRTX2030 = gpu.gen === 'rtx20' || gpu.gen === 'rtx30';
+  const radeon    = isRadeon(gpu);
+
+  let rtKey = s.rt;
+  if (game.rt === 'none') rtKey = 'off';
+  else if (noRT && game.rt !== 'lumen') rtKey = 'off';
+  else if (noRT && game.rt === 'lumen' && rtKey === 'rr') rtKey = 'rt';
+  else if (!canRR && game.rt === 'pt' && rtKey === 'rr') rtKey = 'rt';
+
+  let gpuWarn = '';
+  if (s.rt !== 'off' && noRT && game.rt !== 'none') {
+    gpuWarn = `${gpu.n} não tem RT cores — usando rasterização pura.`;
+  } else if (game.rt === 'pt' && s.rt === 'rr' && (isRTX2030 || radeon)) {
+    gpuWarn = `${gpu.n} não suporta Path Tracing completo — usando Ray Tracing padrão.`;
+  }
+  if (s.fg > 1 && !hasFGHW(gpu)) {
+    gpuWarn = (gpuWarn ? gpuWarn + ' ' : '') + 'Frame Generation não suportado nessa geração.';
+  }
+
+  const rtNames = { rr: game.rrN || 'RT completo', rt: game.rtN || 'Ray Tracing', off: 'sem RT' };
+  const refs = game.r[s.res];
+  let base = refs[rtKey] ?? refs['off'] ?? 100;
+  steps.push({ t: `Benchmark base — ${game.name}`,
+    d: `${s.res.toUpperCase()} · ${rtNames[rtKey] || rtKey} · referência RTX 5070`, m: null, fps: base });
+
+  base *= gpu.m;
+  steps.push({ t: gpu.n, d: 'desempenho relativo da GPU', m: gpu.m, fps: base });
+
+  base *= mobo.m;
+  if (mobo.m !== 1) steps.push({ t: mobo.n, d: 'sustentação de boost (VRM)', m: mobo.m, fps: base });
+
+  const moboWarn = (mobo.m < 0.98 && cpu.m >= 1.00)
+    ? `${mobo.n} pode limitar o boost do ${cpu.n} por VRM insuficiente.` : '';
+
+  const rtActive = rtKey !== 'off';
+  const swLumen  = game.rt === 'lumen' && rtKey === 'rt';
+  if (rtActive && !swLumen) {
+    const rtArch = { rtx20: 0.70, rtx30: 0.85, rdna2: 0.62, rdna3: 0.78, rdna4: 0.95 }[gpu.gen];
+    if (rtArch) {
+      base *= rtArch;
+      steps.push({ t: 'Eficiência de RT da arquitetura', d: gpu.g, m: rtArch, fps: base });
+    }
+  }
+
+  const preM = PRESETS.find(p => p.k === s.preset)?.m || 1;
+  base *= preM;
+  steps.push({ t: `Preset ${PRESETS.find(p => p.k === s.preset)?.n || s.preset}`, d: 'qualidade gráfica', m: preM, fps: base });
+
+  const dlssM = parseFloat(s.dlss) || 1;
+  base *= dlssM;
+  steps.push({ t: upscalerName(s) || 'Upscaler', d: radeon ? 'upscaling FSR' : 'upscaling DLSS', m: dlssM, fps: base });
+
+  const vBase  = game.v[s.res] || 8;
+  const vNeed  = vBase + (VRAM_PRE[s.preset] || 0) + vramRT(game.rt, rtKey);
+  const vAvail = gpu.v;
+  let vBot = false;
+  if (vNeed > vAvail) {
+    vBot = true;
+    const vM = Math.max(1 - Math.min((vNeed - vAvail) / vAvail, 0.55), 0.45);
+    base *= vM;
+    steps.push({ t: 'VRAM insuficiente', d: `precisa ~${Math.round(vNeed * 10) / 10} GB · tem ${vAvail} GB`, m: vM, fps: base });
+  }
+
+  const gpuFpsV = base; // lado GPU, antes do teto de CPU
+
+  const cpuCap = (game.cpuCap || 155) * cpu.m;
+  let cBot = false;
+  if (base > cpuCap) {
+    base = cpuCap; cBot = true;
+    steps.push({ t: `Teto de CPU — ${cpu.n}`, d: 'limite de frames que a CPU prepara', m: null, cap: true, fps: base });
+  }
+
+  const is16 = s.ram.includes('16');
+  const isDDR5_4800 = s.ram.includes('4800');
+  let rBot = false;
+  if (is16) {
+    rBot = true;
+    const rM = game.heavy ? 0.92 : 0.97;
+    base *= rM;
+    steps.push({ t: 'RAM 16 GB', d: 'recomendado: 32 GB', m: rM, fps: base });
+  }
+  if (isDDR5_4800) {
+    base *= 0.975;
+    steps.push({ t: 'DDR5 4800 MT/s', d: 'abaixo do padrão 5200', m: 0.975, fps: base });
+  }
+
+  const fgM  = parseFloat(s.fg) || 1;
+  const bFPS = base;
+  base *= fgM;
+  if (fgM > 1) steps.push({ t: `Frame Generation ×${fgM.toFixed(2)}`, d: 'quadros gerados por IA', m: fgM, fps: base });
+
+  const stutter = vBot || rBot;
+  const minM = stutter ? 0.60 : 0.76;
+  const minL = stutter ? 0.52 : 0.72;
+  const minH = stutter ? 0.66 : 0.80;
+
+  return {
+    avg: Math.round(base),
+    min: Math.round(base * minM),
+    max: Math.round(base * 1.24),
+    avgL: Math.round(base * 0.95),  avgH: Math.round(base * 1.05),
+    minL: Math.round(base * minL),  minH: Math.round(base * minH),
+    maxL: Math.round(base * 1.18),  maxH: Math.round(base * 1.30),
+    cBot, vBot, rBot, gpuWarn, moboWarn,
+    vNeed: Math.round(vNeed * 10) / 10, vAvail,
+    fgM, bFPS: Math.round(bFPS), bMin: Math.round(bFPS * minM),
+    cpuCap: Math.round(cpuCap),
+    gpuFps: Math.round(gpuFpsV),
+    steps,
+  };
+}
+
+function badge(fps) {
+  if (fps < 30)   return { t: 'Injogável',   c: 'var(--bad)',  bg: 'var(--bad-bg)',  glow: false };
+  if (fps < 60)   return { t: 'Tolerável',   c: 'var(--warn)', bg: 'var(--warn-bg)', glow: false };
+  if (fps <= 120) return { t: 'Bom',         c: 'var(--ok)',   bg: 'var(--ok-bg)',   glow: false };
+  if (fps <= 180) return { t: 'Excelente',   c: 'var(--ok)',   bg: 'var(--ok-bg)',   glow: true  };
+  return              { t: '★ Competitivo', c: 'var(--ok)',   bg: 'var(--ok-bg)',   glow: true  };
+}
+
+/* ── Gauge (arco SVG) ────────────────────────────────────── */
+const GAUGE = { cx: 160, cy: 158, r: 120, a0: -110, a1: 110 };
+function gpol(angle, radius) {
+  const rad = angle * Math.PI / 180;
+  return {
+    x: GAUGE.cx + radius * Math.sin(rad),
+    y: GAUGE.cy - radius * Math.cos(rad),
+  };
+}
+function gaugeArcPath() {
+  const p0 = gpol(GAUGE.a0, GAUGE.r), p1 = gpol(GAUGE.a1, GAUGE.r);
+  return `M ${p0.x.toFixed(1)} ${p0.y.toFixed(1)} A ${GAUGE.r} ${GAUGE.r} 0 1 1 ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`;
+}
+let ticksHz = null;
+function buildTicks() {
+  if (ticksHz === st.monHz) return;
+  ticksHz = st.monHz;
+  const g = $('gTicks');
+  g.innerHTML = '';
+  const marks = HZ_MARKERS[st.monHz] || HZ_MARKERS[144];
+  marks.forEach(({ v }) => {
+    const ang = GAUGE.a0 + (v / st.monHz) * (GAUGE.a1 - GAUGE.a0);
+    const pa = gpol(ang, GAUGE.r - 15), pb = gpol(ang, GAUGE.r - 8);
+    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', pa.x); ln.setAttribute('y1', pa.y);
+    ln.setAttribute('x2', pb.x); ln.setAttribute('y2', pb.y);
+    ln.setAttribute('class', v === st.monHz ? 'g-tick hz' : 'g-tick');
+    g.appendChild(ln);
+  });
+  // Rótulos apenas nas extremidades do arco (0 e teto do monitor)
+  [[GAUGE.a0, '0'], [GAUGE.a1, st.monHz + ' Hz']].forEach(([ang, label]) => {
+    const p = gpol(ang, GAUGE.r);
+    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tx.setAttribute('x', p.x);
+    tx.setAttribute('y', 209);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('class', 'g-ticklb');
+    tx.textContent = label;
+    g.appendChild(tx);
+  });
+}
+
+/* ── Animação de números ─────────────────────────────────── */
+const ANIM_MS = 420;
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function animateNumber(el, from, to) {
+  if (from === to || from == null || reducedMotion()) {
+    el.textContent = String(to);
+    return;
+  }
+  const start = performance.now();
+  const tick = now => {
+    const t = Math.min((now - start) / ANIM_MS, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = String(Math.round(from + (to - from) * eased));
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = String(to);
+  };
+  requestAnimationFrame(tick);
+}
+function showDelta(prev, curr) {
+  const holder = $('gDelta');
+  holder.innerHTML = '';
+  if (prev == null || prev === curr) return;
+  const diff = curr - prev;
+  const el = document.createElement('span');
+  el.className = 'delta ' + (diff > 0 ? 'up' : 'dn');
+  el.textContent = (diff > 0 ? '↑' : '↓') + Math.abs(diff);
+  holder.appendChild(el);
+}
+
+/* ── Renderizadores de controles ─────────────────────────── */
+function renderSeg(el, opts, selVal, cb) {
+  el.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'seg-b' + (String(o.v) === String(selVal) ? ' on' : '');
+    b.textContent = o.n;
+    b.addEventListener('click', () => {
+      if (String(o.v) === String(selVal)) return;
+      cb(o.v);
+    });
+    el.appendChild(b);
+  });
+}
+function renderChips(el, opts, selVal, cb) {
+  el.innerHTML = '';
+  opts.forEach(o => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'pill' + (String(o.v) === String(selVal) ? ' on' : '');
+    b.textContent = o.n;
+    b.addEventListener('click', () => cb(o.v));
+    el.appendChild(b);
+  });
+}
+
+/* ── Barras vs monitor ───────────────────────────────────── */
+let barsBuiltHz = null;
+function buildBars() {
+  if (barsBuiltHz === st.monHz) return;
+  barsBuiltHz = st.monHz;
+  const marks = HZ_MARKERS[st.monHz] || HZ_MARKERS[144];
+  const wrap = $('bars');
+  wrap.innerHTML = '';
+  const defs = [
+    { id: 'bMin', lb: '1% low',   color: 'var(--bad)' },
+    { id: 'bAvg', lb: 'Média',    color: 'var(--ok)'  },
+    { id: 'bMax', lb: 'Máximo',   color: 'var(--ok)'  },
+  ];
+  defs.forEach((d, i) => {
+    const row = document.createElement('div');
+    row.className = 'brow';
+    if (i === defs.length - 1) row.style.marginBottom = '0';
+    const hd = document.createElement('div');
+    hd.className = 'bhd';
+    const nm = document.createElement('span');
+    nm.className = 'bname'; nm.textContent = d.lb;
+    const vl = document.createElement('span');
+    vl.className = 'bval'; vl.id = d.id + 'v'; vl.style.color = d.color;
+    hd.appendChild(nm); hd.appendChild(vl);
+    const tr = document.createElement('div');
+    tr.className = 'btrack';
+    const fl = document.createElement('div');
+    fl.className = 'bfill'; fl.id = d.id + 'f';
+    tr.appendChild(fl);
+    marks.forEach(({ v }) => {
+      const mk = document.createElement('div');
+      mk.className = v === st.monHz ? 'bmk hz' : 'bmk';
+      mk.style.left = Math.min(v / st.monHz * 100, 100).toFixed(1) + '%';
+      tr.appendChild(mk);
+    });
+    row.appendChild(hd); row.appendChild(tr);
+    wrap.appendChild(row);
+  });
+  const axis = document.createElement('div');
+  axis.className = 'axis';
+  marks.forEach(({ v, l }) => {
+    const s = document.createElement('span');
+    s.className = 'axlbl';
+    s.style.left = Math.min(v / st.monHz * 100, 100).toFixed(1) + '%';
+    s.textContent = l;
+    axis.appendChild(s);
+  });
+  wrap.appendChild(axis);
+}
+
+/* ── Render principal ────────────────────────────────────── */
+let prevAvg = null, prevMin = null, prevMax = null;
+
+function renderAll() {
+  normalizeState();
+  const r = calc();
+  const b = badge(r.avg);
+  const game = G[st.game], cpu = C[st.cpu], gpu = GP[st.gpu], mobo = MB[st.mobo];
+  const pct = fps => Math.min(fps / st.monHz * 100, 100);
+
+  // Hero
+  $('heroGame').firstChild.textContent = game.name;
+  $('heroBuild').textContent =
+    `${shortCPU(cpu.n)} · ${gpu.n} · ${st.res.toUpperCase()} ${PRESETS.find(p => p.k === st.preset)?.n || ''}`;
+
+  // Gauge
+  buildTicks();
+  const fill = $('gFill');
+  fill.style.stroke = b.c;
+  fill.style.strokeDasharray = `${pct(r.avg).toFixed(1)} 100`;
+  animateNumber($('gNum'), prevAvg, r.avg);
+  showDelta(prevAvg, r.avg);
+  $('gRng').textContent = `${r.avgL} – ${r.avgH} fps`;
+  const bd = $('gBadge');
+  bd.textContent = b.t;
+  bd.className = 'badge' + (b.glow && !reducedMotion() ? ' glow' : '');
+  bd.style.background = b.bg;
+  bd.style.color = b.c;
+
+  // Stats
+  animateNumber($('stMin'), prevMin, r.min);
+  $('stMinR').textContent = `${r.minL} – ${r.minH}`;
+  const pctMon = Math.round(r.avg / st.monHz * 100);
+  $('stPct').textContent = pctMon + '%';
+  $('stPct').style.color = pctMon >= 100 ? 'var(--ok)' : 'var(--tx1)';
+  $('stHz').textContent = `de ${st.monHz} Hz`;
+  animateNumber($('stMax'), prevMax, r.max);
+  $('stMaxR').textContent = `${r.maxL} – ${r.maxH}`;
+
+  // Barras
+  buildBars();
+  const bb = badge(r.avg);
+  $('bMinv').textContent = r.min;
+  $('bAvgv').textContent = r.avg;
+  $('bAvgv').style.color = bb.c;
+  $('bMaxv').textContent = r.max;
+  $('bMinf').style.width = pct(r.min).toFixed(1) + '%';
+  $('bMinf').style.background = 'var(--bad)';
+  $('bAvgf').style.width = pct(r.avg).toFixed(1) + '%';
+  $('bAvgf').style.background = bb.c;
+  $('bMaxf').style.width = pct(r.max).toFixed(1) + '%';
+  $('bMaxf').style.background = 'var(--ok)';
+
+  // Gargalo CPU × GPU
+  renderBneck(r, cpu, gpu);
+
+  // Resoluções lado a lado
+  renderResCmp();
+
+  // Latência
+  $('latline').innerHTML = r.fgM > 1
+    ? `<b>Latência:</b> sente-se como ${r.bMin}–${r.bFPS} FPS reais (antes do Frame Gen ×${r.fgM.toFixed(2)})`
+    : `<b>Latência</b> equivalente ao FPS exibido — sem Frame Generation`;
+
+  // Avisos
+  const warns = [];
+  if (r.cBot)     warns.push(`CPU: ${cpu.n} está limitando — teto estimado de ${r.cpuCap} FPS`);
+  if (r.vBot)     warns.push(`VRAM: jogo requer ~${r.vNeed} GB, GPU possui ${r.vAvail} GB — penalidade aplicada`);
+  if (r.rBot)     warns.push(game.heavy
+    ? `RAM: 16 GB pode causar gagueira em "${game.name}" (recomendado: 32 GB)`
+    : `RAM: 16 GB aplica penalidade leve (recomendado: 32 GB)`);
+  if (r.gpuWarn)  warns.push('GPU: ' + r.gpuWarn);
+  if (r.moboWarn) warns.push('Placa-mãe: ' + r.moboWarn);
+  const wEl = $('warns');
+  wEl.style.display = warns.length ? '' : 'none';
+  wEl.innerHTML = warns.map(w =>
+    `<div class="warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 22 20H2L12 3.5z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r="0.5" fill="currentColor"/></svg><span>${esc(w)}</span></div>`
+  ).join('');
+
+  // PSU
+  const psu = calcPSU();
+  $('psuMin').textContent = psu.min + ' W';
+  $('psuRec').textContent = psu.recommended + ' W';
+  $('psuBd').innerHTML =
+    `Consumo: <b>GPU ${gpu.w || '?'}W</b> + <b>CPU ${cpu.w || '?'}W</b> + <b>Sistema ${SYSTEM_W}W</b> = <b>${psu.total}W</b>`;
+  renderEnergy();
+
+  // Valores das linhas
+  $('vCPU').textContent  = cpu.n;
+  $('vMobo').textContent = mobo.n;
+  $('vRAM').textContent  = RAM_LABELS[st.ram] || st.ram;
+  $('vGPU').textContent  = `${gpu.n} · ${gpu.v} GB`;
+  $('vGame').textContent = game.name;
+
+  // Controles
+  renderSeg($('segHz'), [
+    { v: 60, n: '60 Hz' }, { v: 144, n: '144 Hz' },
+    { v: 210, n: '210 Hz' }, { v: 300, n: '300 Hz' },
+  ], st.monHz, v => { st.monHz = +v; renderAll(); });
+
+  renderSeg($('segRes'), [
+    { v: '1080p', n: '1080p' }, { v: '1440p', n: '1440p' }, { v: '4k', n: '4K' },
+  ], st.res, v => { st.res = v; renderAll(); });
+
+  renderChips($('chipsPre'), PRESETS.map(p => ({ v: p.k, n: p.n })), st.preset,
+    v => { st.preset = v; renderAll(); });
+
+  const ro = rtOptionsFor();
+  $('blkRT').style.display = ro.show ? '' : 'none';
+  if (ro.show) {
+    $('lbRT').textContent = ro.label;
+    renderChips($('chipsRT'), ro.opts.map(o => ({ v: o.k, n: o.n })), st.rt,
+      v => { st.rt = v; renderAll(); });
+  }
+
+  const fo = fgOptionsFor(gpu);
+  $('blkFG').style.display = fo.length > 1 ? '' : 'none';
+  renderChips($('chipsFG'), fo.map(o => ({ v: o.v, n: o.n })), st.fg,
+    v => { st.fg = parseFloat(v); renderAll(); });
+
+  $('lbUp').textContent = isRadeon(gpu) ? 'Upscaling / FSR' : 'Upscaling / DLSS';
+  renderChips($('chipsDLSS'), dlssOptionsFor(gpu).map(o => ({ v: o.m, n: o.n })), st.dlss,
+    v => { st.dlss = parseFloat(v); renderAll(); });
+
+  // Mini bar
+  $('miniNum').textContent = r.avg;
+  const mb = $('miniBadge');
+  mb.textContent = b.t;
+  mb.style.background = b.bg;
+  mb.style.color = b.c;
+  $('miniGame').textContent = game.name;
+
+  prevAvg = r.avg; prevMin = r.min; prevMax = r.max;
+  persistState();
+  if (activeTab === 'comp') renderComp();
+  if (activeTab === 'games') renderGames();
+  if (activeTab === 'upg') renderUpg();
+}
+
+/* ── Bottom sheet genérico ───────────────────────────────── */
+let sheetCfg = null;
+let sheetIsOpen = false;
+
+function openSheet(cfg) {
+  sheetCfg = cfg;
+  $('sheetTitle').textContent = cfg.title;
+  const sw = $('sheetSearchWrap');
+  sw.style.display = cfg.search ? '' : 'none';
+  const inp = $('sheetSearch');
+  inp.value = '';
+  buildSheetList('');
+  $('backdrop').classList.add('on');
+  $('sheet').classList.add('on');
+  sheetIsOpen = true;
+  try { history.pushState({ sheet: 1 }, ''); } catch (e) {}
+  $('sheetBody').scrollTop = 0;
+}
+
+function buildSheetList(filter) {
+  if (!sheetCfg) return;
+  const body = $('sheetBody');
+  body.innerHTML = '';
+  const f = filter.trim().toLowerCase();
+  let any = false;
+  sheetCfg.groups.forEach(gr => {
+    const opts = f
+      ? gr.opts.filter(o => (o.label + ' ' + (o.sub || '')).toLowerCase().includes(f))
+      : gr.opts;
+    if (!opts.length) return;
+    any = true;
+    if (gr.label) {
+      const h = document.createElement('div');
+      h.className = 'opt-grp';
+      h.textContent = gr.label;
+      body.appendChild(h);
+    }
+    opts.forEach(o => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'opt' + (String(o.v) === String(sheetCfg.selected) ? ' sel' : '');
+      btn.innerHTML =
+        `<span class="opt-tx"><span class="opt-nm">${esc(o.label)}</span>` +
+        (o.sub ? `<div class="opt-sb">${esc(o.sub)}</div>` : '') + `</span>` +
+        `<svg class="opt-ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>`;
+      btn.addEventListener('click', () => {
+        const cb = sheetCfg.onPick;
+        closeSheet();
+        cb(o.v);
+      });
+      body.appendChild(btn);
+    });
+  });
+  if (!any) {
+    body.innerHTML = '<div class="opt-empty">Nada encontrado</div>';
+  }
+}
+
+function closeSheet(fromPop) {
+  if (!sheetIsOpen) return;
+  sheetIsOpen = false;
+  $('backdrop').classList.remove('on');
+  $('sheet').classList.remove('on');
+  if (!fromPop) {
+    try { if (history.state && history.state.sheet) history.back(); } catch (e) {}
+  }
+}
+
+/* ── Sheets específicos ──────────────────────────────────── */
+function sheetCPU() {
+  const groups = [];
+  let cur = null;
+  C.forEach((d, i) => {
+    if (!cur || cur.label !== d.g) { cur = { label: d.g, opts: [] }; groups.push(cur); }
+    cur.opts.push({ v: i, label: d.n, sub: `${d.s} · ~${d.w} W` });
+  });
+  openSheet({
+    title: 'Processador', search: true, groups, selected: st.cpu,
+    onPick: v => { st.cpu = +v; renderAll(); },
+  });
+}
+function sheetGPU() {
+  const groups = [];
+  let cur = null;
+  GP.forEach((d, i) => {
+    if (!cur || cur.label !== d.g) { cur = { label: d.g, opts: [] }; groups.push(cur); }
+    cur.opts.push({ v: i, label: d.n, sub: `${d.v} GB VRAM · ~${d.w} W` });
+  });
+  openSheet({
+    title: 'Placa de vídeo', search: true, groups, selected: st.gpu,
+    onPick: v => { st.gpu = +v; renderAll(); },
+  });
+}
+function sheetMobo() {
+  const sock = C[st.cpu].s;
+  const groups = [];
+  let cur = null;
+  MB.forEach((d, i) => {
+    if (d.s !== sock) return;
+    if (!cur || cur.label !== d.g) { cur = { label: d.g, opts: [] }; groups.push(cur); }
+    cur.opts.push({ v: i, label: d.n });
+  });
+  openSheet({
+    title: 'Placa-mãe', search: false, groups, selected: st.mobo,
+    onPick: v => { st.mobo = +v; renderAll(); },
+  });
+}
+function sheetRAM() {
+  const opts = ramOptionsFor(C[st.cpu].s);
+  const groups = [];
+  let cur = null;
+  opts.forEach(o => {
+    if (!cur || cur.label !== o.g) { cur = { label: o.g, opts: [] }; groups.push(cur); }
+    cur.opts.push({ v: o.k, label: o.n });
+  });
+  openSheet({
+    title: 'Memória RAM', search: false, groups, selected: st.ram,
+    onPick: v => { st.ram = v; renderAll(); },
+  });
+}
+function sheetGame() {
+  const groups = [];
+  let cur = null;
+  G.forEach((d, i) => {
+    if (!cur || cur.label !== d.grp) { cur = { label: d.grp, opts: [] }; groups.push(cur); }
+    cur.opts.push({ v: i, label: d.name });
+  });
+  openSheet({
+    title: 'Jogo', search: true, groups, selected: st.game,
+    onPick: v => { st.game = +v; renderAll(); },
+  });
+}
+
+/* ── Builds prontos ──────────────────────────────────────── */
+const TIER_NAMES = { eco: 'Econômico', mid: 'Médio', max: 'Máximo' };
+function buildPresetCards() {
+  const wrap = $('presetScroll');
+  wrap.innerHTML = '';
+  Object.keys(PRESETS_BUILD).forEach(key => {
+    const p = PRESETS_BUILD[key];
+    const [res, tier] = key.split('_');
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'pcard';
+    card.innerHTML =
+      `<div class="pcard-res">${esc(res.toUpperCase())}</div>` +
+      `<div class="pcard-tier">${esc(TIER_NAMES[tier] || tier)}</div>` +
+      `<div class="pcard-hw">${esc(shortCPU(C[p.cpu].n))}<br/>${esc(GP[p.gpu].n)}</div>`;
+    card.addEventListener('click', () => {
+      Object.assign(st, p);
+      renderAll();
+      toast(`Build ${res.toUpperCase()} ${TIER_NAMES[tier]} aplicado`);
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' });
+    });
+    wrap.appendChild(card);
+  });
+}
+
+/* ── Histórico ───────────────────────────────────────────── */
+function loadHist() {
+  try { return JSON.parse(localStorage.getItem(H_KEY)) || []; } catch (e) { return []; }
+}
+function saveHist(list) {
+  try { localStorage.setItem(H_KEY, JSON.stringify(list)); } catch (e) {}
+}
+function saveBuild() {
+  const list = loadHist();
+  list.unshift({ id: Date.now(), ts: Date.now(), s: { ...st } });
+  if (list.length > 30) list.length = 30;
+  saveHist(list);
+  toast('Build salvo no histórico');
+  renderHist();
+}
+function fmtDate(ts) {
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2, '0');
+  return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function renderHist() {
+  const list = loadHist();
+  const wrap = $('histList');
+  wrap.innerHTML = '';
+  if (!list.length) {
+    wrap.innerHTML =
+      `<div class="empty">` +
+      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>` +
+      `<div class="empty-tt">Nenhum build salvo</div>` +
+      `<p>Na aba Calcular, toque no ícone de salvar para guardar o build atual aqui.</p></div>`;
+    return;
+  }
+  list.forEach(e => {
+    const r = calc(e.s);
+    const b = badge(r.avg);
+    const game = G[e.s.game], cpu = C[e.s.cpu], gpu = GP[e.s.gpu];
+    const presetN = PRESETS.find(p => p.k === e.s.preset)?.n || e.s.preset;
+    const card = document.createElement('div');
+    card.className = 'hcard';
+    card.innerHTML =
+      `<div class="hcard-top">` +
+      `  <div class="hcard-tx">` +
+      `    <div class="hcard-game">${esc(game.name)}</div>` +
+      `    <div class="hcard-hw">${esc(shortCPU(cpu.n))} + ${esc(gpu.n)}<br/>${esc(RAM_LABELS[e.s.ram] || e.s.ram)} · ${esc(MB[e.s.mobo].n)}</div>` +
+      `  </div>` +
+      `  <div class="hcard-fps">` +
+      `    <div class="hcard-num">${r.avg}<small> FPS</small></div>` +
+      `    <span class="hcard-badge" style="background:${b.bg};color:${b.c}">${esc(b.t)}</span>` +
+      `  </div>` +
+      `</div>` +
+      `<div class="hcard-meta">` +
+      `  <span class="htag">${esc(e.s.res.toUpperCase())}</span>` +
+      `  <span class="htag">${esc(presetN)}</span>` +
+      `  <span class="htag">${esc(e.s.monHz)} Hz</span>` +
+      `  <span class="htag" style="margin-left:auto;border:none;background:none;color:var(--tx3)">${fmtDate(e.ts)}</span>` +
+      `</div>` +
+      `<div class="hcard-acts">` +
+      `  <button class="hbtn primary" data-act="load"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12m0 0 5-5m-5 5-5-5"/><path d="M5 20h14"/></svg>Carregar</button>` +
+      `  <button class="hbtn" data-act="comp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7h12m0 0-3.5-3.5M20 7l-3.5 3.5M16 17H4m0 0 3.5-3.5M4 17l3.5 3.5"/></svg>Comparar</button>` +
+      `  <button class="hbtn" data-act="share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="12" r="2.4"/><circle cx="17.5" cy="5.5" r="2.4"/><circle cx="17.5" cy="18.5" r="2.4"/><path d="M8.4 10.8 15.1 6.9M8.4 13.2l6.7 3.9"/></svg></button>` +
+      `  <button class="hbtn danger" data-act="del"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5"/></svg></button>` +
+      `</div>`;
+    card.querySelector('[data-act="load"]').addEventListener('click', () => {
+      Object.assign(st, e.s);
+      renderAll();
+      setTab('calc');
+      toast('Build carregado');
+    });
+    card.querySelector('[data-act="comp"]').addEventListener('click', () => {
+      compBId = e.id;
+      setTab('comp');
+    });
+    card.querySelector('[data-act="share"]').addEventListener('click', () => shareState(e.s));
+    card.querySelector('[data-act="del"]').addEventListener('click', () => {
+      const nl = loadHist().filter(x => x.id !== e.id);
+      saveHist(nl);
+      if (compBId === e.id) compBId = null;
+      renderHist();
+      toast('Build excluído');
+    });
+    wrap.appendChild(card);
+  });
+}
+
+/* ── Comparar ────────────────────────────────────────────── */
+let compBId = null;
+
+function buildLabel(s) {
+  return `${G[s.game].name}`;
+}
+function buildHwLine(s) {
+  return `${shortCPU(C[s.cpu].n)} · ${GP[s.gpu].n} · ${s.res.toUpperCase()}`;
+}
+
+function cmpRow(label, va, vb, unit, higherBetter) {
+  const mx = Math.max(va, vb, 1);
+  const winA = higherBetter ? va > vb : va < vb;
+  const winB = higherBetter ? vb > va : vb < va;
+  let deltaHtml = '';
+  if (va !== vb && vb > 0) {
+    const d = Math.round((va - vb) / vb * 100);
+    const good = higherBetter ? d > 0 : d < 0;
+    deltaHtml = `<span class="cmp-delta ${good ? 'up' : 'dn'}">A ${d > 0 ? '+' : ''}${d}%</span>`;
+  }
+  return `<div class="cmp-row">` +
+    `<div class="cmp-lb"><span>${esc(label)}</span>${deltaHtml}</div>` +
+    `<div class="cmp-pair">` +
+    `<div class="cmp-line${winA ? ' cmp-win' : ''}"><span class="cmp-tag">A</span>` +
+    `<div class="cmp-track"><div class="cmp-fill" style="width:${(va / mx * 100).toFixed(1)}%;background:var(--acc)"></div></div>` +
+    `<span class="cmp-val">${va}${unit}</span></div>` +
+    `<div class="cmp-line${winB ? ' cmp-win' : ''}"><span class="cmp-tag">B</span>` +
+    `<div class="cmp-track"><div class="cmp-fill" style="width:${(vb / mx * 100).toFixed(1)}%;background:var(--info)"></div></div>` +
+    `<span class="cmp-val">${vb}${unit}</span></div>` +
+    `</div></div>`;
+}
+
+/* ── 6. Comparar em todos os jogos ── */
+let cmpMode = 'game';
+function renderCompAll(body, entry) {
+  const rows = G.map((g, i) => {
+    const sa = { ...st, game: i };      normalizeS(sa);
+    const sb = { ...entry.s, game: i }; normalizeS(sb);
+    const a = calc(sa).avg, b = calc(sb).avg;
+    return { g, a, b, d: a ? Math.round((b - a) / a * 100) : 0 };
+  }).sort((x, y) => y.d - x.d);
+  const bw = rows.filter(r => r.b > r.a).length;
+  const avgD = Math.round(rows.reduce((s, r) => s + r.d, 0) / rows.length);
+  body.innerHTML =
+    `<p class="ca-sum"><b style="color:var(--info)">B</b> ganha em ${bw} de ${rows.length} jogos · diferença média ${avgD > 0 ? '+' : ''}${avgD}%</p>` +
+    `<div class="card">` + rows.map(r => {
+      const cls = r.d > 1 ? 'up' : (r.d < -1 ? 'dn' : 'eq');
+      return `<div class="ca-row"><div><div class="ca-nm">${esc(r.g.name)}</div>` +
+        `<div class="ca-ab">A ${r.a} → B ${r.b} FPS</div></div>` +
+        `<div class="ca-d ${cls}">${r.d > 0 ? '+' : ''}${r.d}%</div></div>`;
+    }).join('') + `</div>` +
+    `<p style="font-size:10px;color:var(--tx3);text-align:center;margin-top:12px;line-height:1.6">` +
+    `A = build atual · B = ${esc(buildLabel(entry.s))} — cada linha mantém as configurações de cada build, trocando só o jogo.</p>`;
+}
+
+function renderComp() {
+  $('slotAnm').textContent = buildLabel(st);
+  $('slotAhw').textContent = buildHwLine(st);
+
+  const body = $('compBody');
+  const entry = loadHist().find(e => e.id === compBId);
+  const segEl = $('segCmpMode');
+  segEl.style.display = entry ? '' : 'none';
+  if (entry) {
+    renderSeg(segEl, [{ v: 'game', n: 'Jogo atual' }, { v: 'all', n: 'Todos os jogos' }],
+      cmpMode, v => { cmpMode = v; renderComp(); });
+  }
+
+  if (!entry) {
+    $('slotBnm').textContent = 'Escolher do histórico';
+    $('slotBhw').textContent = loadHist().length
+      ? 'Toque para selecionar'
+      : 'Nenhum build salvo ainda';
+    body.innerHTML =
+      `<div class="card"><div class="empty" style="padding:32px 20px">` +
+      `<div class="empty-tt">Escolha o build B</div>` +
+      `<p>${loadHist().length
+        ? 'Toque no cartão B acima para escolher um build salvo.'
+        : 'Salve um build na aba Calcular para poder comparar.'}</p>` +
+      `</div></div>`;
+    return;
+  }
+
+  $('slotBnm').textContent = buildLabel(entry.s);
+  $('slotBhw').textContent = buildHwLine(entry.s);
+
+  if (cmpMode === 'all') { renderCompAll(body, entry); return; }
+
+  const ra = calc(st), rb = calc(entry.s);
+  const pa = calcPSU(st), pb = calcPSU(entry.s);
+
+  body.innerHTML =
+    `<div class="card">` +
+    cmpRow('FPS médio', ra.avg, rb.avg, '', true) +
+    cmpRow('1% low', ra.min, rb.min, '', true) +
+    cmpRow('FPS máximo', ra.max, rb.max, '', true) +
+    cmpRow('Fonte recomendada', pa.recommended, pb.recommended, 'W', false) +
+    `</div>` +
+    `<p style="font-size:10px;color:var(--tx3);text-align:center;margin-top:12px;line-height:1.6">` +
+    `A = build atual da calculadora · B = ${esc(buildLabel(entry.s))} salvo em ${fmtDate(entry.ts)}</p>`;
+}
+
+function sheetPickB() {
+  const list = loadHist();
+  if (!list.length) {
+    toast('Salve builds no histórico primeiro');
+    return;
+  }
+  openSheet({
+    title: 'Escolher build B',
+    search: false,
+    selected: compBId,
+    groups: [{
+      label: 'Histórico',
+      opts: list.map(e => ({
+        v: e.id,
+        label: `${G[e.s.game].name} — ${calc(e.s).avg} FPS`,
+        sub: `${buildHwLine(e.s)} · ${fmtDate(e.ts)}`,
+      })),
+    }],
+    onPick: v => { compBId = +v; renderComp(); },
+  });
+}
+
+/* ── Compartilhar ────────────────────────────────────────── */
+function shareText(s) {
+  const r = calc(s);
+  const psu = calcPSU(s);
+  const game = G[s.game], cpu = C[s.cpu], gpu = GP[s.gpu];
+  const presetN = PRESETS.find(p => p.k === s.preset)?.n || s.preset;
+  const dlssN = upscalerName(s);
+  const ro = rtOptionsFor(s);
+  const rtN = s.rt !== 'off' && ro.show
+    ? (ro.opts.find(o => o.k === s.rt)?.n || '') : '';
+  const lines = [
+    `🎮 ${game.name} — ${s.res.toUpperCase()} ${presetN}`,
+    `${cpu.n} + ${gpu.n}`,
+    `${MB[s.mobo].n} · ${RAM_LABELS[s.ram] || s.ram}`,
+    [dlssN, rtN, r.fgM > 1 ? `Frame Gen ×${r.fgM.toFixed(2)}` : ''].filter(Boolean).join(' · '),
+    ``,
+    `▶ ${r.avg} FPS médio (${r.avgL}–${r.avgH})`,
+    `1% low ${r.min} · máximo ${r.max} · monitor ${s.monHz} Hz`,
+    `🔌 Fonte recomendada: ${psu.recommended} W`,
+    ``,
+    `— Estimador de FPS`,
+  ];
+  return lines.join('\n');
+}
+
+async function shareState(s) {
+  const txt = shareText(s);
+  if (navigator.share) {
+    try {
+      await navigator.share({ text: txt });
+      return;
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  const ok = await copyText(txt);
+  toast(ok ? 'Resumo copiado — cole onde quiser' : 'Não foi possível copiar');
+}
+
+/* ── Abas ────────────────────────────────────────────────── */
+/* ── Gargalo CPU × GPU (hero) ── */
+function renderBneck(r, cpu, gpu) {
+  const el = $('bneck');
+  if (!el) return;
+  const gpuLoad = r.cBot ? Math.max(1, Math.round(r.cpuCap / r.gpuFps * 100)) : 100;
+  const cpuLoad = r.cBot ? 100 : Math.max(1, Math.round(r.gpuFps / r.cpuCap * 100));
+  const verdict = r.cBot
+    ? { t: 'Gargalo de CPU', c: 'var(--warn)' }
+    : { t: 'Limitado pela GPU', c: 'var(--ok)' };
+  const note = r.cBot
+    ? `${esc(cpu.n)} limita este jogo em ${r.cpuCap} FPS — a ${esc(gpu.n)} renderizaria ~${r.gpuFps} FPS (${100 - gpuLoad}% dela fica ociosa).`
+    : `Normal em jogos: a GPU dita o FPS. ${esc(cpu.n)} ainda tem ${100 - cpuLoad}% de folga (teto ~${r.cpuCap} FPS).`;
+  const neutral = 'rgba(244, 240, 228, 0.28)';
+  el.innerHTML =
+    `<div class="bneck-hd"><span class="bneck-tt">Equilíbrio CPU × GPU</span>` +
+    `<span class="bneck-verdict" style="color:${verdict.c}">${verdict.t}</span></div>` +
+    `<div class="bnrow"><span class="bnlb">GPU</span>` +
+    `<span class="bntrack"><span class="bnfill" style="width:${gpuLoad}%;background:${r.cBot ? neutral : 'var(--acc)'}"></span></span>` +
+    `<span class="bnpct">${gpuLoad}%</span></div>` +
+    `<div class="bnrow"><span class="bnlb">CPU</span>` +
+    `<span class="bntrack"><span class="bnfill" style="width:${cpuLoad}%;background:${r.cBot ? 'var(--warn)' : neutral}"></span></span>` +
+    `<span class="bnpct">${cpuLoad}%</span></div>` +
+    `<div class="bneck-note">${note}</div>`;
+}
+
+/* ── Sheet custom (conteúdo livre) ── */
+function openCustomSheet(title, html) {
+  sheetCfg = null;
+  $('sheetTitle').textContent = title;
+  $('sheetSearchWrap').style.display = 'none';
+  $('sheetBody').innerHTML = html;
+  $('backdrop').classList.add('on');
+  $('sheet').classList.add('on');
+  sheetIsOpen = true;
+  try { history.pushState({ sheet: 1 }, ''); } catch (e) {}
+  $('sheetBody').scrollTop = 0;
+}
+
+/* ── "Como calculamos" (waterfall) ── */
+function openHowSheet() {
+  const r = calc();
+  const rows = r.steps.map(sp => {
+    let mult, cls;
+    if (sp.m == null) { mult = sp.cap ? 'teto' : 'base'; cls = 'nt'; }
+    else {
+      mult = '×' + sp.m.toFixed(2);
+      cls = sp.m > 1.001 ? 'up' : (sp.m < 0.999 ? 'dn' : 'nt');
+    }
+    return `<div class="wf-row"><span class="wf-nm">${esc(sp.t)}` +
+      (sp.d ? `<small>${esc(sp.d)}</small>` : '') + `</span>` +
+      `<span class="wf-mult ${cls}">${mult}</span>` +
+      `<span class="wf-fps">${Math.round(sp.fps)}</span></div>`;
+  }).join('');
+  openCustomSheet('Como calculamos',
+    `<div class="wf">${rows}` +
+    `<div class="wf-final"><span class="wf-final-lb">FPS médio estimado</span>` +
+    `<span class="wf-final-v">${r.avg}</span></div>` +
+    `<div class="wf-note">Faixa provável: ${r.avgL}–${r.avgH} FPS (±5%). Base de dados v${DB_META.v} · ${DB_META.updated}.<br/>` +
+    `Estimativa comparativa — o valor real varia por cena, drivers e temperatura.</div></div>`);
+}
+
+/* ── Aba Jogos (build atual em todos os jogos) ── */
+let gamesSort = 'fps';
+function renderGames() {
+  const cpu = C[st.cpu], gpu = GP[st.gpu];
+  const presetN = PRESETS.find(p => p.k === st.preset)?.n || '';
+  $('gamesSub').textContent =
+    `${shortCPU(cpu.n)} · ${gpu.n} · ${st.res.toUpperCase()} ${presetN} — toque num jogo para abrir na calculadora.`;
+  renderSeg($('segGSort'), [
+    { v: 'fps', n: 'Maior FPS' }, { v: 'az', n: 'A–Z' },
+  ], gamesSort, v => { gamesSort = v; renderGames(); });
+
+  const items = G.map((g, i) => {
+    const s2 = { ...st, game: i };
+    normalizeS(s2);
+    return { i, g, r: calc(s2) };
+  });
+  items.sort(gamesSort === 'fps'
+    ? (a, b) => b.r.avg - a.r.avg
+    : (a, b) => a.g.name.localeCompare(b.g.name));
+
+  const wrap = $('gamesList');
+  wrap.innerHTML = '';
+  items.forEach((it, idx) => {
+    const b = badge(it.r.avg);
+    const w = Math.min(it.r.avg / st.monHz * 100, 100);
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'grow';
+    row.innerHTML =
+      `<span class="grow-rank">${idx + 1}</span>` +
+      `<span class="grow-tx"><span class="grow-nm">${esc(it.g.name)}</span>` +
+      `<span class="grow-bar"><span class="grow-fill" style="width:${w.toFixed(1)}%;background:${b.c}"></span></span></span>` +
+      `<span class="grow-fps"><span class="grow-num">${it.r.avg}<small> FPS</small></span>` +
+      `<span class="grow-cap" style="color:${b.c}">${esc(b.t)}</span></span>`;
+    row.addEventListener('click', () => {
+      st.game = it.i;
+      renderAll();
+      setTab('calc');
+      toast(`${it.g.name} aberto na calculadora`);
+    });
+    wrap.appendChild(row);
+  });
+}
+
+/* ── Aba Upgrade (conselheiro) ── */
+function renderUpg() {
+  const cur = calc();
+  const game = G[st.game], cpu = C[st.cpu], gpu = GP[st.gpu];
+  const psuCur = calcPSU(st).recommended;
+  $('upgSub').textContent =
+    `Ganhos estimados em ${game.name} · ${st.res.toUpperCase()} — trocando só a peça indicada.`;
+
+  const mk = over => { const s2 = { ...st, ...over }; normalizeS(s2); return { s2, r: calc(s2) }; };
+  const cand = key => (key === 'gpu' ? GP : C)
+    .map((d, j) => ({ d, j, ...mk({ [key]: j }) }))
+    .filter(x => x.j !== st[key] && x.r.avg >= cur.avg * 1.05)
+    .sort((a, b) => b.r.avg - a.r.avg)
+    .slice(0, 5);
+
+  const gpuUp = cand('gpu');
+  const cpuUp = cand('cpu');
+
+  let ramUp = null;
+  if (st.ram.includes('16')) {
+    const t = st.ram.replace('16', '32');
+    if (RAM_LABELS[t]) {
+      const { r } = mk({ ram: t });
+      if (r.avg > cur.avg) ramUp = { n: RAM_LABELS[t], r, sub: 'elimina a penalidade de 16 GB' };
+    }
+  } else if (st.ram.includes('4800')) {
+    const t = st.ram.replace('_4800', '');
+    if (RAM_LABELS[t]) {
+      const { r } = mk({ ram: t });
+      if (r.avg > cur.avg) ramUp = { n: RAM_LABELS[t], r, sub: 'DDR5 5200 no lugar de 4800' };
+    }
+  }
+
+  const verdict = cur.cBot
+    ? { tt: 'Seu maior ganho vem da CPU',
+        tx: `${esc(cpu.n)} está segurando a ${esc(gpu.n)} em ${cur.cpuCap} FPS neste jogo. Trocar a CPU destrava até ~${cur.gpuFps} FPS.` }
+    : (cur.vBot
+      ? { tt: 'VRAM está limitando',
+          tx: `A ${esc(gpu.n)} tem ${gpu.v} GB — menos do que o jogo pede (~${cur.vNeed} GB). Priorize uma GPU com mais VRAM.` }
+      : { tt: 'Seu maior ganho vem da GPU',
+          tx: `O sistema está limitado pela ${esc(gpu.n)} — a CPU ainda tem folga de ${Math.max(0, 100 - Math.round(cur.gpuFps / cur.cpuCap * 100))}%.` });
+
+  const upRow = (nm, sub, tags, gain, resFps) =>
+    `<div class="uprow"><span class="uprow-tx"><span class="uprow-nm">${nm}${tags}</span>` +
+    `<span class="uprow-sb">${sub}</span></span>` +
+    `<span class="upgain"><span class="upgain-d">+${gain}</span>` +
+    `<span class="upgain-r">→ ${resFps} FPS (+${Math.round(gain / cur.avg * 100)}%)</span></span></div>`;
+
+  const gpuRows = gpuUp.map(x => {
+    const psuN = calcPSU(x.s2).recommended;
+    const tag = psuN > psuCur ? `<span class="uptag plat">fonte ${psuN} W</span>` : '';
+    return upRow(esc(x.d.n), `${esc(x.d.g)} · ${x.d.v} GB VRAM`, tag, x.r.avg - cur.avg, x.r.avg);
+  }).join('');
+
+  const cpuRows = cpuUp.map(x => {
+    const drop = x.d.s === cpu.s;
+    const tag = drop
+      ? '<span class="uptag drop">drop-in</span>'
+      : '<span class="uptag plat">nova plataforma</span>';
+    const sub = drop ? esc(x.d.g) : `${esc(x.d.g)} · requer placa-mãe e RAM novas`;
+    return upRow(esc(x.d.n), sub, tag, x.r.avg - cur.avg, x.r.avg);
+  }).join('');
+
+  const emptyBox = msg => `<div class="opt-empty">${msg}</div>`;
+  const secGPU = `<p class="sec">Upgrade de GPU</p><section class="card">` +
+    (gpuRows || emptyBox(cur.cBot
+      ? 'GPU não é o gargalo agora — troque a CPU primeiro.'
+      : 'Nenhuma GPU da base ganha ≥5% neste cenário — você já está no teto.')) + `</section>`;
+  const secCPU = `<p class="sec">Upgrade de CPU</p><section class="card">` +
+    (cpuRows || emptyBox(cur.cBot
+      ? 'Nenhuma CPU da base ganha ≥5% aqui.'
+      : 'Trocar CPU quase não ganha aqui — você está limitado pela GPU.')) + `</section>`;
+  const secRAM = ramUp
+    ? `<p class="sec">Upgrade de RAM</p><section class="card">` +
+      upRow(esc(ramUp.n), esc(ramUp.sub), '<span class="uptag drop">drop-in</span>',
+        ramUp.r.avg - cur.avg, ramUp.r.avg) + `</section>`
+    : '';
+
+  $('upgBody').innerHTML =
+    `<div class="verdict"><span class="verdict-ic">` +
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 9.5 10.5l4 4L21 7"/><path d="M15 7h6v6"/></svg></span>` +
+    `<span><span class="verdict-tt">${verdict.tt}</span><div class="verdict-tx">${verdict.tx}</div></span></div>` +
+    (cur.cBot ? secCPU + secGPU : secGPU + secCPU) + secRAM +
+    `<p class="wf-note">Partindo de ${cur.avg} FPS (${esc(shortCPU(cpu.n))} + ${esc(gpu.n)}). ` +
+    `Ganhos valem para o jogo e preset atuais — mudar de jogo muda o ranking.</p>`;
+}
+
+/* ── Card de compartilhamento (canvas) ── */
+const HEXC  = { 'var(--ok)': '#a9d562', 'var(--warn)': '#f0a836', 'var(--bad)': '#f48a8a' };
+const HEXBG = { 'var(--ok-bg)': 'rgba(150,200,70,0.16)', 'var(--warn-bg)': 'rgba(240,168,54,0.15)', 'var(--bad-bg)': 'rgba(235,100,100,0.15)' };
+function rrect(x, a, b, w, h, r) {
+  x.beginPath();
+  x.moveTo(a + r, b);
+  x.arcTo(a + w, b, a + w, b + h, r);
+  x.arcTo(a + w, b + h, a, b + h, r);
+  x.arcTo(a, b + h, a, b, r);
+  x.arcTo(a, b, a + w, b, r);
+  x.closePath();
+}
+function fitTxt(x, txt, maxW) {
+  if (x.measureText(txt).width <= maxW) return txt;
+  let t = txt;
+  while (t.length > 2 && x.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+function buildShareCanvas(s) {
+  const r = calc(s), b = badge(r.avg);
+  const game = G[s.game], cpu = C[s.cpu], gpu = GP[s.gpu];
+  const psu = calcPSU(s);
+  const cAcc = HEXC[b.c] || '#a9d562';
+  const MONO = '"Roboto Mono","SF Mono",ui-monospace,Menlo,monospace';
+  const SANS = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif';
+  const W = 1080, H = 1350;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+
+  x.fillStyle = '#0d0c0a'; x.fillRect(0, 0, W, H);
+  const gr = x.createRadialGradient(W / 2, -80, 60, W / 2, -80, 900);
+  gr.addColorStop(0, 'rgba(232,130,90,0.22)');
+  gr.addColorStop(1, 'rgba(232,130,90,0)');
+  x.fillStyle = gr; x.fillRect(0, 0, W, H);
+  x.strokeStyle = 'rgba(244,240,228,0.10)'; x.lineWidth = 2;
+  rrect(x, 24, 24, W - 48, H - 48, 40); x.stroke();
+
+  x.fillStyle = '#e8825a';
+  x.beginPath(); x.arc(96, 106, 9, 0, 7); x.fill();
+  x.textAlign = 'left'; x.fillStyle = '#7d7a70';
+  x.font = `700 26px ${SANS}`;
+  x.fillText('ESTIMADOR DE FPS', 122, 115);
+  x.textAlign = 'right';
+  x.fillText(s.res.toUpperCase() + ' · ' + s.monHz + ' Hz', W - 92, 115);
+
+  x.textAlign = 'left'; x.fillStyle = '#f2f0e6';
+  x.font = `800 56px ${SANS}`;
+  x.fillText(fitTxt(x, game.name, W - 184), 92, 214);
+  x.fillStyle = '#b3b0a2'; x.font = `500 33px ${SANS}`;
+  x.fillText(fitTxt(x, `${cpu.n} + ${gpu.n}`, W - 184), 92, 270);
+  const presetN = PRESETS.find(p => p.k === s.preset)?.n || '';
+  x.fillStyle = '#7d7a70'; x.font = `500 28px ${SANS}`;
+  x.fillText(fitTxt(x, `${MB[s.mobo].n} · ${RAM_LABELS[s.ram] || s.ram} · ${presetN}`, W - 184), 92, 316);
+
+  x.textAlign = 'center';
+  x.fillStyle = cAcc;
+  x.font = `700 270px ${MONO}`;
+  x.fillText(String(r.avg), W / 2, 660);
+  x.fillStyle = '#7d7a70'; x.font = `700 28px ${SANS}`;
+  x.fillText('FPS MÉDIO', W / 2, 712);
+  x.font = `500 26px ${MONO}`;
+  x.fillText(`${r.avgL} – ${r.avgH} fps`, W / 2, 752);
+
+  x.font = `800 30px ${SANS}`;
+  const btUp = b.t.toUpperCase();
+  const bw = x.measureText(btUp).width + 72;
+  x.fillStyle = HEXBG[b.bg] || 'rgba(150,200,70,0.16)';
+  rrect(x, W / 2 - bw / 2, 786, bw, 62, 31); x.fill();
+  x.fillStyle = cAcc;
+  x.fillText(btUp, W / 2, 828);
+
+  const cols = [
+    { lb: '1% LOW',     v: String(r.min), sb: `${r.minL} – ${r.minH}`, c: '#f48a8a' },
+    { lb: 'VS MONITOR', v: Math.round(r.avg / s.monHz * 100) + '%', sb: `de ${s.monHz} Hz`, c: '#f2f0e6' },
+    { lb: 'MÁXIMO',     v: String(r.max), sb: `${r.maxL} – ${r.maxH}`, c: '#a9d562' },
+  ];
+  cols.forEach((cl, i) => {
+    const cx = W / 2 + (i - 1) * 310;
+    x.fillStyle = '#7d7a70'; x.font = `700 23px ${SANS}`;
+    x.fillText(cl.lb, cx, 956);
+    x.fillStyle = cl.c; x.font = `700 62px ${MONO}`;
+    x.fillText(cl.v, cx, 1030);
+    x.fillStyle = '#7d7a70'; x.font = `500 22px ${MONO}`;
+    x.fillText(cl.sb, cx, 1068);
+  });
+
+  x.strokeStyle = 'rgba(244,240,228,0.14)'; x.lineWidth = 1;
+  x.beginPath(); x.moveTo(92, 1128); x.lineTo(W - 92, 1128); x.stroke();
+  x.fillStyle = '#b3b0a2'; x.font = `600 30px ${SANS}`;
+  x.fillText(`Fonte recomendada: ${psu.recommended} W`, W / 2, 1188);
+  x.fillStyle = '#7d7a70'; x.font = `500 24px ${SANS}`;
+  x.fillText(`Estimativa · base v${DB_META.v} (${DB_META.updated}) · varia por cena e drivers`, W / 2, 1234);
+  return cv;
+}
+
+async function shareImage(s) {
+  const cv = buildShareCanvas(s);
+  let blob = null;
+  try { blob = await new Promise(res => cv.toBlob(res, 'image/png')); } catch (e) {}
+  if (blob && navigator.canShare && navigator.share) {
+    try {
+      const file = new File([blob], 'fps-estimado.png', { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], text: shareText(s) });
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === 'AbortError') return;
+    }
+  }
+  const url = cv.toDataURL('image/png');
+  openCustomSheet('Compartilhar',
+    `<div class="shprev"><img src="${url}" alt="Card do resultado"/>` +
+    `<div class="shrow">` +
+    `<a class="shbtn primary" href="${url}" download="fps-estimado.png">` +
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5"/><path d="M5 20h14"/></svg>Baixar PNG</a>` +
+    `<button class="shbtn" id="shTxt" type="button">` +
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Copiar texto</button>` +
+    `</div><div class="shrow"><button class="shbtn" id="shCode" type="button">` +
+    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4.5 4L8 16M16 8l4.5 4L16 16"/></svg>Código do build (para importar no app de um amigo)</button>` +
+    `</div><div class="wf-note">Se o download não funcionar no app, faça um print da prévia acima.</div></div>`);
+  const btn = document.getElementById('shTxt');
+  if (btn) btn.addEventListener('click', async () => {
+    const ok = await copyText(shareText(s));
+    toast(ok ? 'Resumo copiado — cole onde quiser' : 'Não foi possível copiar');
+  });
+  const bc = document.getElementById('shCode');
+  if (bc) bc.addEventListener('click', async () => {
+    const ok = await copyText(buildCode(s));
+    toast(ok ? 'Código copiado — envie para um amigo' : 'Não foi possível copiar');
+  });
+}
+
+/* ── Onboarding (primeira abertura) ── */
+const ONB_KEY = 'fps:onboard:v1';
+function dismissOnboard() {
+  try { localStorage.setItem(ONB_KEY, '1'); } catch (e) {}
+  $('onbd').classList.remove('on');
+}
+function buildOnboard() {
+  const wrap = $('onbdGroups');
+  wrap.innerHTML = '';
+  ['1080p', '1440p', '4k'].forEach(res => {
+    const lb = document.createElement('div');
+    lb.className = 'onbd-lb';
+    lb.textContent = res.toUpperCase();
+    wrap.appendChild(lb);
+    const grid = document.createElement('div');
+    grid.className = 'onbd-grid';
+    ['eco', 'mid', 'max'].forEach(tier => {
+      const p = PRESETS_BUILD[`${res}_${tier}`];
+      if (!p) return;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'pcard';
+      card.innerHTML =
+        `<div class="pcard-res">${esc(res.toUpperCase())}</div>` +
+        `<div class="pcard-tier">${esc(TIER_NAMES[tier])}</div>` +
+        `<div class="pcard-hw">${esc(shortCPU(C[p.cpu].n))}<br/>${esc(GP[p.gpu].n)}</div>`;
+      card.addEventListener('click', () => {
+        Object.assign(st, p);
+        dismissOnboard();
+        renderAll();
+        toast(`Build ${res.toUpperCase()} ${TIER_NAMES[tier]} aplicado — ajuste como quiser`);
+      });
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+  });
+}
+function maybeOnboard() {
+  let seen = null;
+  try { seen = localStorage.getItem(ONB_KEY); } catch (e) {}
+  if (seen) return;
+  buildOnboard();
+  $('onbd').classList.add('on');
+}
+
+/* ── Utilitários novos ── */
+const fmtBRL = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+const svgPen = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"/></svg>';
+const svgTrash = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5h6v2M6.5 7l1 13h9l1-13M10 11v5M14 11v5"/></svg>';
+const svgCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 5 5L19 7"/></svg>';
+function closeSheetSafe() {
+  if (typeof closeSheet === 'function') { try { closeSheet(); return; } catch (e) {} }
+  $('backdrop').classList.remove('on');
+  $('sheet').classList.remove('on');
+  sheetIsOpen = false;
+}
+
+/* ── 3. Comparativo de resoluções ── */
+function renderResCmp() {
+  const el = $('resCmp');
+  if (!el) return;
+  const cells = ['1080p', '1440p', '4k'].map(res => {
+    const s2 = { ...st, res };
+    normalizeS(s2);
+    const r = calc(s2);
+    const b = badge(r.avg);
+    const on = st.res === res;
+    return `<button type="button" class="rc-cell${on ? ' on' : ''}" data-res="${res}">` +
+      `<span class="rc-res">${res.toUpperCase()}</span>` +
+      `<span class="rc-fps" style="color:${b.c}">${r.avg}</span>` +
+      `<span class="rc-cap">FPS</span></button>`;
+  }).join('');
+  el.innerHTML = `<div class="rc-hd">Nas três resoluções — toque para trocar</div><div class="rc-grid">${cells}</div>`;
+  el.querySelectorAll('.rc-cell').forEach(c => c.addEventListener('click', () => {
+    if (st.res !== c.dataset.res) { st.res = c.dataset.res; renderAll(); }
+  }));
+}
+
+/* ── 5. Custo de energia mensal ── */
+function renderEnergy() {
+  const el = $('energy');
+  if (!el) return;
+  const cpu = C[st.cpu], gpu = GP[st.gpu];
+  const gameW = Math.round((gpu.w || 200) + (cpu.w || 80) * 0.6 + SYSTEM_W * 0.8);
+  const h = +st.hoursDay || 3;
+  const t = +st.tariff || 0.95;
+  el.innerHTML =
+    `<div class="en-hd"><span class="en-tt">Custo de energia</span><span class="en-out" id="enOut"></span></div>` +
+    `<div class="en-row"><span class="en-lb">Horas de jogo/dia</span><span class="en-ch">` +
+    [1, 2, 3, 4, 6, 8].map(x => `<button type="button" class="en-c${x === h ? ' on' : ''}" data-h="${x}">${x}h</button>`).join('') +
+    `</span></div>` +
+    `<div class="en-row"><span class="en-lb">Tarifa (R$/kWh)</span><input class="en-in" id="enTarif" type="number" inputmode="decimal" step="0.05" min="0" value="${t.toFixed(2)}"/></div>` +
+    `<div class="en-note" id="enNote"></div>`;
+  const upd = () => {
+    const hh = +st.hoursDay || 3, tt = +st.tariff || 0.95;
+    const kwh = gameW / 1000 * hh * 30;
+    $('enOut').textContent = fmtBRL(kwh * tt) + '/mês';
+    $('enNote').textContent = `≈ ${kwh.toFixed(0)} kWh/mês com carga típica de ${gameW} W jogando ${hh}h/dia. Tarifa média BR ≈ R$ 0,95/kWh — confira na sua conta de luz.`;
+  };
+  upd();
+  el.querySelectorAll('.en-c').forEach(c => c.addEventListener('click', () => {
+    st.hoursDay = +c.dataset.h;
+    persistState();
+    el.querySelectorAll('.en-c').forEach(x => x.classList.toggle('on', +x.dataset.h === st.hoursDay));
+    upd();
+  }));
+  $('enTarif').addEventListener('input', e => {
+    const v = parseFloat(String(e.target.value).replace(',', '.'));
+    if (v > 0 && v < 20) { st.tariff = v; persistState(); upd(); }
+  });
+}
+
+/* ── 1. Meta de FPS (otimizador de configurações) ── */
+let goalTarget = null;
+function upRankM(m) { if (m <= 0.66) return 5; if (m <= 0.93) return 4; if (m <= 1.001) return 3; return 2; }
+function comboScore(s2) {
+  const pIdx = PRESETS.findIndex(p => p.k === s2.preset);
+  const pRank = pIdx < 0 ? 0 : PRESETS.length - pIdx;
+  const fg = +s2.fg || 1;
+  return pRank * 1000 + upRankM(+s2.dlss) * 100 + (fg === 1 ? 60 : fg < 2 ? 25 : 0) + (s2.rt === st.rt ? 8 : 0);
+}
+function openGoalSheet() {
+  goalTarget = st.monHz;
+  openCustomSheet('Meta de FPS', '');
+  fillGoal();
+}
+function fillGoal() {
+  const target = goalTarget;
+  const cur = calc();
+  const gpu = GP[st.gpu];
+  const tgts = [...new Set([60, 90, 120, 144, 240, st.monHz])].sort((a, b) => a - b);
+  const rtChoices = st.rt !== 'off' ? [st.rt, 'off'] : [st.rt];
+  const seen = new Map();
+  PRESETS.forEach(p => dlssOptionsFor(gpu).forEach(u => fgOptionsFor(gpu).forEach(f => rtChoices.forEach(rt => {
+    const s2 = { ...st, preset: p.k, dlss: u.m, fg: f.v, rt };
+    normalizeS(s2);
+    const key = `${s2.preset}|${s2.dlss}|${s2.fg}|${s2.rt}`;
+    if (seen.has(key)) return;
+    seen.set(key, { s2, r: calc(s2), score: comboScore(s2) });
+  }))));
+  const all = [...seen.values()];
+  const meets = all.filter(x => x.r.avg >= target);
+  const curScore = comboScore(st);
+  const curMeets = cur.avg >= target;
+  const list = (curMeets ? meets.filter(x => x.score > curScore) : meets)
+    .sort((a, b) => b.score - a.score).slice(0, 3);
+
+  const chips = tgts.map(v =>
+    `<button type="button" class="gt${v === target ? ' on' : ''}" data-t="${v}">${v} FPS${v === st.monHz ? ' · monitor' : ''}</button>`).join('');
+  let html = `<div class="goal-tgts">${chips}</div>` +
+    `<div class="goal-cur">Hoje: <b style="color:var(--tx1)">${cur.avg} FPS</b> em ${esc(G[st.game].name)} · ${st.res.toUpperCase()}</div>`;
+
+  if (!meets.length) {
+    const best = all.slice().sort((a, b) => b.r.avg - a.r.avg)[0];
+    html += `<div class="gbest">Nenhuma combinação de configurações chega a ${target} FPS neste jogo — o máximo do seu hardware é ~${best.r.avg} FPS. O caminho é trocar peça.</div>` +
+      `<button class="gbtn" id="gUpg" type="button">Ver o que trocar → aba Upgrade</button>`;
+  } else if (!list.length) {
+    html += `<div class="gbest" style="background:var(--ok-bg);color:var(--ok)">Você já atinge ${target} FPS com a melhor qualidade possível — nada a melhorar aqui.</div>`;
+  } else {
+    html += `<p class="sec" style="margin:6px 16px 8px">${curMeets ? 'Mesma meta, mais qualidade' : `Para chegar a ${target} FPS`}</p>` +
+      `<div class="card" style="margin:0 16px">` + list.map((x, i) => {
+        const pN = PRESETS.find(p => p.k === x.s2.preset)?.n || x.s2.preset;
+        const uN = (dlssOptionsFor(gpu).find(o => o.m === +x.s2.dlss) || {}).n || '';
+        const fN = x.s2.fg > 1 ? (fgOptionsFor(gpu).find(o => o.v == x.s2.fg)?.n || 'Frame Gen') : '';
+        const rN = x.s2.rt !== st.rt ? 'desliga RT' : '';
+        const sub = [uN, fN, rN].filter(Boolean).join(' · ');
+        return `<button type="button" class="gopt" data-i="${i}">` +
+          `<span class="gopt-tx"><span class="gopt-nm">Preset ${esc(pN)}</span>` +
+          `<span class="gopt-sb">${esc(sub)} — toque para aplicar</span></span>` +
+          `<span class="gopt-fps">${x.r.avg}<small>FPS</small></span></button>`;
+      }).join('') + `</div>` +
+      `<div class="wf-note">Sugestões priorizam qualidade visual: preset mais alto primeiro, depois upscaler mais leve, Frame Gen por último.</div>`;
+  }
+
+  $('sheetBody').innerHTML = html;
+  $('sheetBody').querySelectorAll('.gt').forEach(c => c.addEventListener('click', () => {
+    goalTarget = +c.dataset.t;
+    fillGoal();
+  }));
+  const gu = document.getElementById('gUpg');
+  if (gu) gu.addEventListener('click', () => { closeSheetSafe(); setTab('upg'); });
+  $('sheetBody').querySelectorAll('.gopt').forEach(btn => btn.addEventListener('click', () => {
+    const x = list[+btn.dataset.i];
+    st.preset = x.s2.preset; st.dlss = x.s2.dlss; st.fg = x.s2.fg; st.rt = x.s2.rt;
+    closeSheetSafe();
+    renderAll();
+    toast(`Aplicado — ~${x.r.avg} FPS estimado`);
+  }));
+}
+
+/* ── 2. Código de build ── */
+function buildCode(s = st) {
+  const o = { g: G[s.game].name, c: C[s.cpu].n, p: GP[s.gpu].n, m: MB[s.mobo].n,
+    r: s.ram, e: s.res, q: s.preset, t: s.rt, f: s.fg, d: s.dlss, h: s.monHz };
+  return 'FPS1.' + btoa(unescape(encodeURIComponent(JSON.stringify(o))));
+}
+function parseCode(code) {
+  const m = String(code || '').trim().match(/FPS1\.([A-Za-z0-9+/=]+)/);
+  if (!m) return null;
+  try {
+    const o = JSON.parse(decodeURIComponent(escape(atob(m[1]))));
+    const gi = G.findIndex(x => x.name === o.g);
+    const ci = C.findIndex(x => x.n === o.c);
+    const pi = GP.findIndex(x => x.n === o.p);
+    const mi = MB.findIndex(x => x.n === o.m);
+    if (gi < 0 || ci < 0 || pi < 0) return null;
+    const s = { game: gi, cpu: ci, gpu: pi, mobo: mi >= 0 ? mi : 0,
+      ram: o.r, res: o.e, preset: o.q, rt: o.t, fg: o.f, dlss: o.d, monHz: +o.h || 144 };
+    if (!['1080p', '1440p', '4k'].includes(s.res)) s.res = '1440p';
+    if (!PRESETS.find(p => p.k === s.preset)) s.preset = 'ultra';
+    normalizeS(s);
+    return s;
+  } catch (e) { return null; }
+}
+function openImportSheet() {
+  openCustomSheet('Importar build',
+    `<div style="padding:0 16px 10px">` +
+    `<textarea class="codebox" id="impBox" placeholder="Cole aqui o código (começa com FPS1.)"></textarea>` +
+    `<button class="gbtn" id="impGo" type="button" style="width:100%;margin:10px 0 0">Importar</button>` +
+    `<div class="wf-note">Peça para seu amigo tocar em “Copiar código” no Histórico do app dele e te enviar.</div></div>`);
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    navigator.clipboard.readText().then(t => {
+      const box = document.getElementById('impBox');
+      if (t && parseCode(t) && box && !box.value) box.value = t.trim();
+    }).catch(() => {});
+  }
+  $('impGo').addEventListener('click', () => {
+    const s = parseCode($('impBox').value);
+    if (!s) { toast('Código inválido — confira se copiou tudo'); return; }
+    Object.assign(st, s);
+    closeSheetSafe();
+    setTab('calc');
+    renderAll();
+    toast('Build importado');
+  });
+}
+
+/* ── 4. Perfis de PC ── */
+const P_KEY = 'fps:profiles:v1';
+let profiles = null;
+let profEditId = null, profDelId = null;
+function loadProfiles() {
+  if (profiles) return profiles;
+  try { profiles = JSON.parse(localStorage.getItem(P_KEY)); } catch (e) { profiles = null; }
+  if (!profiles || !Array.isArray(profiles.list) || !profiles.list.length) {
+    profiles = { list: [{ id: 1, name: 'Meu PC', s: { ...st } }], active: 1 };
+  }
+  if (!profiles.list.find(x => x.id === profiles.active)) profiles.active = profiles.list[0].id;
+  return profiles;
+}
+function saveProfiles() { try { localStorage.setItem(P_KEY, JSON.stringify(profiles)); } catch (e) {} }
+function activeProfile() { const p = loadProfiles(); return p.list.find(x => x.id === p.active) || p.list[0]; }
+function syncProfile() {
+  const ap = activeProfile();
+  ap.s = { ...st };
+  saveProfiles();
+}
+function renderProfBar() {
+  const el = document.getElementById('profName');
+  if (el) el.textContent = activeProfile().name;
+}
+function profSub(pr) {
+  try { return `${shortCPU(C[pr.s.cpu].n)} + ${GP[pr.s.gpu].n} · ${pr.s.res.toUpperCase()}`; }
+  catch (e) { return '—'; }
+}
+function switchProfile(id) {
+  const p = loadProfiles();
+  if (id === p.active) { closeSheetSafe(); return; }
+  activeProfile().s = { ...st };
+  p.active = id;
+  Object.assign(st, activeProfile().s);
+  normalizeState();
+  saveProfiles();
+  renderProfBar();
+  closeSheetSafe();
+  renderAll();
+  toast(`Perfil “${activeProfile().name}” ativo`);
+}
+function openProfilesSheet() {
+  profEditId = null; profDelId = null;
+  openCustomSheet('Perfis de PC', '');
+  fillProfiles();
+}
+function fillProfiles() {
+  const p = loadProfiles();
+  const rows = p.list.map(pr => {
+    const on = pr.id === p.active;
+    if (pr.id === profEditId) {
+      return `<div class="prow${on ? ' on' : ''}"><span class="prow-dot"></span>` +
+        `<input class="pin" id="pinEdit" value="${esc(pr.name)}" maxlength="24"/>` +
+        `<span class="prow-act"><button class="pico" data-ok="${pr.id}" type="button" aria-label="Salvar nome">${svgCheck}</button></span></div>`;
+    }
+    return `<div class="prow${on ? ' on' : ''}">` +
+      `<span class="prow-dot"></span>` +
+      `<button class="prow-tx" data-sw="${pr.id}" type="button">` +
+      `<span class="prow-nm">${esc(pr.name)}</span>` +
+      `<span class="prow-sb">${esc(profSub(pr))}</span></button>` +
+      `<span class="prow-act">` +
+      `<button class="pico" data-ed="${pr.id}" type="button" aria-label="Renomear">${svgPen}</button>` +
+      (p.list.length > 1 ? `<button class="pico danger" data-del="${pr.id}" type="button" aria-label="Excluir">${pr.id === profDelId ? svgCheck : svgTrash}</button>` : '') +
+      `</span></div>`;
+  }).join('');
+  $('sheetBody').innerHTML =
+    `<div class="card" style="margin:0 16px">${rows}</div>` +
+    `<button class="pnew" id="pNew" type="button">+ Novo perfil (cópia do atual)</button>` +
+    `<div class="wf-note" style="margin-top:0">O perfil ativo guarda automaticamente tudo o que você mudar na calculadora. Para excluir, toque duas vezes na lixeira.</div>`;
+  $('sheetBody').querySelectorAll('[data-sw]').forEach(b => b.addEventListener('click', () => switchProfile(+b.dataset.sw)));
+  $('sheetBody').querySelectorAll('[data-ed]').forEach(b => b.addEventListener('click', () => {
+    profEditId = +b.dataset.ed; profDelId = null;
+    fillProfiles();
+    const i = document.getElementById('pinEdit');
+    if (i) { i.focus(); i.select(); }
+  }));
+  $('sheetBody').querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+    const id = +b.dataset.del;
+    if (profDelId !== id) { profDelId = id; fillProfiles(); return; }
+    p.list = p.list.filter(x => x.id !== id);
+    profDelId = null;
+    if (p.active === id) {
+      p.active = p.list[0].id;
+      Object.assign(st, p.list[0].s);
+      normalizeState();
+      renderAll();
+    }
+    saveProfiles(); renderProfBar(); fillProfiles();
+    toast('Perfil excluído');
+  }));
+  $('sheetBody').querySelectorAll('[data-ok]').forEach(b => b.addEventListener('click', () => {
+    const pr = p.list.find(x => x.id === +b.dataset.ok);
+    const v = (document.getElementById('pinEdit').value || '').trim();
+    if (pr && v) pr.name = v.slice(0, 24);
+    profEditId = null;
+    saveProfiles(); renderProfBar(); fillProfiles();
+  }));
+  const pn = document.getElementById('pNew');
+  if (pn) pn.addEventListener('click', () => {
+    const id = Date.now();
+    p.list.push({ id, name: `PC ${p.list.length + 1}`, s: { ...st } });
+    p.active = id;
+    saveProfiles(); renderProfBar(); fillProfiles();
+    toast('Novo perfil criado a partir do atual');
+  });
+}
+
+let activeTab = 'calc';
+function setTab(t) {
+  if (t === activeTab && t !== 'comp' && t !== 'hist') return;
+  activeTab = t;
+  document.querySelectorAll('.panel').forEach(p => {
+    const on = p.id === 'panel-' + t;
+    p.classList.remove('on');
+    if (on) {
+      void p.offsetWidth; // reinicia animação
+      p.classList.add('on');
+    }
+  });
+  document.querySelectorAll('.nav-b').forEach(b => {
+    b.classList.toggle('on', b.dataset.tab === t);
+  });
+  if (t === 'comp') renderComp();
+  if (t === 'hist') renderHist();
+  if (t === 'games') renderGames();
+  if (t === 'upg') renderUpg();
+  if (t !== 'calc') $('mini').classList.remove('on');
+  window.scrollTo(0, 0);
+}
+
+/* ── Inicialização ───────────────────────────────────────── */
+function init() {
+  // Geometria do gauge
+  const d = gaugeArcPath();
+  $('gTrack').setAttribute('d', d);
+  $('gFill').setAttribute('d', d);
+
+  restoreState();
+  buildPresetCards();
+  renderAll();
+  renderHist();
+  renderComp();
+
+  // Linhas → sheets
+  $('rowCPU').addEventListener('click', sheetCPU);
+  $('rowGPU').addEventListener('click', sheetGPU);
+  $('rowMobo').addEventListener('click', sheetMobo);
+  $('rowRAM').addEventListener('click', sheetRAM);
+  $('rowGame').addEventListener('click', sheetGame);
+
+  // Sheet
+  $('sheetClose').addEventListener('click', () => closeSheet());
+  $('backdrop').addEventListener('click', () => closeSheet());
+  $('sheetSearch').addEventListener('input', e => buildSheetList(e.target.value));
+  window.addEventListener('popstate', () => {
+    if (sheetIsOpen) closeSheet(true);
+  });
+
+  // Ações do hero
+  $('btnSave').addEventListener('click', saveBuild);
+  $('btnShare').addEventListener('click', () => shareImage(st));
+  $('btnHow').addEventListener('click', openHowSheet);
+  $('btnGoal').addEventListener('click', openGoalSheet);
+  $('btnProf').addEventListener('click', openProfilesSheet);
+  $('btnCode').addEventListener('click', async () => {
+    const ok = await copyText(buildCode());
+    toast(ok ? 'Código copiado — envie para um amigo' : 'Não foi possível copiar');
+  });
+  $('btnImport').addEventListener('click', openImportSheet);
+  renderProfBar();
+  $('btnPresets').addEventListener('click', () => {
+    const y = $('secPresets').getBoundingClientRect().top + window.scrollY - 54;
+    window.scrollTo({ top: y, behavior: reducedMotion() ? 'auto' : 'smooth' });
+  });
+
+  // Comparar
+  $('slotB').addEventListener('click', sheetPickB);
+
+  // Navegação
+  document.querySelectorAll('.nav-b').forEach(b => {
+    b.addEventListener('click', () => setTab(b.dataset.tab));
+  });
+
+  // Onboarding + versão da base
+  $('onbdSkip').addEventListener('click', () => {
+    dismissOnboard();
+    toast('Monte seu PC pelas linhas abaixo');
+  });
+  $('dbv').textContent = 'v' + DB_META.v + ' · ' + DB_META.updated;
+  maybeOnboard();
+
+  // Mini barra sticky
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => {
+      const vis = entries[0].isIntersecting;
+      $('mini').classList.toggle('on', !vis && activeTab === 'calc');
+    }, { threshold: 0 });
+    io.observe($('hero'));
+  }
+
+  // Remove stagger inicial após a entrada
+  setTimeout(() => {
+    const el = $('calcInner');
+    if (el) el.classList.remove('first-load');
+  }, 800);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+</script>
+
+<script>
+  /* Registro do Service Worker — necessário para instalação como PWA */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('SW registrado:', reg.scope))
+        .catch(err => console.warn('SW falhou:', err));
+    });
+  }
+</script>
+</body>
+</html>
