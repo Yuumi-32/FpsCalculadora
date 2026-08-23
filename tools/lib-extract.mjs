@@ -79,7 +79,7 @@ function sandbox() {
 const EXPORTED = [
   'G', 'C', 'GP', 'MB', 'HZ_MARKERS', 'PRESETS', 'DLSS', 'FSR', 'DB_META',
   'VRAM_PRE', 'RAM_LABELS', 'PRESETS_BUILD', 'SYSTEM_W',
-  'calc', 'calcPSU', 'vramRT', 'normalizeS', 'st',
+  'calc', 'calcPSU', 'vramRT', 'normalizeS', 'st', 'badge',
   'isRadeon', 'hasRTHW', 'canRRHW', 'hasFGHW',
   'ramOptionsFor', 'rtOptionsFor', 'fgOptionsFor', 'dlssOptionsFor', 'upscalerName',
 ];

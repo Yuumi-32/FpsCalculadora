@@ -2,7 +2,6 @@ package com.fps.calculadora.core
 
 import java.util.Locale
 import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
@@ -51,14 +50,7 @@ data class CalcResult(
  * vetores gerados da implementação JS original, então qualquer divergência de
  * ordem de operação ou arredondamento falha o build.
  */
-class FpsCalculator(private val db: GameDatabase = GameDatabase.default) {
-
-    /**
-     * `Math.round` do JavaScript arredonda .5 para +infinito; `kotlin.math.round`
-     * arredonda para longe do zero. Os FPS são sempre positivos, mas replicar a
-     * definição exata elimina a classe inteira de divergência.
-     */
-    private fun jsRound(x: Double): Int = floor(x + 0.5).toInt()
+class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
 
     fun calc(state: BuildState): CalcResult {
         val game = db.game(state.gameId)

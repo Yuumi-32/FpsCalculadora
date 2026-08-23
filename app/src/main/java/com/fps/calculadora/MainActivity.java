@@ -9,7 +9,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
+
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends Activity {
 
@@ -20,15 +23,19 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Tela cheia: sem barra de título, sem barra de status
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        );
 
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
+
+        // A partir do targetSdk 35 o Android desenha sob as barras do sistema e
+        // ignora FLAG_FULLSCREEN. Sem isto, a topbar do HTML fica atrás do
+        // relógio e a navegação inferior atrás da barra de gestos.
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, windowInsets) -> {
+            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         // Configurações do WebView
         WebSettings settings = webView.getSettings();

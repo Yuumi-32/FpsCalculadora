@@ -117,6 +117,55 @@ for (let i = 0; i < 1200; i++) {
   normCases.push({ raw, normalized: norm });
 }
 
+/* Paridade dos derivados que moravam dentro de funcoes de DOM:
+   as cargas de renderBneck() (:2762) e o custo de renderEnergy() (:3166).
+   Nao da para chamar essas funcoes direto (elas montam HTML), entao as
+   expressoes sao reproduzidas aqui e conferidas contra valores reais de calc().
+   Uma amostra basta: o que se testa e a aritmetica, nao a cobertura de calc. */
+const derivedCases = cases.filter((_, i) => i % 8 === 0).map(({ tag, state }) => {
+  const r = app.calc(state);
+  const cpu = C[state.cpu], gpu = GP[state.gpu];
+  const gpuLoad = r.cBot ? Math.max(1, Math.round(r.cpuCap / r.gpuFps * 100)) : 100;
+  const cpuLoad = r.cBot ? 100 : Math.max(1, Math.round(r.gpuFps / r.cpuCap * 100));
+  const gameW = Math.round((gpu.w || 200) + (cpu.w || 80) * 0.6 + app.SYSTEM_W * 0.8);
+  const hours = 3, tariff = 0.95;
+  const kwh = gameW / 1000 * hours * 30;
+  // Mesma sequência do renderAll() (:2279) — a ordem faz parte do contrato.
+  const game = G[state.game];
+  const warnings = [];
+  if (r.cBot) warnings.push(`CPU: ${cpu.n} está limitando — teto estimado de ${r.cpuCap} FPS`);
+  if (r.vBot) warnings.push(`VRAM: jogo requer ~${r.vNeed} GB, GPU possui ${r.vAvail} GB — penalidade aplicada`);
+  if (r.rBot) warnings.push(game.heavy
+    ? `RAM: 16 GB pode causar gagueira em "${game.name}" (recomendado: 32 GB)`
+    : `RAM: 16 GB aplica penalidade leve (recomendado: 32 GB)`);
+  if (r.gpuWarn) warnings.push('GPU: ' + r.gpuWarn);
+  if (r.moboWarn) warnings.push('Placa-mãe: ' + r.moboWarn);
+
+  return {
+    tag, state,
+    expected: {
+      gpuLoad, cpuLoad, cpuLimited: r.cBot,
+      warnings,
+      gamingWatts: gameW,
+      kwhPerMonth: round4(kwh),
+      monthlyCost: round4(kwh * tariff),
+    },
+  };
+});
+
+/* Paridade de badge(): a faixa de desempenho que colore o gauge.
+   Varredura densa em volta de cada limiar (30 / 60 / 120 / 180) mais um
+   pente por todo o intervalo útil de FPS. */
+const badgeCases = (() => {
+  const pts = new Set();
+  for (let f = 0; f <= 420; f++) pts.add(f);
+  [30, 60, 120, 180].forEach(t => [-2, -1, 0, 1, 2].forEach(d => pts.add(t + d)));
+  return [...pts].filter(f => f >= 0).sort((a, b) => a - b).map(fps => {
+    const b = app.badge(fps);
+    return { fps, expected: { label: b.t, color: b.c, bg: b.bg, glow: b.glow } };
+  });
+})();
+
 const meta = {
   generatedFrom: 'app/src/main/assets/www/index.html',
   dbVersion: app.DB_META.v,
@@ -127,10 +176,16 @@ writeFileSync(resolve(OUT, 'golden-calc.json'),
   JSON.stringify({ meta, cases: calcCases }) + '\n', 'utf8');
 writeFileSync(resolve(OUT, 'golden-normalize.json'),
   JSON.stringify({ meta, cases: normCases }) + '\n', 'utf8');
+writeFileSync(resolve(OUT, 'golden-derived.json'),
+  JSON.stringify({ meta, cases: derivedCases }) + '\n', 'utf8');
+writeFileSync(resolve(OUT, 'golden-badge.json'),
+  JSON.stringify({ meta, cases: badgeCases }) + '\n', 'utf8');
 
 const bots = calcCases.filter(c => c.expected.cBot).length;
 const vbots = calcCases.filter(c => c.expected.vBot).length;
 const warns = calcCases.filter(c => c.expected.gpuWarn).length;
 console.log(`golden-calc.json      — ${calcCases.length} casos`);
 console.log(`golden-normalize.json — ${normCases.length} casos`);
+console.log(`golden-badge.json     — ${badgeCases.length} casos`);
+console.log(`golden-derived.json   — ${derivedCases.length} casos`);
 console.log(`cobertura: ${bots} com teto de CPU, ${vbots} com VRAM estourada, ${warns} com aviso de GPU`);
