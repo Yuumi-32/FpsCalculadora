@@ -25,24 +25,32 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 ## Tecnologia
 
-App Android nativo (Java) cuja interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. Não há chamadas de rede nem dependências externas — todo o cálculo, a base de jogos e o histórico rodam localmente no aparelho.
+A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. Não há chamadas de rede — todo o cálculo, a base de jogos e o histórico rodam localmente no aparelho.
+
+O app está **migrando para UI nativa em Jetpack Compose**. A primeira etapa já está no repositório: o módulo `:core`, em Kotlin puro, com a base de dados em JSON e o cálculo de FPS coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. Ver [`core/README.md`](core/README.md) e [`docs/FASE-2-HANDOFF.md`](docs/FASE-2-HANDOFF.md).
 
 | | |
 |---|---|
-| Linguagem | Java |
-| UI | WebView + HTML/CSS/JS embutidos |
-| Dependências externas | Nenhuma |
+| Linguagem | Java (app) · Kotlin (core) |
+| UI | WebView + HTML/CSS/JS embutidos — Compose em migração |
 | minSdk / targetSdk | 24 / 34 |
-| Android Gradle Plugin | 8.2.2 |
+| Android Gradle Plugin | 8.2.2 · Gradle 8.9 |
 
 ## Estrutura do projeto
 
 ```
-app/src/main/
+app/src/main/                                    # módulo Android
 ├── java/com/fps/calculadora/MainActivity.java   # Activity: WebView em tela cheia
-├── assets/www/index.html                        # UI completa (HTML/CSS/JS, dados dos jogos e lógica de cálculo)
+├── assets/www/index.html                        # UI completa (HTML/CSS/JS, dados e lógica)
 ├── res/                                          # ícones, layout, strings, tema
 └── AndroidManifest.xml
+
+core/                                            # módulo Kotlin puro, sem Android
+├── src/main/resources/data/*.json               # jogos, CPUs, GPUs, placas-mãe
+├── src/main/kotlin/…/FpsCalculator.kt           # o cálculo de FPS
+└── src/test/…                                   # testes de paridade contra o JS
+
+tools/*.mjs                                      # extraem os dados e os vetores de teste do index.html
 ```
 
 ## Como rodar
@@ -55,13 +63,19 @@ git clone https://github.com/Yuumi-32/FpsCalculadora.git
 
 Abra a pasta no Android Studio e deixe o Gradle sincronizar (usa o wrapper, sem configuração adicional), depois rode em um emulador ou dispositivo físico.
 
-Ou via linha de comando:
+Ou via linha de comando (o wrapper já vem no repositório, não precisa instalar Gradle):
 
 ```bash
 ./gradlew assembleDebug
 ```
 
 O APK debug é gerado em `app/build/outputs/apk/debug/` (`applicationId` com sufixo `.debug`).
+
+Para rodar os testes do cálculo de FPS:
+
+```bash
+./gradlew :core:test
+```
 
 ## Aviso
 
