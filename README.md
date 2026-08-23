@@ -27,14 +27,14 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. Não há chamadas de rede — todo o cálculo, a base de jogos e o histórico rodam localmente no aparelho.
 
-O app está **migrando para UI nativa em Jetpack Compose**. A primeira etapa já está no repositório: o módulo `:core`, em Kotlin puro, com a base de dados em JSON e o cálculo de FPS coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. Ver [`core/README.md`](core/README.md) e [`docs/FASE-2-HANDOFF.md`](docs/FASE-2-HANDOFF.md).
+O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. A tela Calcular já existe em Compose e convive com o WebView — no build de debug as duas aparecem como ícones separados. Ver [`core/README.md`](core/README.md).
 
 | | |
 |---|---|
-| Linguagem | Java (app) · Kotlin (core) |
+| Linguagem | Kotlin (core, UI Compose) · Java (Activity do WebView) |
 | UI | WebView + HTML/CSS/JS embutidos — Compose em migração |
-| minSdk / targetSdk | 24 / 34 |
-| Android Gradle Plugin | 8.2.2 · Gradle 8.9 |
+| minSdk / targetSdk | 24 / 36 |
+| Android Gradle Plugin | 8.13.0 · Gradle 8.14.3 |
 
 ## Estrutura do projeto
 
