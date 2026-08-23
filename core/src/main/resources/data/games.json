@@ -1,0 +1,999 @@
+[
+  {
+    "id": "alan-wake-2",
+    "index": 0,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "Alan Wake 2",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing",
+    "heavy": true,
+    "reference": {
+      "1080p": {
+        "rr": 58,
+        "rt": 86,
+        "off": 142
+      },
+      "1440p": {
+        "rr": 51,
+        "rt": 65,
+        "off": 135
+      },
+      "4k": {
+        "rr": 46,
+        "rt": 40,
+        "off": 80
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 10,
+      "4k": 14
+    }
+  },
+  {
+    "id": "black-myth-wukong",
+    "index": 1,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "Black Myth: Wukong",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing (Lumen)",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 55,
+        "rt": 82,
+        "off": 105
+      },
+      "1440p": {
+        "rr": 40,
+        "rt": 62,
+        "off": 78
+      },
+      "4k": {
+        "rr": 24,
+        "rt": 38,
+        "off": 50
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 10,
+      "4k": 14
+    }
+  },
+  {
+    "id": "cyberpunk-2077",
+    "index": 2,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "Cyberpunk 2077",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 62,
+        "rt": 102,
+        "off": 158
+      },
+      "1440p": {
+        "rr": 43,
+        "rt": 70,
+        "off": 112
+      },
+      "4k": {
+        "rr": 26,
+        "rt": 70,
+        "off": 72
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 10,
+      "4k": 12
+    }
+  },
+  {
+    "id": "dying-light-2",
+    "index": 3,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "Dying Light 2",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 112,
+        "rt": 88,
+        "off": 148
+      },
+      "1440p": {
+        "rr": 82,
+        "rt": 64,
+        "off": 115
+      },
+      "4k": {
+        "rr": 52,
+        "rt": 40,
+        "off": 75
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 12
+    }
+  },
+  {
+    "id": "marvel-s-spider-man-2",
+    "index": 4,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "Marvel's Spider-Man 2",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing",
+    "heavy": true,
+    "reference": {
+      "1080p": {
+        "rr": 120,
+        "rt": 95,
+        "off": 162
+      },
+      "1440p": {
+        "rr": 90,
+        "rt": 70,
+        "off": 128
+      },
+      "4k": {
+        "rr": 58,
+        "rt": 44,
+        "off": 84
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 10,
+      "4k": 14
+    }
+  },
+  {
+    "id": "the-witcher-3-next-gen",
+    "index": 5,
+    "group": "🔥 Path Tracing / RT Pesado",
+    "name": "The Witcher 3 (Next-Gen)",
+    "rtMode": "pt",
+    "rrLabel": "Path Tracing + RR",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 108,
+        "rt": 85,
+        "off": 142
+      },
+      "1440p": {
+        "rr": 80,
+        "rt": 62,
+        "off": 112
+      },
+      "4k": {
+        "rr": 50,
+        "rt": 38,
+        "off": 72
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "crimson-desert",
+    "index": 6,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Crimson Desert",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing + RR",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 140,
+        "off": 165
+      },
+      "1440p": {
+        "rt": 122,
+        "off": 138
+      },
+      "4k": {
+        "rt": 75,
+        "off": 88
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 12,
+      "4k": 14
+    }
+  },
+  {
+    "id": "death-stranding-2",
+    "index": 7,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Death Stranding 2",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 118,
+        "off": 158
+      },
+      "1440p": {
+        "rt": 90,
+        "off": 122
+      },
+      "4k": {
+        "rt": 56,
+        "off": 78
+      }
+    },
+    "vram": {
+      "1080p": 7,
+      "1440p": 9,
+      "4k": 12
+    }
+  },
+  {
+    "id": "death-stranding-director-s-cut",
+    "index": 8,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Death Stranding: Director's Cut",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 158,
+        "off": 202
+      },
+      "1440p": {
+        "rt": 122,
+        "off": 162
+      },
+      "4k": {
+        "rt": 78,
+        "off": 108
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 7,
+      "4k": 9
+    }
+  },
+  {
+    "id": "doom-eternal",
+    "index": 9,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Doom Eternal",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 195,
+        "off": 290
+      },
+      "1440p": {
+        "rt": 155,
+        "off": 235
+      },
+      "4k": {
+        "rt": 100,
+        "off": 165
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "dragon-s-dogma-2",
+    "index": 10,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Dragon's Dogma 2",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 95,
+        "off": 130
+      },
+      "1440p": {
+        "rt": 72,
+        "off": 100
+      },
+      "4k": {
+        "rt": 45,
+        "off": 65
+      }
+    },
+    "vram": {
+      "1080p": 8,
+      "1440p": 10,
+      "4k": 12
+    }
+  },
+  {
+    "id": "forza-horizon-5",
+    "index": 11,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Forza Horizon 5",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing (reflexos)",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 185,
+        "off": 205
+      },
+      "1440p": {
+        "rt": 148,
+        "off": 165
+      },
+      "4k": {
+        "rt": 130,
+        "off": 145
+      }
+    },
+    "vram": {
+      "1080p": 5,
+      "1440p": 6,
+      "4k": 10
+    }
+  },
+  {
+    "id": "forza-horizon-6",
+    "index": 12,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Forza Horizon 6",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 138,
+        "off": 178
+      },
+      "1440p": {
+        "rt": 106,
+        "off": 140
+      },
+      "4k": {
+        "rt": 66,
+        "off": 90
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 11
+    }
+  },
+  {
+    "id": "marvel-s-spider-man-remastered",
+    "index": 13,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Marvel's Spider-Man Remastered",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 130,
+        "off": 175
+      },
+      "1440p": {
+        "rt": 100,
+        "off": 138
+      },
+      "4k": {
+        "rt": 62,
+        "off": 88
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "marvel-s-spider-man-miles-morales",
+    "index": 14,
+    "group": "⚡ Ray Tracing Padrão",
+    "name": "Marvel's Spider-Man: Miles Morales",
+    "rtMode": "rt",
+    "rtLabel": "Ray Tracing",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rt": 138,
+        "off": 185
+      },
+      "1440p": {
+        "rt": 108,
+        "off": 145
+      },
+      "4k": {
+        "rt": 68,
+        "off": 95
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "arc-raiders",
+    "index": 15,
+    "group": "🎯 UE5 Lumen (Hardware / Software)",
+    "name": "Arc Raiders",
+    "rtMode": "lumen",
+    "rrLabel": "Hardware Lumen",
+    "rtLabel": "Software Lumen",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 125,
+        "rt": 140,
+        "off": 158
+      },
+      "1440p": {
+        "rr": 95,
+        "rt": 108,
+        "off": 122
+      },
+      "4k": {
+        "rr": 60,
+        "rt": 68,
+        "off": 78
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "fortnite",
+    "index": 16,
+    "group": "🎯 UE5 Lumen (Hardware / Software)",
+    "name": "Fortnite",
+    "rtMode": "lumen",
+    "rrLabel": "Hardware Lumen",
+    "rtLabel": "Software Lumen",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 150,
+        "rt": 168,
+        "off": 198
+      },
+      "1440p": {
+        "rr": 115,
+        "rt": 128,
+        "off": 152
+      },
+      "4k": {
+        "rr": 72,
+        "rt": 80,
+        "off": 95
+      }
+    },
+    "vram": {
+      "1080p": 5,
+      "1440p": 7,
+      "4k": 9
+    }
+  },
+  {
+    "id": "hell-is-us",
+    "index": 17,
+    "group": "🎯 UE5 Lumen (Hardware / Software)",
+    "name": "Hell is Us",
+    "rtMode": "lumen",
+    "rrLabel": "Hardware Lumen",
+    "rtLabel": "Software Lumen",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 105,
+        "rt": 118,
+        "off": 132
+      },
+      "1440p": {
+        "rr": 80,
+        "rt": 90,
+        "off": 102
+      },
+      "4k": {
+        "rr": 50,
+        "rt": 56,
+        "off": 64
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "marvel-rivals",
+    "index": 18,
+    "group": "🎯 UE5 Lumen (Hardware / Software)",
+    "name": "Marvel Rivals",
+    "rtMode": "lumen",
+    "rrLabel": "Hardware Lumen",
+    "rtLabel": "Software Lumen",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 140,
+        "rt": 158,
+        "off": 178
+      },
+      "1440p": {
+        "rr": 108,
+        "rt": 122,
+        "off": 138
+      },
+      "4k": {
+        "rr": 68,
+        "rt": 76,
+        "off": 88
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "remnant-ii",
+    "index": 19,
+    "group": "🎯 UE5 Lumen (Hardware / Software)",
+    "name": "Remnant II",
+    "rtMode": "lumen",
+    "rrLabel": "Hardware Lumen",
+    "rtLabel": "Software Lumen",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "rr": 118,
+        "rt": 132,
+        "off": 148
+      },
+      "1440p": {
+        "rr": 90,
+        "rt": 102,
+        "off": 115
+      },
+      "4k": {
+        "rr": 56,
+        "rt": 64,
+        "off": 72
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "apex-legends",
+    "index": 20,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Apex Legends",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 400,
+    "reference": {
+      "1080p": {
+        "off": 350
+      },
+      "1440p": {
+        "off": 278
+      },
+      "4k": {
+        "off": 165
+      }
+    },
+    "vram": {
+      "1080p": 3,
+      "1440p": 5,
+      "4k": 7
+    }
+  },
+  {
+    "id": "counter-strike-2",
+    "index": 21,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Counter-Strike 2",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 450,
+    "reference": {
+      "1080p": {
+        "off": 360
+      },
+      "1440p": {
+        "off": 290
+      },
+      "4k": {
+        "off": 160
+      }
+    },
+    "vram": {
+      "1080p": 3,
+      "1440p": 4,
+      "4k": 6
+    }
+  },
+  {
+    "id": "darksiders-iii",
+    "index": 22,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Darksiders III",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 190
+      },
+      "1440p": {
+        "off": 155
+      },
+      "4k": {
+        "off": 102
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "darksiders-genesis",
+    "index": 23,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Darksiders Genesis",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 210
+      },
+      "1440p": {
+        "off": 170
+      },
+      "4k": {
+        "off": 114
+      }
+    },
+    "vram": {
+      "1080p": 3,
+      "1440p": 4,
+      "4k": 6
+    }
+  },
+  {
+    "id": "diablo-iv",
+    "index": 24,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Diablo IV",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 168
+      },
+      "1440p": {
+        "off": 138
+      },
+      "4k": {
+        "off": 90
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 10
+    }
+  },
+  {
+    "id": "dota-2",
+    "index": 25,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Dota 2",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 650,
+    "reference": {
+      "1080p": {
+        "off": 450
+      },
+      "1440p": {
+        "off": 380
+      },
+      "4k": {
+        "off": 248
+      }
+    },
+    "vram": {
+      "1080p": 2,
+      "1440p": 3,
+      "4k": 4
+    }
+  },
+  {
+    "id": "dying-light",
+    "index": 26,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Dying Light",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 205
+      },
+      "1440p": {
+        "off": 168
+      },
+      "4k": {
+        "off": 112
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "grand-theft-auto-v",
+    "index": 27,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Grand Theft Auto V",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 235
+      },
+      "1440p": {
+        "off": 188
+      },
+      "4k": {
+        "off": 128
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "league-of-legends",
+    "index": 28,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "League of Legends",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 700,
+    "reference": {
+      "1080p": {
+        "off": 500
+      },
+      "1440p": {
+        "off": 400
+      },
+      "4k": {
+        "off": 260
+      }
+    },
+    "vram": {
+      "1080p": 2,
+      "1440p": 3,
+      "4k": 4
+    }
+  },
+  {
+    "id": "overwatch-2",
+    "index": 29,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Overwatch 2",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 450,
+    "reference": {
+      "1080p": {
+        "off": 380
+      },
+      "1440p": {
+        "off": 290
+      },
+      "4k": {
+        "off": 170
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "pubg-battlegrounds",
+    "index": 30,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "PUBG: Battlegrounds",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 280,
+    "reference": {
+      "1080p": {
+        "off": 210
+      },
+      "1440p": {
+        "off": 168
+      },
+      "4k": {
+        "off": 108
+      }
+    },
+    "vram": {
+      "1080p": 5,
+      "1440p": 7,
+      "4k": 10
+    }
+  },
+  {
+    "id": "rainbow-six-siege",
+    "index": 31,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Rainbow Six Siege",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 400,
+    "reference": {
+      "1080p": {
+        "off": 380
+      },
+      "1440p": {
+        "off": 290
+      },
+      "4k": {
+        "off": 165
+      }
+    },
+    "vram": {
+      "1080p": 4,
+      "1440p": 6,
+      "4k": 8
+    }
+  },
+  {
+    "id": "red-dead-redemption-2",
+    "index": 32,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Red Dead Redemption 2",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 152
+      },
+      "1440p": {
+        "off": 122
+      },
+      "4k": {
+        "off": 82
+      }
+    },
+    "vram": {
+      "1080p": 6,
+      "1440p": 8,
+      "4k": 12
+    }
+  },
+  {
+    "id": "rocket-league",
+    "index": 33,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Rocket League",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 500,
+    "reference": {
+      "1080p": {
+        "off": 500
+      },
+      "1440p": {
+        "off": 380
+      },
+      "4k": {
+        "off": 218
+      }
+    },
+    "vram": {
+      "1080p": 3,
+      "1440p": 4,
+      "4k": 5
+    }
+  },
+  {
+    "id": "slime-rancher-2",
+    "index": 34,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Slime Rancher 2",
+    "rtMode": "none",
+    "heavy": false,
+    "reference": {
+      "1080p": {
+        "off": 262
+      },
+      "1440p": {
+        "off": 210
+      },
+      "4k": {
+        "off": 142
+      }
+    },
+    "vram": {
+      "1080p": 3,
+      "1440p": 4,
+      "4k": 6
+    }
+  },
+  {
+    "id": "valorant",
+    "index": 35,
+    "group": "🚀 Rasterização Pura (sem RT)",
+    "name": "Valorant",
+    "rtMode": "none",
+    "heavy": false,
+    "cpuCap": 600,
+    "reference": {
+      "1080p": {
+        "off": 500
+      },
+      "1440p": {
+        "off": 400
+      },
+      "4k": {
+        "off": 230
+      }
+    },
+    "vram": {
+      "1080p": 2,
+      "1440p": 3,
+      "4k": 4
+    }
+  }
+]

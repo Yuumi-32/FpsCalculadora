@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FpsCalculadora"
 include ':app'
+include ':core'

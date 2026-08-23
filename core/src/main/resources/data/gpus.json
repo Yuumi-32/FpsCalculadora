@@ -1,0 +1,692 @@
+[
+  {
+    "id": "gtx-1050",
+    "index": 0,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1050",
+    "mult": 0.07,
+    "vram": 2,
+    "gen": "gtx10",
+    "watts": 70
+  },
+  {
+    "id": "gtx-1050-ti",
+    "index": 1,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1050 Ti",
+    "mult": 0.09,
+    "vram": 4,
+    "gen": "gtx10",
+    "watts": 75
+  },
+  {
+    "id": "gtx-1060-3gb",
+    "index": 2,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1060 3GB",
+    "mult": 0.13,
+    "vram": 3,
+    "gen": "gtx10",
+    "watts": 110
+  },
+  {
+    "id": "gtx-1060-6gb",
+    "index": 3,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1060 6GB",
+    "mult": 0.15,
+    "vram": 6,
+    "gen": "gtx10",
+    "watts": 120
+  },
+  {
+    "id": "gtx-1070",
+    "index": 4,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1070",
+    "mult": 0.22,
+    "vram": 8,
+    "gen": "gtx10",
+    "watts": 145
+  },
+  {
+    "id": "gtx-1070-ti",
+    "index": 5,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1070 Ti",
+    "mult": 0.26,
+    "vram": 8,
+    "gen": "gtx10",
+    "watts": 175
+  },
+  {
+    "id": "gtx-1080",
+    "index": 6,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1080",
+    "mult": 0.28,
+    "vram": 8,
+    "gen": "gtx10",
+    "watts": 185
+  },
+  {
+    "id": "gtx-1080-ti",
+    "index": 7,
+    "group": "GTX 10 (Pascal)",
+    "name": "GTX 1080 Ti",
+    "mult": 0.35,
+    "vram": 11,
+    "gen": "gtx10",
+    "watts": 220
+  },
+  {
+    "id": "gtx-1650",
+    "index": 8,
+    "group": "GTX 16 (Turing sem RT)",
+    "name": "GTX 1650",
+    "mult": 0.09,
+    "vram": 4,
+    "gen": "gtx16",
+    "watts": 75
+  },
+  {
+    "id": "gtx-1650-super",
+    "index": 9,
+    "group": "GTX 16 (Turing sem RT)",
+    "name": "GTX 1650 Super",
+    "mult": 0.13,
+    "vram": 4,
+    "gen": "gtx16",
+    "watts": 95
+  },
+  {
+    "id": "gtx-1660",
+    "index": 10,
+    "group": "GTX 16 (Turing sem RT)",
+    "name": "GTX 1660",
+    "mult": 0.15,
+    "vram": 6,
+    "gen": "gtx16",
+    "watts": 110
+  },
+  {
+    "id": "gtx-1660-super",
+    "index": 11,
+    "group": "GTX 16 (Turing sem RT)",
+    "name": "GTX 1660 Super",
+    "mult": 0.18,
+    "vram": 6,
+    "gen": "gtx16",
+    "watts": 125
+  },
+  {
+    "id": "gtx-1660-ti",
+    "index": 12,
+    "group": "GTX 16 (Turing sem RT)",
+    "name": "GTX 1660 Ti",
+    "mult": 0.2,
+    "vram": 6,
+    "gen": "gtx16",
+    "watts": 130
+  },
+  {
+    "id": "rtx-2060",
+    "index": 13,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2060",
+    "mult": 0.22,
+    "vram": 6,
+    "gen": "rtx20",
+    "watts": 160
+  },
+  {
+    "id": "rtx-2060-super",
+    "index": 14,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2060 Super",
+    "mult": 0.26,
+    "vram": 8,
+    "gen": "rtx20",
+    "watts": 175
+  },
+  {
+    "id": "rtx-2070",
+    "index": 15,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2070",
+    "mult": 0.28,
+    "vram": 8,
+    "gen": "rtx20",
+    "watts": 175
+  },
+  {
+    "id": "rtx-2070-super",
+    "index": 16,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2070 Super",
+    "mult": 0.32,
+    "vram": 8,
+    "gen": "rtx20",
+    "watts": 215
+  },
+  {
+    "id": "rtx-2080",
+    "index": 17,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2080",
+    "mult": 0.34,
+    "vram": 8,
+    "gen": "rtx20",
+    "watts": 215
+  },
+  {
+    "id": "rtx-2080-super",
+    "index": 18,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2080 Super",
+    "mult": 0.36,
+    "vram": 8,
+    "gen": "rtx20",
+    "watts": 245
+  },
+  {
+    "id": "rtx-2080-ti",
+    "index": 19,
+    "group": "RTX 20 (Turing)",
+    "name": "RTX 2080 Ti",
+    "mult": 0.42,
+    "vram": 11,
+    "gen": "rtx20",
+    "watts": 270
+  },
+  {
+    "id": "rtx-3050",
+    "index": 20,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3050",
+    "mult": 0.25,
+    "vram": 8,
+    "gen": "rtx30",
+    "watts": 130
+  },
+  {
+    "id": "rtx-3060-8gb",
+    "index": 21,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3060 8GB",
+    "mult": 0.3,
+    "vram": 8,
+    "gen": "rtx30",
+    "watts": 170
+  },
+  {
+    "id": "rtx-3060-12gb",
+    "index": 22,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3060 12GB",
+    "mult": 0.32,
+    "vram": 12,
+    "gen": "rtx30",
+    "watts": 170
+  },
+  {
+    "id": "rtx-3060-ti",
+    "index": 23,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3060 Ti",
+    "mult": 0.42,
+    "vram": 8,
+    "gen": "rtx30",
+    "watts": 200
+  },
+  {
+    "id": "rtx-3070",
+    "index": 24,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3070",
+    "mult": 0.48,
+    "vram": 8,
+    "gen": "rtx30",
+    "watts": 220
+  },
+  {
+    "id": "rtx-3070-ti",
+    "index": 25,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3070 Ti",
+    "mult": 0.52,
+    "vram": 8,
+    "gen": "rtx30",
+    "watts": 290
+  },
+  {
+    "id": "rtx-3080-10gb",
+    "index": 26,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3080 10GB",
+    "mult": 0.62,
+    "vram": 10,
+    "gen": "rtx30",
+    "watts": 320
+  },
+  {
+    "id": "rtx-3080-12gb",
+    "index": 27,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3080 12GB",
+    "mult": 0.65,
+    "vram": 12,
+    "gen": "rtx30",
+    "watts": 350
+  },
+  {
+    "id": "rtx-3080-ti",
+    "index": 28,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3080 Ti",
+    "mult": 0.72,
+    "vram": 12,
+    "gen": "rtx30",
+    "watts": 350
+  },
+  {
+    "id": "rtx-3090",
+    "index": 29,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3090",
+    "mult": 0.75,
+    "vram": 24,
+    "gen": "rtx30",
+    "watts": 360
+  },
+  {
+    "id": "rtx-3090-ti",
+    "index": 30,
+    "group": "RTX 30 (Ampere)",
+    "name": "RTX 3090 Ti",
+    "mult": 0.85,
+    "vram": 24,
+    "gen": "rtx30",
+    "watts": 450
+  },
+  {
+    "id": "rtx-4060",
+    "index": 31,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4060",
+    "mult": 0.48,
+    "vram": 8,
+    "gen": "rtx40",
+    "watts": 115
+  },
+  {
+    "id": "rtx-4060-ti-8gb",
+    "index": 32,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4060 Ti 8GB",
+    "mult": 0.55,
+    "vram": 8,
+    "gen": "rtx40",
+    "watts": 160
+  },
+  {
+    "id": "rtx-4060-ti-16gb",
+    "index": 33,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4060 Ti 16GB",
+    "mult": 0.58,
+    "vram": 16,
+    "gen": "rtx40",
+    "watts": 165
+  },
+  {
+    "id": "rtx-4070",
+    "index": 34,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4070",
+    "mult": 0.75,
+    "vram": 12,
+    "gen": "rtx40",
+    "watts": 200
+  },
+  {
+    "id": "rtx-4070-super",
+    "index": 35,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4070 Super",
+    "mult": 0.88,
+    "vram": 12,
+    "gen": "rtx40",
+    "watts": 220
+  },
+  {
+    "id": "rtx-4070-ti",
+    "index": 36,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4070 Ti",
+    "mult": 1.02,
+    "vram": 12,
+    "gen": "rtx40",
+    "watts": 280
+  },
+  {
+    "id": "rtx-4070-ti-super",
+    "index": 37,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4070 Ti Super",
+    "mult": 1.12,
+    "vram": 16,
+    "gen": "rtx40",
+    "watts": 285
+  },
+  {
+    "id": "rtx-4080",
+    "index": 38,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4080",
+    "mult": 1.28,
+    "vram": 16,
+    "gen": "rtx40",
+    "watts": 305
+  },
+  {
+    "id": "rtx-4080-super",
+    "index": 39,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4080 Super",
+    "mult": 1.32,
+    "vram": 16,
+    "gen": "rtx40",
+    "watts": 320
+  },
+  {
+    "id": "rtx-4090",
+    "index": 40,
+    "group": "RTX 40 (Ada Lovelace)",
+    "name": "RTX 4090",
+    "mult": 1.55,
+    "vram": 24,
+    "gen": "rtx40",
+    "watts": 425
+  },
+  {
+    "id": "rtx-5050",
+    "index": 41,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5050",
+    "mult": 0.45,
+    "vram": 8,
+    "gen": "rtx50",
+    "watts": 130
+  },
+  {
+    "id": "rtx-5060",
+    "index": 42,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5060",
+    "mult": 0.62,
+    "vram": 8,
+    "gen": "rtx50",
+    "watts": 145
+  },
+  {
+    "id": "rtx-5060-ti-8gb",
+    "index": 43,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5060 Ti 8GB",
+    "mult": 0.75,
+    "vram": 8,
+    "gen": "rtx50",
+    "watts": 180
+  },
+  {
+    "id": "rtx-5060-ti-16gb",
+    "index": 44,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5060 Ti 16GB",
+    "mult": 0.78,
+    "vram": 16,
+    "gen": "rtx50",
+    "watts": 180
+  },
+  {
+    "id": "rtx-5070",
+    "index": 45,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5070",
+    "mult": 1,
+    "vram": 12,
+    "gen": "rtx50",
+    "watts": 250
+  },
+  {
+    "id": "rtx-5070-ti",
+    "index": 46,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5070 Ti",
+    "mult": 1.22,
+    "vram": 16,
+    "gen": "rtx50",
+    "watts": 300
+  },
+  {
+    "id": "rtx-5080",
+    "index": 47,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5080",
+    "mult": 1.5,
+    "vram": 16,
+    "gen": "rtx50",
+    "watts": 360
+  },
+  {
+    "id": "rtx-5090",
+    "index": 48,
+    "group": "RTX 50 (Blackwell)",
+    "name": "RTX 5090",
+    "mult": 2.05,
+    "vram": 32,
+    "gen": "rtx50",
+    "watts": 575
+  },
+  {
+    "id": "rx-6600",
+    "index": 49,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6600",
+    "mult": 0.32,
+    "vram": 8,
+    "gen": "rdna2",
+    "watts": 132
+  },
+  {
+    "id": "rx-6600-xt",
+    "index": 50,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6600 XT",
+    "mult": 0.38,
+    "vram": 8,
+    "gen": "rdna2",
+    "watts": 160
+  },
+  {
+    "id": "rx-6650-xt",
+    "index": 51,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6650 XT",
+    "mult": 0.4,
+    "vram": 8,
+    "gen": "rdna2",
+    "watts": 176
+  },
+  {
+    "id": "rx-6700-xt",
+    "index": 52,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6700 XT",
+    "mult": 0.5,
+    "vram": 12,
+    "gen": "rdna2",
+    "watts": 230
+  },
+  {
+    "id": "rx-6750-xt",
+    "index": 53,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6750 XT",
+    "mult": 0.53,
+    "vram": 12,
+    "gen": "rdna2",
+    "watts": 250
+  },
+  {
+    "id": "rx-6800",
+    "index": 54,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6800",
+    "mult": 0.58,
+    "vram": 16,
+    "gen": "rdna2",
+    "watts": 250
+  },
+  {
+    "id": "rx-6800-xt",
+    "index": 55,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6800 XT",
+    "mult": 0.65,
+    "vram": 16,
+    "gen": "rdna2",
+    "watts": 300
+  },
+  {
+    "id": "rx-6900-xt",
+    "index": 56,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6900 XT",
+    "mult": 0.72,
+    "vram": 16,
+    "gen": "rdna2",
+    "watts": 300
+  },
+  {
+    "id": "rx-6950-xt",
+    "index": 57,
+    "group": "RX 6000 (RDNA 2)",
+    "name": "RX 6950 XT",
+    "mult": 0.78,
+    "vram": 16,
+    "gen": "rdna2",
+    "watts": 335
+  },
+  {
+    "id": "rx-7600",
+    "index": 58,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7600",
+    "mult": 0.48,
+    "vram": 8,
+    "gen": "rdna3",
+    "watts": 165
+  },
+  {
+    "id": "rx-7600-xt",
+    "index": 59,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7600 XT",
+    "mult": 0.52,
+    "vram": 16,
+    "gen": "rdna3",
+    "watts": 190
+  },
+  {
+    "id": "rx-7700-xt",
+    "index": 60,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7700 XT",
+    "mult": 0.68,
+    "vram": 12,
+    "gen": "rdna3",
+    "watts": 245
+  },
+  {
+    "id": "rx-7800-xt",
+    "index": 61,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7800 XT",
+    "mult": 0.8,
+    "vram": 16,
+    "gen": "rdna3",
+    "watts": 263
+  },
+  {
+    "id": "rx-7900-gre",
+    "index": 62,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7900 GRE",
+    "mult": 0.88,
+    "vram": 16,
+    "gen": "rdna3",
+    "watts": 260
+  },
+  {
+    "id": "rx-7900-xt",
+    "index": 63,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7900 XT",
+    "mult": 1.08,
+    "vram": 20,
+    "gen": "rdna3",
+    "watts": 315
+  },
+  {
+    "id": "rx-7900-xtx",
+    "index": 64,
+    "group": "RX 7000 (RDNA 3)",
+    "name": "RX 7900 XTX",
+    "mult": 1.25,
+    "vram": 24,
+    "gen": "rdna3",
+    "watts": 355
+  },
+  {
+    "id": "rx-9060-xt-8gb",
+    "index": 65,
+    "group": "RX 9000 (RDNA 4)",
+    "name": "RX 9060 XT 8GB",
+    "mult": 0.72,
+    "vram": 8,
+    "gen": "rdna4",
+    "watts": 160
+  },
+  {
+    "id": "rx-9060-xt-16gb",
+    "index": 66,
+    "group": "RX 9000 (RDNA 4)",
+    "name": "RX 9060 XT 16GB",
+    "mult": 0.75,
+    "vram": 16,
+    "gen": "rdna4",
+    "watts": 165
+  },
+  {
+    "id": "rx-9070",
+    "index": 67,
+    "group": "RX 9000 (RDNA 4)",
+    "name": "RX 9070",
+    "mult": 1.02,
+    "vram": 16,
+    "gen": "rdna4",
+    "watts": 220
+  },
+  {
+    "id": "rx-9070-xt",
+    "index": 68,
+    "group": "RX 9000 (RDNA 4)",
+    "name": "RX 9070 XT",
+    "mult": 1.15,
+    "vram": 16,
+    "gen": "rdna4",
+    "watts": 304
+  }
+]

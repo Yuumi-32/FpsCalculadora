@@ -1,0 +1,312 @@
+{
+  "meta": {
+    "version": "2.0",
+    "updated": "julho de 2026"
+  },
+  "systemWatts": 80,
+  "presets": [
+    {
+      "key": "max",
+      "name": "Máximo",
+      "mult": 1
+    },
+    {
+      "key": "cinematic",
+      "name": "Cinematic",
+      "mult": 1.05
+    },
+    {
+      "key": "veryhigh",
+      "name": "Very High",
+      "mult": 1.12
+    },
+    {
+      "key": "ultra",
+      "name": "Ultra",
+      "mult": 1.2
+    },
+    {
+      "key": "high",
+      "name": "High",
+      "mult": 1.4
+    },
+    {
+      "key": "medium",
+      "name": "Medium",
+      "mult": 1.7
+    },
+    {
+      "key": "low",
+      "name": "Low",
+      "mult": 2.2
+    }
+  ],
+  "upscalersNvidia": [
+    {
+      "key": "qual",
+      "name": "DLSS Qualidade",
+      "mult": 0.92,
+      "needsRtx": true
+    },
+    {
+      "key": "bal",
+      "name": "DLSS Balanceado",
+      "mult": 1,
+      "needsRtx": true
+    },
+    {
+      "key": "perf",
+      "name": "DLSS Performance",
+      "mult": 1.12,
+      "needsRtx": true
+    },
+    {
+      "key": "dlaa",
+      "name": "DLAA",
+      "mult": 0.65,
+      "needsRtx": true
+    },
+    {
+      "key": "native",
+      "name": "Nativo (sem DLSS)",
+      "mult": 0.6,
+      "needsRtx": false
+    }
+  ],
+  "upscalersAmd": [
+    {
+      "key": "qual",
+      "name": "FSR Qualidade",
+      "mult": 0.92
+    },
+    {
+      "key": "bal",
+      "name": "FSR Balanceado",
+      "mult": 1
+    },
+    {
+      "key": "perf",
+      "name": "FSR Performance",
+      "mult": 1.12
+    },
+    {
+      "key": "naa",
+      "name": "FSR Native AA",
+      "mult": 0.65
+    },
+    {
+      "key": "native",
+      "name": "Nativo (sem FSR)",
+      "mult": 0.6
+    }
+  ],
+  "rtEfficiencyByGen": {
+    "rtx20": 0.7,
+    "rtx30": 0.85,
+    "rdna2": 0.62,
+    "rdna3": 0.78,
+    "rdna4": 0.95
+  },
+  "vramByPreset": {
+    "max": 0,
+    "cinematic": 0.5,
+    "veryhigh": -0.5,
+    "ultra": -1,
+    "high": -1.5,
+    "medium": -2.5,
+    "low": -4
+  },
+  "ramLabels": {
+    "ddr4_16": "DDR4 16GB DC 3200",
+    "ddr4_32": "DDR4 32GB DC 3200",
+    "ddr4_64": "DDR4 64GB DC 3200",
+    "ddr5_4800_16": "DDR5 16GB DC 4800",
+    "ddr5_4800_32": "DDR5 32GB DC 4800",
+    "ddr5_4800_64": "DDR5 64GB DC 4800",
+    "ddr5_16": "DDR5 16GB DC 5200",
+    "ddr5_32": "DDR5 32GB DC 5200",
+    "ddr5_64": "DDR5 64GB DC 5200"
+  },
+  "hzMarkers": {
+    "60": [
+      {
+        "v": 30,
+        "l": "30"
+      },
+      {
+        "v": 60,
+        "l": "60 Hz"
+      }
+    ],
+    "144": [
+      {
+        "v": 60,
+        "l": "60"
+      },
+      {
+        "v": 120,
+        "l": "120"
+      },
+      {
+        "v": 144,
+        "l": "144 Hz"
+      }
+    ],
+    "210": [
+      {
+        "v": 60,
+        "l": "60"
+      },
+      {
+        "v": 120,
+        "l": "120"
+      },
+      {
+        "v": 210,
+        "l": "210 Hz"
+      }
+    ],
+    "300": [
+      {
+        "v": 60,
+        "l": "60"
+      },
+      {
+        "v": 144,
+        "l": "144"
+      },
+      {
+        "v": 300,
+        "l": "300 Hz"
+      }
+    ]
+  },
+  "buildPresets": {
+    "1080p_eco": {
+      "cpu": "ryzen-5-3600",
+      "gpu": "rtx-3060-12gb",
+      "mobo": "b450",
+      "cpuIndex": 6,
+      "gpuIndex": 22,
+      "moboIndex": 1,
+      "ram": "ddr4_16",
+      "res": "1080p",
+      "preset": "high",
+      "rt": "off",
+      "dlss": 1,
+      "fg": 1
+    },
+    "1080p_mid": {
+      "cpu": "ryzen-5-5600x",
+      "gpu": "rtx-4060",
+      "mobo": "b550",
+      "cpuIndex": 14,
+      "gpuIndex": 31,
+      "moboIndex": 3,
+      "ram": "ddr4_32",
+      "res": "1080p",
+      "preset": "ultra",
+      "rt": "rt",
+      "dlss": 1,
+      "fg": 1
+    },
+    "1080p_max": {
+      "cpu": "ryzen-7-5800x3d",
+      "gpu": "rtx-4070-super",
+      "mobo": "b550",
+      "cpuIndex": 19,
+      "gpuIndex": 35,
+      "moboIndex": 3,
+      "ram": "ddr4_32",
+      "res": "1080p",
+      "preset": "ultra",
+      "rt": "rt",
+      "dlss": 1,
+      "fg": 1
+    },
+    "1440p_eco": {
+      "cpu": "ryzen-5-5600x",
+      "gpu": "rtx-4060-ti-16gb",
+      "mobo": "b550",
+      "cpuIndex": 14,
+      "gpuIndex": 33,
+      "moboIndex": 3,
+      "ram": "ddr4_32",
+      "res": "1440p",
+      "preset": "high",
+      "rt": "off",
+      "dlss": 1,
+      "fg": 1
+    },
+    "1440p_mid": {
+      "cpu": "ryzen-7-5800x3d",
+      "gpu": "rtx-4070",
+      "mobo": "b550",
+      "cpuIndex": 19,
+      "gpuIndex": 34,
+      "moboIndex": 3,
+      "ram": "ddr4_32",
+      "res": "1440p",
+      "preset": "ultra",
+      "rt": "rt",
+      "dlss": 1,
+      "fg": 1.78
+    },
+    "1440p_max": {
+      "cpu": "ryzen-7-7800x3d",
+      "gpu": "rtx-5070-ti",
+      "mobo": "b650e-pcie-5-0",
+      "cpuIndex": 26,
+      "gpuIndex": 46,
+      "moboIndex": 8,
+      "ram": "ddr5_32",
+      "res": "1440p",
+      "preset": "ultra",
+      "rt": "rr",
+      "dlss": 1,
+      "fg": 1.78
+    },
+    "4k_eco": {
+      "cpu": "ryzen-7-5800x3d",
+      "gpu": "rtx-4070-super",
+      "mobo": "b550",
+      "cpuIndex": 19,
+      "gpuIndex": 35,
+      "moboIndex": 3,
+      "ram": "ddr4_32",
+      "res": "4k",
+      "preset": "high",
+      "rt": "off",
+      "dlss": 1.12,
+      "fg": 1.78
+    },
+    "4k_mid": {
+      "cpu": "ryzen-7-7800x3d",
+      "gpu": "rtx-4080-super",
+      "mobo": "b650e-pcie-5-0",
+      "cpuIndex": 26,
+      "gpuIndex": 39,
+      "moboIndex": 8,
+      "ram": "ddr5_32",
+      "res": "4k",
+      "preset": "ultra",
+      "rt": "rt",
+      "dlss": 1,
+      "fg": 1.78
+    },
+    "4k_max": {
+      "cpu": "ryzen-7-9800x3d",
+      "gpu": "rtx-5090",
+      "mobo": "x870e-pcie-5-0",
+      "cpuIndex": 33,
+      "gpuIndex": 48,
+      "moboIndex": 13,
+      "ram": "ddr5_64",
+      "res": "4k",
+      "preset": "max",
+      "rt": "rr",
+      "dlss": 1,
+      "fg": 3.15
+    }
+  }
+}

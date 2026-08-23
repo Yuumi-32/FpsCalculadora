@@ -1,0 +1,170 @@
+[
+  {
+    "id": "a320-sem-oc",
+    "index": 0,
+    "group": "AM4 · Série 400",
+    "name": "A320 (sem OC)",
+    "socket": "AM4",
+    "mult": 0.96
+  },
+  {
+    "id": "b450",
+    "index": 1,
+    "group": "AM4 · Série 400",
+    "name": "B450",
+    "socket": "AM4",
+    "mult": 0.98
+  },
+  {
+    "id": "x470",
+    "index": 2,
+    "group": "AM4 · Série 400",
+    "name": "X470",
+    "socket": "AM4",
+    "mult": 0.99
+  },
+  {
+    "id": "b550",
+    "index": 3,
+    "group": "AM4 · Série 500",
+    "name": "B550",
+    "socket": "AM4",
+    "mult": 1
+  },
+  {
+    "id": "x570",
+    "index": 4,
+    "group": "AM4 · Série 500",
+    "name": "X570",
+    "socket": "AM4",
+    "mult": 1
+  },
+  {
+    "id": "x570s",
+    "index": 5,
+    "group": "AM4 · Série 500",
+    "name": "X570S",
+    "socket": "AM4",
+    "mult": 1
+  },
+  {
+    "id": "a620-sem-oc",
+    "index": 6,
+    "group": "AM5 · Série 600",
+    "name": "A620 (sem OC)",
+    "socket": "AM5",
+    "mult": 0.96
+  },
+  {
+    "id": "b650",
+    "index": 7,
+    "group": "AM5 · Série 600",
+    "name": "B650",
+    "socket": "AM5",
+    "mult": 0.98
+  },
+  {
+    "id": "b650e-pcie-5-0",
+    "index": 8,
+    "group": "AM5 · Série 600",
+    "name": "B650E (PCIe 5.0)",
+    "socket": "AM5",
+    "mult": 0.99
+  },
+  {
+    "id": "x670",
+    "index": 9,
+    "group": "AM5 · Série 600",
+    "name": "X670",
+    "socket": "AM5",
+    "mult": 1
+  },
+  {
+    "id": "x670e-pcie-5-0",
+    "index": 10,
+    "group": "AM5 · Série 600",
+    "name": "X670E (PCIe 5.0)",
+    "socket": "AM5",
+    "mult": 1
+  },
+  {
+    "id": "b850",
+    "index": 11,
+    "group": "AM5 · Série 800",
+    "name": "B850",
+    "socket": "AM5",
+    "mult": 1
+  },
+  {
+    "id": "x870",
+    "index": 12,
+    "group": "AM5 · Série 800",
+    "name": "X870",
+    "socket": "AM5",
+    "mult": 1.01
+  },
+  {
+    "id": "x870e-pcie-5-0",
+    "index": 13,
+    "group": "AM5 · Série 800",
+    "name": "X870E (PCIe 5.0)",
+    "socket": "AM5",
+    "mult": 1.01
+  },
+  {
+    "id": "h610-sem-oc",
+    "index": 14,
+    "group": "LGA1700 · Série 600/700",
+    "name": "H610 (sem OC)",
+    "socket": "LGA1700",
+    "mult": 0.96
+  },
+  {
+    "id": "b660",
+    "index": 15,
+    "group": "LGA1700 · Série 600/700",
+    "name": "B660",
+    "socket": "LGA1700",
+    "mult": 0.98
+  },
+  {
+    "id": "b760",
+    "index": 16,
+    "group": "LGA1700 · Série 600/700",
+    "name": "B760",
+    "socket": "LGA1700",
+    "mult": 0.99
+  },
+  {
+    "id": "z690",
+    "index": 17,
+    "group": "LGA1700 · Série 600/700",
+    "name": "Z690",
+    "socket": "LGA1700",
+    "mult": 1
+  },
+  {
+    "id": "z790",
+    "index": 18,
+    "group": "LGA1700 · Série 600/700",
+    "name": "Z790",
+    "socket": "LGA1700",
+    "mult": 1
+  },
+  {
+    "id": "b860",
+    "index": 19,
+    "group": "LGA1851 · Série 800",
+    "name": "B860",
+    "socket": "LGA1851",
+    "mult": 1
+  },
+  {
+    "id": "z890",
+    "index": 20,
+    "group": "LGA1851 · Série 800",
+    "name": "Z890",
+    "socket": "LGA1851",
+    "mult": 1.01
+  }
+]

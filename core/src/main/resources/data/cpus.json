@@ -1,0 +1,479 @@
+[
+  {
+    "id": "ryzen-5-1600",
+    "index": 0,
+    "group": "AM4 · Zen (1000)",
+    "name": "Ryzen 5 1600",
+    "mult": 0.4,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-7-1700x",
+    "index": 1,
+    "group": "AM4 · Zen (1000)",
+    "name": "Ryzen 7 1700X",
+    "mult": 0.45,
+    "socket": "AM4",
+    "watts": 70
+  },
+  {
+    "id": "ryzen-7-1800x",
+    "index": 2,
+    "group": "AM4 · Zen (1000)",
+    "name": "Ryzen 7 1800X",
+    "mult": 0.48,
+    "socket": "AM4",
+    "watts": 75
+  },
+  {
+    "id": "ryzen-5-2600",
+    "index": 3,
+    "group": "AM4 · Zen+ (2000)",
+    "name": "Ryzen 5 2600",
+    "mult": 0.55,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-5-2600x",
+    "index": 4,
+    "group": "AM4 · Zen+ (2000)",
+    "name": "Ryzen 5 2600X",
+    "mult": 0.58,
+    "socket": "AM4",
+    "watts": 60
+  },
+  {
+    "id": "ryzen-7-2700x",
+    "index": 5,
+    "group": "AM4 · Zen+ (2000)",
+    "name": "Ryzen 7 2700X",
+    "mult": 0.62,
+    "socket": "AM4",
+    "watts": 85
+  },
+  {
+    "id": "ryzen-5-3600",
+    "index": 6,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 5 3600",
+    "mult": 0.72,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-5-3600x",
+    "index": 7,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 5 3600X",
+    "mult": 0.74,
+    "socket": "AM4",
+    "watts": 55
+  },
+  {
+    "id": "ryzen-7-3700x",
+    "index": 8,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 7 3700X",
+    "mult": 0.78,
+    "socket": "AM4",
+    "watts": 65
+  },
+  {
+    "id": "ryzen-7-3800x",
+    "index": 9,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 7 3800X",
+    "mult": 0.8,
+    "socket": "AM4",
+    "watts": 80
+  },
+  {
+    "id": "ryzen-9-3900x",
+    "index": 10,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 9 3900X",
+    "mult": 0.82,
+    "socket": "AM4",
+    "watts": 100
+  },
+  {
+    "id": "ryzen-9-3950x",
+    "index": 11,
+    "group": "AM4 · Zen 2 (3000)",
+    "name": "Ryzen 9 3950X",
+    "mult": 0.83,
+    "socket": "AM4",
+    "watts": 110
+  },
+  {
+    "id": "ryzen-5-5500",
+    "index": 12,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 5 5500",
+    "mult": 0.85,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-5-5600",
+    "index": 13,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 5 5600",
+    "mult": 0.92,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-5-5600x",
+    "index": 14,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 5 5600X",
+    "mult": 0.95,
+    "socket": "AM4",
+    "watts": 60
+  },
+  {
+    "id": "ryzen-7-5700",
+    "index": 15,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 7 5700",
+    "mult": 0.98,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-7-5700x",
+    "index": 16,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 7 5700X",
+    "mult": 1,
+    "socket": "AM4",
+    "watts": 55
+  },
+  {
+    "id": "ryzen-7-5700x3d",
+    "index": 17,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 7 5700X3D",
+    "mult": 1.18,
+    "socket": "AM4",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-7-5800x",
+    "index": 18,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 7 5800X",
+    "mult": 1.02,
+    "socket": "AM4",
+    "watts": 90
+  },
+  {
+    "id": "ryzen-7-5800x3d",
+    "index": 19,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 7 5800X3D",
+    "mult": 1.2,
+    "socket": "AM4",
+    "watts": 55
+  },
+  {
+    "id": "ryzen-9-5900x",
+    "index": 20,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 9 5900X",
+    "mult": 1.05,
+    "socket": "AM4",
+    "watts": 110
+  },
+  {
+    "id": "ryzen-9-5950x",
+    "index": 21,
+    "group": "AM4 · Zen 3 (5000)",
+    "name": "Ryzen 9 5950X",
+    "mult": 1.06,
+    "socket": "AM4",
+    "watts": 115
+  },
+  {
+    "id": "ryzen-5-7600",
+    "index": 22,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 5 7600",
+    "mult": 1.05,
+    "socket": "AM5",
+    "watts": 60
+  },
+  {
+    "id": "ryzen-5-7600x",
+    "index": 23,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 5 7600X",
+    "mult": 1.08,
+    "socket": "AM5",
+    "watts": 75
+  },
+  {
+    "id": "ryzen-7-7700",
+    "index": 24,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 7 7700",
+    "mult": 1.1,
+    "socket": "AM5",
+    "watts": 65
+  },
+  {
+    "id": "ryzen-7-7700x",
+    "index": 25,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 7 7700X",
+    "mult": 1.12,
+    "socket": "AM5",
+    "watts": 90
+  },
+  {
+    "id": "ryzen-7-7800x3d",
+    "index": 26,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 7 7800X3D",
+    "mult": 1.3,
+    "socket": "AM5",
+    "watts": 50
+  },
+  {
+    "id": "ryzen-9-7900x",
+    "index": 27,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 9 7900X",
+    "mult": 1.15,
+    "socket": "AM5",
+    "watts": 120
+  },
+  {
+    "id": "ryzen-9-7900x3d",
+    "index": 28,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 9 7900X3D",
+    "mult": 1.25,
+    "socket": "AM5",
+    "watts": 90
+  },
+  {
+    "id": "ryzen-9-7950x",
+    "index": 29,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 9 7950X",
+    "mult": 1.18,
+    "socket": "AM5",
+    "watts": 130
+  },
+  {
+    "id": "ryzen-9-7950x3d",
+    "index": 30,
+    "group": "AM5 · Zen 4 (7000)",
+    "name": "Ryzen 9 7950X3D",
+    "mult": 1.3,
+    "socket": "AM5",
+    "watts": 100
+  },
+  {
+    "id": "ryzen-5-9600x",
+    "index": 31,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 5 9600X",
+    "mult": 1.12,
+    "socket": "AM5",
+    "watts": 70
+  },
+  {
+    "id": "ryzen-7-9700x",
+    "index": 32,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 7 9700X",
+    "mult": 1.18,
+    "socket": "AM5",
+    "watts": 85
+  },
+  {
+    "id": "ryzen-7-9800x3d",
+    "index": 33,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 7 9800X3D",
+    "mult": 1.4,
+    "socket": "AM5",
+    "watts": 70
+  },
+  {
+    "id": "ryzen-9-9900x",
+    "index": 34,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 9 9900X",
+    "mult": 1.22,
+    "socket": "AM5",
+    "watts": 110
+  },
+  {
+    "id": "ryzen-9-9900x3d",
+    "index": 35,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 9 9900X3D",
+    "mult": 1.32,
+    "socket": "AM5",
+    "watts": 95
+  },
+  {
+    "id": "ryzen-9-9950x",
+    "index": 36,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 9 9950X",
+    "mult": 1.25,
+    "socket": "AM5",
+    "watts": 130
+  },
+  {
+    "id": "ryzen-9-9950x3d",
+    "index": 37,
+    "group": "AM5 · Zen 5 (9000)",
+    "name": "Ryzen 9 9950X3D",
+    "mult": 1.42,
+    "socket": "AM5",
+    "watts": 110
+  },
+  {
+    "id": "core-i3-12100f",
+    "index": 38,
+    "group": "LGA1700 · Intel 12ª ger.",
+    "name": "Core i3-12100F",
+    "mult": 0.85,
+    "socket": "LGA1700",
+    "watts": 58
+  },
+  {
+    "id": "core-i5-12400f",
+    "index": 39,
+    "group": "LGA1700 · Intel 12ª ger.",
+    "name": "Core i5-12400F",
+    "mult": 0.93,
+    "socket": "LGA1700",
+    "watts": 65
+  },
+  {
+    "id": "core-i5-12600k",
+    "index": 40,
+    "group": "LGA1700 · Intel 12ª ger.",
+    "name": "Core i5-12600K",
+    "mult": 1,
+    "socket": "LGA1700",
+    "watts": 95
+  },
+  {
+    "id": "core-i7-12700k",
+    "index": 41,
+    "group": "LGA1700 · Intel 12ª ger.",
+    "name": "Core i7-12700K",
+    "mult": 1.05,
+    "socket": "LGA1700",
+    "watts": 125
+  },
+  {
+    "id": "core-i9-12900k",
+    "index": 42,
+    "group": "LGA1700 · Intel 12ª ger.",
+    "name": "Core i9-12900K",
+    "mult": 1.1,
+    "socket": "LGA1700",
+    "watts": 145
+  },
+  {
+    "id": "core-i5-13400f",
+    "index": 43,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i5-13400F",
+    "mult": 0.98,
+    "socket": "LGA1700",
+    "watts": 85
+  },
+  {
+    "id": "core-i5-13600k",
+    "index": 44,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i5-13600K",
+    "mult": 1.1,
+    "socket": "LGA1700",
+    "watts": 120
+  },
+  {
+    "id": "core-i7-13700k",
+    "index": 45,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i7-13700K",
+    "mult": 1.16,
+    "socket": "LGA1700",
+    "watts": 150
+  },
+  {
+    "id": "core-i9-13900k",
+    "index": 46,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i9-13900K",
+    "mult": 1.22,
+    "socket": "LGA1700",
+    "watts": 180
+  },
+  {
+    "id": "core-i5-14600k",
+    "index": 47,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i5-14600K",
+    "mult": 1.12,
+    "socket": "LGA1700",
+    "watts": 125
+  },
+  {
+    "id": "core-i7-14700k",
+    "index": 48,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i7-14700K",
+    "mult": 1.18,
+    "socket": "LGA1700",
+    "watts": 160
+  },
+  {
+    "id": "core-i9-14900k",
+    "index": 49,
+    "group": "LGA1700 · Intel 13ª/14ª ger.",
+    "name": "Core i9-14900K",
+    "mult": 1.24,
+    "socket": "LGA1700",
+    "watts": 190
+  },
+  {
+    "id": "core-ultra-5-245k",
+    "index": 50,
+    "group": "LGA1851 · Core Ultra 200S",
+    "name": "Core Ultra 5 245K",
+    "mult": 1.1,
+    "socket": "LGA1851",
+    "watts": 110
+  },
+  {
+    "id": "core-ultra-7-265k",
+    "index": 51,
+    "group": "LGA1851 · Core Ultra 200S",
+    "name": "Core Ultra 7 265K",
+    "mult": 1.15,
+    "socket": "LGA1851",
+    "watts": 125
+  },
+  {
+    "id": "core-ultra-9-285k",
+    "index": 52,
+    "group": "LGA1851 · Core Ultra 200S",
+    "name": "Core Ultra 9 285K",
+    "mult": 1.2,
+    "socket": "LGA1851",
+    "watts": 145
+  }
+]
