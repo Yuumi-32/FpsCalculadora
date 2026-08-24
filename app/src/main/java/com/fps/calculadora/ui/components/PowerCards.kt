@@ -235,7 +235,10 @@ private fun HourChip(hours: Int, selected: Boolean, onClick: () -> Unit) {
  */
 @Composable
 private fun TariffField(tariff: Double, onTariffChange: (Double) -> Unit) {
-    var text by remember(tariff) { mutableStateOf("%.2f".format(tariff)) }
+    // Sem chave: o valor inicial vem de `tariff`, mas depois disso o texto só
+    // muda pela digitação do usuário — reformatar a cada tecla (via `tariff`
+    // como chave) apagava o que ele estava escrevendo a cada dígito válido.
+    var text by remember { mutableStateOf("%.2f".format(tariff)) }
     BasicTextField(
         value = text,
         onValueChange = { raw ->
