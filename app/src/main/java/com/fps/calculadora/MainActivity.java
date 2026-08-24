@@ -32,7 +32,13 @@ public class MainActivity extends Activity {
         // ignora FLAG_FULLSCREEN. Sem isto, a topbar do HTML fica atrás do
         // relógio e a navegação inferior atrás da barra de gestos.
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            // O teclado entra junto: com o app desenhando sob as barras, o
+            // adjustResize sozinho não reserva mais espaço para o IME e o
+            // campo de busca dos bottom sheets ficaria coberto.
+            Insets bars = windowInsets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout()
+                            | WindowInsetsCompat.Type.ime());
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             return WindowInsetsCompat.CONSUMED;
         });
