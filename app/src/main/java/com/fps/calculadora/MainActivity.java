@@ -31,7 +31,12 @@ public class MainActivity extends Activity {
         // A partir do targetSdk 35 o Android desenha sob as barras do sistema e
         // ignora FLAG_FULLSCREEN. Sem isto, a topbar do HTML fica atrás do
         // relógio e a navegação inferior atrás da barra de gestos.
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (view, windowInsets) -> {
+        //
+        // O padding vai no container, não na WebView: setPadding() numa WebView
+        // não desloca o conteúdo da página de forma confiável (ainda mais com
+        // useWideViewPort ligado). Aplicado na RelativeLayout, ele encolhe os
+        // limites da WebView de verdade.
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.root), (view, windowInsets) -> {
             // O teclado entra junto: com o app desenhando sob as barras, o
             // adjustResize sozinho não reserva mais espaço para o IME e o
             // campo de busca dos bottom sheets ficaria coberto.
