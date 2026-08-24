@@ -4,6 +4,18 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+// Credenciais de assinatura ficam fora do controle de versão.
+// Copie keystore.properties.example para keystore.properties e preencha.
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+// Só assina quando a configuração está completa — assim um arquivo pela
+// metade gera pacote não assinado em vez de quebrar o build.
+def hasSigning = keystoreProps['storeFile'] && keystoreProps['keyAlias'] &&
+    keystoreProps['storePassword'] && keystoreProps['keyPassword']
+
 android {
     namespace 'com.fps.calculadora'
     compileSdk 36
@@ -16,10 +28,24 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        if (hasSigning) {
+            release {
+                storeFile     rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias      keystoreProps['keyAlias']
+                keyPassword   keystoreProps['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            }
         }
         debug {
             applicationIdSuffix ".debug"

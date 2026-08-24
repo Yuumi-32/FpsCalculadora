@@ -13,5 +13,10 @@ local.properties
 *.apk
 *.aab
 
-# Claude Code
-.claude/settings.local.json
+# Ferramentas locais do editor
+.claude/
+
+# Assinatura de release — NUNCA versionar
+*.jks
+*.keystore
+keystore.properties
