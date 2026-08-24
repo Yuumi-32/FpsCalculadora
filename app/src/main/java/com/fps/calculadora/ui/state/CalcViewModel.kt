@@ -1,28 +1,48 @@
 package com.fps.calculadora.ui.state
 
+import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.fps.calculadora.core.Balance
 import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.CalcResult
+import com.fps.calculadora.core.CompareRow
 import com.fps.calculadora.core.DEFAULT_HOURS_PER_DAY
 import com.fps.calculadora.core.DEFAULT_TARIFF_BRL
 import com.fps.calculadora.core.EnergyEstimate
 import com.fps.calculadora.core.FpsCalculator
+import com.fps.calculadora.core.GameCompareSummary
 import com.fps.calculadora.core.GameDatabase
+import com.fps.calculadora.core.GameRankEntry
+import com.fps.calculadora.core.GamesSort
+import com.fps.calculadora.core.HistoryEntry
 import com.fps.calculadora.core.PerformanceTier
 import com.fps.calculadora.core.PsuEstimate
 import com.fps.calculadora.core.Resolution
 import com.fps.calculadora.core.RtSetting
+import com.fps.calculadora.core.UpgradeAdvice
 import com.fps.calculadora.core.balance
+import com.fps.calculadora.core.buildCode
 import com.fps.calculadora.core.byResolution
+import com.fps.calculadora.core.compareAllGames
+import com.fps.calculadora.core.compareGame
 import com.fps.calculadora.core.energyFor
 import com.fps.calculadora.core.normalize
+import com.fps.calculadora.core.parseBuildCode
+import com.fps.calculadora.core.rankAllGames
+import com.fps.calculadora.core.toBuildState
+import com.fps.calculadora.core.upgradeAdvice
 import com.fps.calculadora.core.warningsFor
+import com.fps.calculadora.core.withNewEntry
+import com.fps.calculadora.data.HistoryStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 /** Tudo que a tela Calcular mostra para um estado — calculado de uma vez só. */
 data class CalcSnapshot(
@@ -36,17 +56,21 @@ data class CalcSnapshot(
     val byResolution: Map<Resolution, CalcResult>,
 )
 
+/** Modo de comparação da aba Comparar builds — o `cmpMode` do `index.html` (:2630). */
+enum class CompareMode { GAME, ALL_GAMES }
+
 /**
- * Guarda o estado da build e deriva o resultado.
- *
- * Não faz conta nenhuma: tudo vem do `:core`. O papel aqui é segurar a escolha
- * do usuário, normalizá-la a cada mudança e lembrar o valor anterior para a
- * seta de variação do gauge.
+ * Guarda o estado da build (compartilhado por todas as abas) e deriva os
+ * resultados de cada uma. Não faz conta nenhuma: tudo vem do `:core`. O papel
+ * aqui é segurar a escolha do usuário, normalizá-la a cada mudança, lembrar o
+ * valor anterior para a seta de variação do gauge, e falar com o histórico
+ * local (`DataStore`).
  */
-class CalcViewModel : ViewModel() {
+class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
     val db: GameDatabase = GameDatabase.default
     private val calculator = FpsCalculator(db)
+    private val historyStore = HistoryStore(application)
 
     var state by mutableStateOf(db.normalize(defaultState()))
         private set
@@ -58,6 +82,17 @@ class CalcViewModel : ViewModel() {
     /** Último FPS exibido, para o gauge mostrar de quanto foi o salto. */
     var previousFps by mutableStateOf<Int?>(null)
         private set
+
+    /** Ordenação da aba "Seu PC em todos os jogos" — não persiste entre sessões, igual ao original. */
+    var gamesSort by mutableStateOf(GamesSort.FPS)
+
+    /** Modo da aba Comparar builds. */
+    var compareMode by mutableStateOf(CompareMode.GAME)
+
+    /** `id` do build do histórico escolhido como B na aba Comparar — `null` até o usuário escolher um. */
+    var compareBuildId by mutableStateOf<Long?>(null)
+
+    val historyEntries: Flow<List<HistoryEntry>> = historyStore.entries
 
     val snapshot: CalcSnapshot
         get() {
@@ -74,20 +109,65 @@ class CalcViewModel : ViewModel() {
             )
         }
 
+    fun gamesRanking(): List<GameRankEntry> = calculator.rankAllGames(state, gamesSort)
+
+    fun upgradeAdvice(): UpgradeAdvice = calculator.upgradeAdvice(state)
+
+    fun compareGame(buildB: BuildState): List<CompareRow> = calculator.compareGame(state, buildB)
+
+    fun compareAllGames(buildB: BuildState): GameCompareSummary = calculator.compareAllGames(state, buildB)
+
+    /** FPS médio de uma build qualquer — usado pra rotular builds do histórico sem trocar a build atual. */
+    fun fpsFor(build: BuildState): Int = calculator.calc(build).avg
+
+    fun exportCurrentBuildCode(): String = db.buildCode(state)
+
+    /** `true` quando o código era válido e a build atual foi trocada por ele. */
+    fun importBuildCode(code: String): Boolean {
+        val parsed = db.parseBuildCode(code) ?: return false
+        applyState(parsed)
+        return true
+    }
+
     /**
      * Aplica uma mudança e renormaliza — é o que impede combinações impossíveis
      * (DDR5 numa AM4, RT numa GTX) de sobreviverem a uma troca de peça.
      */
     fun update(transform: (BuildState) -> BuildState) {
-        val before = calculator.calc(state).avg
         val next = db.normalize(transform(state))
         if (next == state) return
-        previousFps = before
-        state = next
+        applyState(next)
     }
 
     fun clearPreviousFps() {
         previousFps = null
+    }
+
+    /** Salva a build atual no histórico local — porta o `saveBuild()` (`index.html:2519`). */
+    fun saveCurrentBuild() {
+        viewModelScope.launch {
+            val current = historyStore.entries.first()
+            historyStore.save(current.withNewEntry(state, System.currentTimeMillis()))
+        }
+    }
+
+    /** Carrega um build salvo como a build atual — porta a ação "Carregar" do card de histórico. */
+    fun loadHistoryEntry(entry: HistoryEntry) {
+        applyState(db.normalize(entry.state.toBuildState()))
+    }
+
+    /** Remove um build do histórico — porta a ação "Excluir" (`index.html:2570`). */
+    fun deleteHistoryEntry(id: Long) {
+        viewModelScope.launch {
+            val current = historyStore.entries.first()
+            historyStore.save(current.filterNot { it.id == id })
+        }
+        if (compareBuildId == id) compareBuildId = null
+    }
+
+    private fun applyState(next: BuildState) {
+        previousFps = calculator.calc(state).avg
+        state = next
     }
 
     private companion object {

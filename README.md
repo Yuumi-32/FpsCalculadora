@@ -27,7 +27,7 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. Não há chamadas de rede — todo o cálculo, a base de jogos e o histórico rodam localmente no aparelho.
 
-O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. A tela Calcular já existe em Compose e convive com o WebView — no build de debug as duas aparecem como ícones separados. Ver [`core/README.md`](core/README.md).
+O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. As 5 telas (Calcular, Seu PC em todos os jogos, O que trocar primeiro, Comparar builds, Histórico) já existem em Compose e convivem com o WebView — no build de debug as duas aparecem como ícones separados. Ver [`core/README.md`](core/README.md).
 
 | | |
 |---|---|

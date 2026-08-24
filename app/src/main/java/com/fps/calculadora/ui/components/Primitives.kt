@@ -83,6 +83,44 @@ fun SvgIcon(
     )
 }
 
+/**
+ * Ícone da aba "Jogos" — grade 2×2 de retângulos arredondados. É desenhado à
+ * parte do [SvgIcon] porque o `PathParser` só lê um `d` de `path`, e o
+ * original usa quatro `rect rx="1.6"` — cantos arredondados de verdade em vez
+ * de aproximar por segmentos de arco escritos à mão.
+ */
+@Composable
+fun GridIcon(
+    modifier: Modifier = Modifier,
+    tint: Color = FpsColors.Tx1,
+    strokeWidth: Float = 1.7f,
+    viewportSize: Float = 24f,
+) {
+    Box(
+        modifier.drawBehind {
+            val factor = size.minDimension / viewportSize
+            translate(
+                left = (size.width - viewportSize * factor) / 2f,
+                top = (size.height - viewportSize * factor) / 2f,
+            ) {
+                scale(factor, pivot = androidx.compose.ui.geometry.Offset.Zero) {
+                    val stroke = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    val corner = androidx.compose.ui.geometry.CornerRadius(1.6f, 1.6f)
+                    for ((x, y) in listOf(4f to 4f, 13f to 4f, 4f to 13f, 13f to 13f)) {
+                        drawRoundRect(
+                            color = tint,
+                            topLeft = androidx.compose.ui.geometry.Offset(x, y),
+                            size = androidx.compose.ui.geometry.Size(7f, 7f),
+                            cornerRadius = corner,
+                            style = stroke,
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
 /** `.card` — o contêiner padrão das seções. */
 @Composable
 fun FpsCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
@@ -93,6 +131,18 @@ fun FpsCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -
             .background(FpsColors.Bg1)
             .border(1.dp, FpsColors.Line, RoundedCornerShape(FpsRadius.Lg)),
         content = content,
+    )
+}
+
+/** `h2` — título de topo das telas Jogos, Upgrade, Comparar e Histórico. */
+@Composable
+fun ScreenTitle(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text,
+        modifier.padding(top = 10.dp, bottom = 4.dp),
+        color = FpsColors.Tx1,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
     )
 }
 
@@ -367,4 +417,17 @@ object Icons {
     const val INFO = "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM12 11v5"
     const val TARGET = "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z" +
         "M12 7.4a4.6 4.6 0 1 0 0 9.2 4.6 4.6 0 0 0 0-9.2z"
+
+    // Barra de navegação e as 4 telas que ela abre.
+    const val NAV_CALC = "M4.5 17.5a8.5 8.5 0 1 1 15 0M12 13.5 15.5 9" +
+        "M12 13.1a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8z"
+    const val NAV_UPGRADE = "M3 17 9.5 10.5l4 4L21 7M15 7h6v6"
+    const val NAV_COMPARE = "M8 7h12m0 0-3.5-3.5M20 7l-3.5 3.5M16 17H4m0 0 3.5-3.5M4 17l3.5 3.5"
+    const val NAV_HISTORY = "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM12 7.5V12l3 2"
+
+    const val SAVE = "M6 3.5h12a1 1 0 0 1 1 1V21l-7-4-7 4V4.5a1 1 0 0 1 1-1z"
+    const val COPY_CODE = "M8 8h12v12H8zM16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"
+    const val IMPORT_CODE = "M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14"
+    const val LOAD = "M12 4v12m0 0 5-5m-5 5-5-5M5 20h14"
+    const val TRASH = "M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5"
 }

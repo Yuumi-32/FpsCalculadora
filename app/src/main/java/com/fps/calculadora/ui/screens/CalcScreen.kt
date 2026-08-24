@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +38,7 @@ import com.fps.calculadora.core.RtSetting
 import com.fps.calculadora.core.frameGenOptionsFor
 import com.fps.calculadora.core.ramOptionsFor
 import com.fps.calculadora.core.rtOptionsFor
+import com.fps.calculadora.core.shortCpuName
 import com.fps.calculadora.ui.components.BalanceCard
 import com.fps.calculadora.ui.components.ChipRow
 import com.fps.calculadora.ui.components.EnergyCard
@@ -53,6 +55,7 @@ import com.fps.calculadora.ui.components.SectionLabel
 import com.fps.calculadora.ui.components.SegmentedControl
 import com.fps.calculadora.ui.components.SelectionRow
 import com.fps.calculadora.ui.components.StatsRow
+import com.fps.calculadora.ui.components.SvgIcon
 import com.fps.calculadora.ui.components.WarningList
 import com.fps.calculadora.ui.components.color
 import com.fps.calculadora.ui.state.CalcViewModel
@@ -83,12 +86,20 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
     val mobo = db.mobo(state.moboId)
 
     var picker by remember { mutableStateOf(Picker.NONE) }
+    var justSaved by remember { mutableStateOf(false) }
 
     // A seta de variação some depois de 2,4 s, como o `deltaFade` do CSS.
     LaunchedEffect(vm.previousFps) {
         if (vm.previousFps != null) {
             delay(2400)
             vm.clearPreviousFps()
+        }
+    }
+
+    LaunchedEffect(justSaved) {
+        if (justSaved) {
+            delay(1400)
+            justSaved = false
         }
     }
 
@@ -101,16 +112,27 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
         TopBar()
 
         HeroCard {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    game.name,
+                    color = FpsColors.Tx1,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                SaveBuildButton(
+                    saved = justSaved,
+                    onClick = { vm.saveCurrentBuild(); justSaved = true },
+                )
+            }
             Text(
-                game.name,
-                color = FpsColors.Tx1,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                "${shortCpu(cpu.name)} · ${gpu.name} · " +
+                "${shortCpuName(cpu.name)} · ${gpu.name} · " +
                     "${state.resolution.key.uppercase()} ${db.preset(state.preset)?.name.orEmpty()}",
                 color = FpsColors.Tx3,
                 fontSize = 11.sp,
@@ -307,6 +329,26 @@ private fun TopBar() {
     }
 }
 
+/** `#btnSave` — salva a build atual no histórico local (`index.html:916`). */
+@Composable
+private fun SaveBuildButton(saved: Boolean, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .size(30.dp)
+            .clip(RoundedCornerShape(9.dp))
+            .background(if (saved) FpsColors.OkBg else FpsColors.Bg2)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        SvgIcon(
+            Icons.SAVE,
+            Modifier.size(15.dp),
+            tint = if (saved) FpsColors.Ok else FpsColors.Tx2,
+            strokeWidth = 1.8f,
+        )
+    }
+}
+
 /** `.hero` — o cartão do resultado. */
 @Composable
 private fun HeroCard(content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit) {
@@ -403,12 +445,6 @@ private fun Footer(dbVersion: String, modifier: Modifier = Modifier) {
         textAlign = TextAlign.Center,
     )
 }
-
-/** `shortCPU` (`index.html:1783`) — encurta o nome para caber numa linha. */
-private fun shortCpu(name: String): String = name
-    .replace("Ryzen ", "R")
-    .replace("Core Ultra ", "Ultra ")
-    .replace("Core ", "")
 
 private fun hzMarkersFor(vm: CalcViewModel, monitorHz: Int) =
     vm.db.constants.hzMarkers[monitorHz.toString()]
