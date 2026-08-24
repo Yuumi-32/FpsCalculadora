@@ -11,7 +11,7 @@ App Android que estima o desempenho (FPS) de um PC gamer a partir da combinaçã
 
 ## Funcionalidades
 
-- **Calculadora de FPS** — escolha CPU (Ryzen/Intel Core), GPU (GeForce/Radeon), resolução (1080p/1440p/4K), taxa de atualização do monitor, preset gráfico, Ray Tracing, Frame Generation e upscaling (DLSS/FSR/XeSS), e veja o FPS médio, 1% low e máximo estimados.
+- **Calculadora de FPS** — escolha CPU (Ryzen/Intel Core), GPU (GeForce/Radeon), resolução (1080p/1440p/4K), taxa de atualização do monitor, preset gráfico, Ray Tracing, Frame Generation e upscaling (DLSS/FSR), e veja o FPS médio, 1% low e máximo estimados.
 - **Seu PC em todos os jogos** — ranking do FPS estimado da sua build atual em toda a base de jogos cadastrada, ordenável por desempenho ou nome.
 - **O que trocar primeiro?** — mostra se o gargalo é CPU ou GPU e quanto cada upgrade de peça ganharia em FPS.
 - **Comparar builds** — coloca a build atual lado a lado com uma build salva no histórico.
@@ -76,6 +76,24 @@ Para rodar os testes do cálculo de FPS:
 ```bash
 ./gradlew :core:test
 ```
+
+## Build de release
+
+O pacote enviado à Play Store é um AAB assinado. A chave de assinatura não fica no repositório — gere a sua uma única vez:
+
+```bash
+keytool -genkeypair -v -keystore fps-calculadora-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+Copie `keystore.properties.example` para `keystore.properties`, aponte `storeFile` para o arquivo gerado e preencha as senhas. Os dois estão no `.gitignore`.
+
+> Guarde a keystore e as senhas com backup. Quem tiver a chave de upload assina pacotes no seu nome, e perdê-la exige um processo de recuperação junto ao Google.
+
+```bash
+./gradlew bundleRelease
+```
+
+O AAB sai em `app/build/outputs/bundle/release/`. Sem `keystore.properties` completo o build ainda conclui, mas gera um pacote não assinado, que a Play recusa.
 
 ## Aviso
 
