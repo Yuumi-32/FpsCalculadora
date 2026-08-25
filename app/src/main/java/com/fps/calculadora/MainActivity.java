@@ -2,7 +2,9 @@ package com.fps.calculadora;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -22,11 +26,15 @@ import android.widget.Toast;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.webkit.WebViewAssetLoader;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class MainActivity extends Activity {
+
+    /** Domínio reservado do Google para servir assets locais como se fossem https:// de verdade. */
+    private static final String APP_ORIGIN = "https://appassets.androidplatform.net";
 
     private WebView webView;
 
@@ -71,15 +79,39 @@ public class MainActivity extends Activity {
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
 
-        // Acesso a assets locais
-        settings.setAllowFileAccess(true);
+        // O conteúdo local passou a vir pelo WebViewAssetLoader (https://appassets...),
+        // não mais por file:// — não precisa mais de acesso a arquivo bruto.
+        settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(true);
 
-        // Evita abrir o navegador externo — tudo fica dentro do app
+        // Serve os assets locais por https://appassets.androidplatform.net em vez
+        // de file:// — dá ao WebView uma origem estável e segura, o que faz o
+        // localStorage parar de depender dos detalhes frágeis do file://.
+        WebViewAssetLoader assetLoader = new WebViewAssetLoader.Builder()
+                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .build();
+
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                return assetLoader.shouldInterceptRequest(request.getUrl());
+            }
+
+            // Só o próprio app navega dentro da WebView. Qualquer URL de fora
+            // (não existe nenhuma hoje, mas o app tem allowFileAccess + JS
+            // ligados) abre no navegador do aparelho em vez de carregar aqui —
+            // sem isso, um link externo herdaria o acesso a arquivo local do
+            // app.
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
+                if (url != null && url.startsWith(APP_ORIGIN)) {
+                    return false;
+                }
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(MainActivity.this, "Não há app para abrir esse link", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             }
         });
@@ -98,8 +130,8 @@ public class MainActivity extends Activity {
         webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) ->
                 saveDataUriToGallery(url, mimeType));
 
-        // Carrega o HTML da pasta assets/www/
-        webView.loadUrl("file:///android_asset/www/index.html");
+        // Carrega o HTML da pasta assets/www/, servido pelo WebViewAssetLoader.
+        webView.loadUrl(APP_ORIGIN + "/assets/www/index.html");
     }
 
     private void saveDataUriToGallery(String dataUri, String mimeType) {
