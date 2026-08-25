@@ -49,7 +49,11 @@ class ComposeMainActivity : ComponentActivity() {
                     Column(Modifier.fillMaxSize().systemBarsPadding()) {
                         Box(Modifier.weight(1f)) {
                             when (tab) {
-                                AppTab.CALC -> CalcScreen(vm = vm, animated = animated)
+                                AppTab.CALC -> CalcScreen(
+                                    vm = vm,
+                                    animated = animated,
+                                    onGoToUpgrade = { tab = AppTab.UPGRADE },
+                                )
                                 AppTab.GAMES -> GamesScreen(vm = vm, onOpenGame = { tab = AppTab.CALC })
                                 AppTab.UPGRADE -> UpgradeScreen(vm = vm)
                                 AppTab.COMPARE -> CompareScreen(vm = vm)

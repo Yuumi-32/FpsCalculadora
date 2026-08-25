@@ -44,12 +44,15 @@ import com.fps.calculadora.ui.components.ChipRow
 import com.fps.calculadora.ui.components.EnergyCard
 import com.fps.calculadora.ui.components.FpsCard
 import com.fps.calculadora.ui.components.FpsGauge
+import com.fps.calculadora.ui.components.GoalSheet
+import com.fps.calculadora.ui.components.HowSheet
 import com.fps.calculadora.ui.components.Icons
 import com.fps.calculadora.ui.components.LabeledBlock
 import com.fps.calculadora.ui.components.LatencyLine
 import com.fps.calculadora.ui.components.MonitorBars
 import com.fps.calculadora.ui.components.PickerOption
 import com.fps.calculadora.ui.components.PickerSheet
+import com.fps.calculadora.ui.components.PresetBuildsCarousel
 import com.fps.calculadora.ui.components.PsuCard
 import com.fps.calculadora.ui.components.SectionLabel
 import com.fps.calculadora.ui.components.SegmentedControl
@@ -67,6 +70,9 @@ import kotlinx.coroutines.delay
 /** Qual folha de seleção está aberta. */
 private enum class Picker { NONE, CPU, MOBO, RAM, GPU, GAME }
 
+/** Qual folha informativa do hero está aberta. */
+private enum class InfoSheet { NONE, HOW, GOAL }
+
 /**
  * A tela Calcular — o `#panel-calc` do `index.html` (:890-1069).
  *
@@ -74,7 +80,12 @@ private enum class Picker { NONE, CPU, MOBO, RAM, GPU, GAME }
  * Aqui não se decide nenhum número.
  */
 @Composable
-fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifier) {
+fun CalcScreen(
+    vm: CalcViewModel,
+    animated: Boolean,
+    onGoToUpgrade: () -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
     val snapshot = vm.snapshot
     val state = snapshot.state
     val result = snapshot.result
@@ -86,6 +97,7 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
     val mobo = db.mobo(state.moboId)
 
     var picker by remember { mutableStateOf(Picker.NONE) }
+    var infoSheet by remember { mutableStateOf(InfoSheet.NONE) }
     var justSaved by remember { mutableStateOf(false) }
 
     // A seta de variação some depois de 2,4 s, como o `deltaFade` do CSS.
@@ -169,6 +181,11 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
                 modifier = Modifier.padding(top = 12.dp),
             )
             LatencyLine(result, Modifier.padding(top = 10.dp))
+            HowGoalButtons(
+                onHow = { infoSheet = InfoSheet.HOW },
+                onGoal = { infoSheet = InfoSheet.GOAL },
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 10.dp),
+            )
         }
 
         ResolutionCompare(
@@ -179,6 +196,14 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
         )
 
         WarningList(snapshot.warnings, Modifier.padding(top = 12.dp))
+
+        SectionLabel("Builds prontos")
+        PresetBuildsCarousel(
+            presets = db.constants.buildPresets,
+            cpuName = { id -> shortCpuName(db.cpu(id).name) },
+            gpuName = { id -> db.gpu(id).name },
+            onSelect = { preset -> vm.applyBuildPreset(preset) },
+        )
 
         SectionLabel("Monte seu PC")
         FpsCard {
@@ -313,6 +338,50 @@ fun CalcScreen(vm: CalcViewModel, animated: Boolean, modifier: Modifier = Modifi
             onSelect = { id -> vm.update { it.copy(gameId = id) }; picker = Picker.NONE },
             onDismiss = { picker = Picker.NONE },
         )
+    }
+
+    when (infoSheet) {
+        InfoSheet.NONE -> Unit
+        InfoSheet.HOW -> HowSheet(
+            result = result,
+            dbVersion = db.meta.version,
+            dbUpdated = db.meta.updated,
+            onDismiss = { infoSheet = InfoSheet.NONE },
+        )
+        InfoSheet.GOAL -> GoalSheet(
+            initialTarget = state.monitorHz,
+            monitorHz = state.monitorHz,
+            gameName = game.name,
+            resolutionLabel = state.resolution.key.uppercase(),
+            goalAdvice = { target -> vm.goalAdvice(target) },
+            onApply = { option -> vm.applyGoalOption(option) },
+            onGoToUpgrade = onGoToUpgrade,
+            onDismiss = { infoSheet = InfoSheet.NONE },
+        )
+    }
+}
+
+/** `#btnHow` / `#btnGoal` — as duas pílulas embaixo do hero (`index.html:958`). */
+@Composable
+private fun HowGoalButtons(onHow: () -> Unit, onGoal: () -> Unit, modifier: Modifier = Modifier) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        HowGoalPill("Como calculamos", Icons.INFO, onHow)
+        HowGoalPill("Meta de FPS", Icons.TARGET, onGoal)
+    }
+}
+
+@Composable
+private fun HowGoalPill(label: String, iconPath: String, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(100.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        SvgIcon(iconPath, Modifier.size(13.dp), tint = FpsColors.Tx3, strokeWidth = 1.8f)
+        Text(label, color = FpsColors.Tx3, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
     }
 }
 

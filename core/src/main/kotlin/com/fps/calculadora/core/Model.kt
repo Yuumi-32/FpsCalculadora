@@ -156,7 +156,14 @@ data class BuildPreset(
     val cpuIndex: Int, val gpuIndex: Int, val moboIndex: Int,
     val ram: String, val res: String, val preset: String,
     val rt: String, val dlss: Double, val fg: Double,
-)
+) {
+    /** Aplica o preset sobre um estado — jogo e monitor ficam como estavam (`Object.assign(st, p)` do JS). */
+    fun applyTo(current: BuildState): BuildState = current.copy(
+        cpuId = cpu, gpuId = gpu, moboId = mobo,
+        ram = ram, resolution = Resolution.fromKey(res), preset = preset,
+        rt = RtSetting.fromKey(rt), frameGen = fg, upscaler = dlss,
+    )
+}
 
 @Serializable
 data class Constants(

@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fps.calculadora.core.Balance
+import com.fps.calculadora.core.BuildPreset
 import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.CalcResult
 import com.fps.calculadora.core.CompareRow
@@ -20,6 +21,8 @@ import com.fps.calculadora.core.GameCompareSummary
 import com.fps.calculadora.core.GameDatabase
 import com.fps.calculadora.core.GameRankEntry
 import com.fps.calculadora.core.GamesSort
+import com.fps.calculadora.core.GoalAdvice
+import com.fps.calculadora.core.GoalOption
 import com.fps.calculadora.core.HistoryEntry
 import com.fps.calculadora.core.PerformanceTier
 import com.fps.calculadora.core.PsuEstimate
@@ -32,6 +35,7 @@ import com.fps.calculadora.core.byResolution
 import com.fps.calculadora.core.compareAllGames
 import com.fps.calculadora.core.compareGame
 import com.fps.calculadora.core.energyFor
+import com.fps.calculadora.core.goalAdvice
 import com.fps.calculadora.core.normalize
 import com.fps.calculadora.core.parseBuildCode
 import com.fps.calculadora.core.rankAllGames
@@ -112,6 +116,14 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     fun gamesRanking(): List<GameRankEntry> = calculator.rankAllGames(state, gamesSort)
 
     fun upgradeAdvice(): UpgradeAdvice = calculator.upgradeAdvice(state)
+
+    fun goalAdvice(target: Int): GoalAdvice = calculator.goalAdvice(state, target)
+
+    /** Aplica uma opção da "Meta de FPS" como a build atual. */
+    fun applyGoalOption(option: GoalOption) = applyState(option.state)
+
+    /** Aplica um card de "Builds prontos" — porta o clique do `.pcard` (`index.html:2503`). */
+    fun applyBuildPreset(preset: BuildPreset) = applyState(db.normalize(preset.applyTo(state)))
 
     fun compareGame(buildB: BuildState): List<CompareRow> = calculator.compareGame(state, buildB)
 
