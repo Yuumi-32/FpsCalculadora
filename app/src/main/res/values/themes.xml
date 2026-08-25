@@ -14,7 +14,7 @@
          installSplashScreen(). -->
     <style name="Theme.FpsCalculadora.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/colorBackground</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon</item>
         <item name="postSplashScreenTheme">@style/Theme.FpsCalculadora</item>
     </style>
 </resources>

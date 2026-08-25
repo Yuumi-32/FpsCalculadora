@@ -1,6 +1,7 @@
 package com.fps.calculadora.data
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -22,17 +23,27 @@ private val json = Json { ignoreUnknownKeys = true }
 class HistoryStore(private val context: Context) {
 
     val entries: Flow<List<HistoryEntry>> = context.historyDataStore.data.map { prefs ->
-        val raw = prefs[HISTORY_KEY] ?: return@map emptyList()
-        try {
-            json.decodeFromString<List<HistoryEntry>>(raw)
-        } catch (e: Exception) {
-            emptyList()
+        prefs.decodeEntries()
+    }
+
+    /**
+     * Lê e grava numa única transação do `DataStore`, para que salvar/excluir em
+     * sequência rápida nunca perca uma mudança: um `update` que lesse
+     * `entries.first()` fora do `edit {}` poderia sobrescrever, com uma lista
+     * desatualizada, o que a chamada anterior acabou de gravar.
+     */
+    suspend fun update(transform: (List<HistoryEntry>) -> List<HistoryEntry>) {
+        context.historyDataStore.edit { prefs ->
+            prefs[HISTORY_KEY] = json.encodeToString(transform(prefs.decodeEntries()))
         }
     }
 
-    suspend fun save(entries: List<HistoryEntry>) {
-        context.historyDataStore.edit { prefs ->
-            prefs[HISTORY_KEY] = json.encodeToString(entries)
+    private fun Preferences.decodeEntries(): List<HistoryEntry> {
+        val raw = this[HISTORY_KEY] ?: return emptyList()
+        return try {
+            json.decodeFromString<List<HistoryEntry>>(raw)
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }

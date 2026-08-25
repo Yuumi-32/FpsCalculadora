@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícone do launcher com uma margem interna: sem isso o PNG legado (sem
+     safe-zone de ícone adaptativo) fica cortado/ampliado no container que o
+     core-splashscreen usa pra exibir windowSplashScreenAnimatedIcon. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@mipmap/ic_launcher"
+    android:insetLeft="12%"
+    android:insetTop="12%"
+    android:insetRight="12%"
+    android:insetBottom="12%" />

@@ -45,7 +45,6 @@ import com.fps.calculadora.core.warningsFor
 import com.fps.calculadora.core.withNewEntry
 import com.fps.calculadora.data.HistoryStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** Tudo que a tela Calcular mostra para um estado — calculado de uma vez só. */
@@ -157,9 +156,9 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Salva a build atual no histórico local — porta o `saveBuild()` (`index.html:2519`). */
     fun saveCurrentBuild() {
+        val id = System.currentTimeMillis()
         viewModelScope.launch {
-            val current = historyStore.entries.first()
-            historyStore.save(current.withNewEntry(state, System.currentTimeMillis()))
+            historyStore.update { it.withNewEntry(state, id) }
         }
     }
 
@@ -171,8 +170,7 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     /** Remove um build do histórico — porta a ação "Excluir" (`index.html:2570`). */
     fun deleteHistoryEntry(id: Long) {
         viewModelScope.launch {
-            val current = historyStore.entries.first()
-            historyStore.save(current.filterNot { it.id == id })
+            historyStore.update { entries -> entries.filterNot { it.id == id } }
         }
         if (compareBuildId == id) compareBuildId = null
     }

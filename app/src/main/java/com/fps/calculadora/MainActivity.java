@@ -186,7 +186,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    // Preserva o estado da WebView em rotação de tela
+    // Preserva o estado da WebView caso o processo seja recriado (ex.: o
+    // sistema mata o app em segundo plano por memória) — não mais por
+    // rotação de tela, que ficou travada em retrato.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
