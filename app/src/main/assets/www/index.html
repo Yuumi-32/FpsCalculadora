@@ -1966,9 +1966,9 @@ function calc(s = st) {
   base *= gpu.m;
   steps.push({ t: gpu.n, d: 'desempenho relativo da GPU', m: gpu.m, fps: base });
 
-  base *= mobo.m;
-  if (mobo.m !== 1) steps.push({ t: mobo.n, d: 'sustentação de boost (VRM)', m: mobo.m, fps: base });
-
+  // A placa-mãe (VRM) só afeta o quanto a CPU sustenta boost — não tem
+  // ligação física com o lado GPU do cálculo. O efeito dela entra depois,
+  // no teto de CPU, não aqui.
   const moboWarn = (mobo.m < 0.98 && cpu.m >= 1.00)
     ? `${mobo.n} pode limitar o boost do ${cpu.n} por VRM insuficiente.` : '';
 
@@ -2003,11 +2003,14 @@ function calc(s = st) {
 
   const gpuFpsV = base; // lado GPU, antes do teto de CPU
 
-  const cpuCap = (game.cpuCap || 155) * cpu.m;
+  const cpuCap = (game.cpuCap || 155) * cpu.m * mobo.m;
   let cBot = false;
   if (base > cpuCap) {
     base = cpuCap; cBot = true;
-    steps.push({ t: `Teto de CPU — ${cpu.n}`, d: 'limite de frames que a CPU prepara', m: null, cap: true, fps: base });
+    const capDesc = mobo.m !== 1
+      ? `limite de frames que a CPU prepara · ${mobo.n} reduz o boost sustentado`
+      : 'limite de frames que a CPU prepara';
+    steps.push({ t: `Teto de CPU — ${cpu.n}`, d: capDesc, m: null, cap: true, fps: base });
   }
 
   const is16 = s.ram.includes('16');
@@ -2034,12 +2037,16 @@ function calc(s = st) {
   const minL = stutter ? 0.52 : 0.72;
   const minH = stutter ? 0.66 : 0.80;
 
+  // O Frame Generation interpola quadros extras — infla a média/máximo que a
+  // tela mostra, mas não elimina o engasgo do pipeline de renderização real.
+  // O 1% low usa bFPS (antes do FG) para não fingir uma suavidade que a
+  // interpolação de quadros não entrega.
   return {
     avg: Math.round(base),
-    min: Math.round(base * minM),
+    min: Math.round(bFPS * minM),
     max: Math.round(base * 1.24),
     avgL: Math.round(base * 0.95),  avgH: Math.round(base * 1.05),
-    minL: Math.round(base * minL),  minH: Math.round(base * minH),
+    minL: Math.round(bFPS * minL),  minH: Math.round(bFPS * minH),
     maxL: Math.round(base * 1.18),  maxH: Math.round(base * 1.30),
     cBot, vBot, rBot, gpuWarn, moboWarn,
     vNeed: Math.round(vNeed * 10) / 10, vAvail,

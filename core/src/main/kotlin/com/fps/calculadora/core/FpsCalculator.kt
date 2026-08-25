@@ -95,11 +95,9 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
         base *= gpu.mult
         steps += Step(gpu.name, "desempenho relativo da GPU", gpu.mult, fps = base)
 
-        base *= mobo.mult
-        if (mobo.mult != 1.0) {
-            steps += Step(mobo.name, "sustentação de boost (VRM)", mobo.mult, fps = base)
-        }
-
+        // A placa-mãe (VRM) só afeta o quanto a CPU sustenta boost — não tem
+        // ligação física com o lado GPU do cálculo. O efeito dela entra
+        // depois, no teto de CPU, não aqui.
         val moboWarning = if (mobo.mult < 0.98 && cpu.mult >= 1.00) {
             "${mobo.name} pode limitar o boost do ${cpu.name} por VRM insuficiente."
         } else ""
@@ -145,13 +143,18 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
 
         val gpuFps = base // lado GPU, antes do teto de CPU
 
-        val cpuCap = (game.cpuCap ?: Game.DEFAULT_CPU_CAP) * cpu.mult
+        val cpuCap = (game.cpuCap ?: Game.DEFAULT_CPU_CAP) * cpu.mult * mobo.mult
         val cpuBottleneck = base > cpuCap
         if (cpuBottleneck) {
             base = cpuCap
+            val capDetail = if (mobo.mult != 1.0) {
+                "limite de frames que a CPU prepara · ${mobo.name} reduz o boost sustentado"
+            } else {
+                "limite de frames que a CPU prepara"
+            }
             steps += Step(
                 "Teto de CPU — ${cpu.name}",
-                "limite de frames que a CPU prepara",
+                capDetail,
                 mult = null, isCap = true, fps = base,
             )
         }
@@ -183,12 +186,16 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
         val minLowMult = if (stutter) 0.52 else 0.72
         val minHighMult = if (stutter) 0.66 else 0.80
 
+        // O Frame Generation interpola quadros extras — infla a média/máximo
+        // que a tela mostra, mas não elimina o engasgo do pipeline de
+        // renderização real. O 1% low usa baseFps (antes do FG) para não
+        // fingir uma suavidade que a interpolação de quadros não entrega.
         return CalcResult(
             avg = jsRound(base),
-            min = jsRound(base * minMult),
+            min = jsRound(baseFps * minMult),
             max = jsRound(base * MAX_MULT),
             avgLow = jsRound(base * 0.95), avgHigh = jsRound(base * 1.05),
-            minLow = jsRound(base * minLowMult), minHigh = jsRound(base * minHighMult),
+            minLow = jsRound(baseFps * minLowMult), minHigh = jsRound(baseFps * minHighMult),
             maxLow = jsRound(base * 1.18), maxHigh = jsRound(base * 1.30),
             cpuBottleneck = cpuBottleneck,
             vramBottleneck = vramBottleneck,
