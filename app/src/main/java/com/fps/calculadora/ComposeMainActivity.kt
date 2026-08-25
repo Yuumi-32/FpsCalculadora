@@ -37,6 +37,7 @@ import com.fps.calculadora.ui.theme.FpsTheme
  */
 class ComposeMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        SplashScreenBridge.install(this)
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {

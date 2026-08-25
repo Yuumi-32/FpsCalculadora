@@ -8,4 +8,13 @@
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
     </style>
+
+    <!-- Tela de abertura via core-splashscreen: mesmo fundo escuro do app, o
+         ícone do launcher, e volta pro tema normal assim que a Activity chama
+         installSplashScreen(). -->
+    <style name="Theme.FpsCalculadora.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/colorBackground</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.FpsCalculadora</item>
+    </style>
 </resources>
