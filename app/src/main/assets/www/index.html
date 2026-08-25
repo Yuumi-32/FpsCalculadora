@@ -4,14 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Estimador de FPS — PC Gaming</title>
-<link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#0d0c0a" />
 <meta name="description" content="Calculadora de FPS para PCs — Ryzen, Intel Core, GeForce e Radeon" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Fps" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" />
-<link rel="icon" type="image/png" href="favicon.png" />
 <style>
 /* ============================================================
    ESTIMADOR DE FPS — redesign mobile dark
@@ -3536,15 +3530,5 @@ if (document.readyState === 'loading') {
 
 </script>
 
-<script>
-  /* Registro do Service Worker — necessário para instalação como PWA */
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('SW registrado:', reg.scope))
-        .catch(err => console.warn('SW falhou:', err));
-    });
-  }
-</script>
 </body>
 </html>

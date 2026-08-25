@@ -2,17 +2,29 @@ package com.fps.calculadora;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentValues;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
+import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.view.View;
 import android.view.Window;
+import android.widget.Toast;
 
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public class MainActivity extends Activity {
 
@@ -72,10 +84,63 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage msg) {
+                Log.i("FpsWebConsole", msg.message() + " -- " + msg.sourceId() + ":" + msg.lineNumber());
+                return true;
+            }
+        });
+
+        // O card de resultado (botão "Baixar PNG") é um <a download> com uma
+        // data URI. Sem DownloadListener, o WebView não tem pra onde mandar
+        // esse toque — o clique simplesmente não faz nada.
+        webView.setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) ->
+                saveDataUriToGallery(url, mimeType));
 
         // Carrega o HTML da pasta assets/www/
         webView.loadUrl("file:///android_asset/www/index.html");
+    }
+
+    private void saveDataUriToGallery(String dataUri, String mimeType) {
+        int comma = dataUri == null ? -1 : dataUri.indexOf(',');
+        byte[] bytes = null;
+        if (comma >= 0) {
+            try {
+                bytes = Base64.decode(dataUri.substring(comma + 1), Base64.DEFAULT);
+            } catch (IllegalArgumentException e) {
+                bytes = null;
+            }
+        }
+        if (bytes == null) {
+            Toast.makeText(this, "Não foi possível salvar a imagem", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            // MediaStore.RELATIVE_PATH só existe a partir do Android 10; antes
+            // disso salvar em galeria pública exigiria a permissão em tempo de
+            // execução WRITE_EXTERNAL_STORAGE, que este app não pede.
+            Toast.makeText(this, "Baixar imagem exige Android 10 ou mais recente", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, "fps-estimado-" + System.currentTimeMillis() + ".png");
+        values.put(MediaStore.Images.Media.MIME_TYPE, mimeType != null ? mimeType : "image/png");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/FPS Calculadora");
+
+        Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) {
+            Toast.makeText(this, "Não foi possível salvar a imagem", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try (OutputStream out = getContentResolver().openOutputStream(uri)) {
+            if (out == null) throw new IOException("openOutputStream retornou null");
+            out.write(bytes);
+            Toast.makeText(this, "Imagem salva em Fotos → FPS Calculadora", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this, "Não foi possível salvar a imagem", Toast.LENGTH_SHORT).show();
+        }
     }
 
     // Botão Voltar navega no histórico em vez de fechar o app
