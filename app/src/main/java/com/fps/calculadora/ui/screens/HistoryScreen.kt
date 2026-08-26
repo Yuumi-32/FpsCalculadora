@@ -209,7 +209,7 @@ private fun HistoryCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier.padding(top = 8.dp),
             ) {
-                HistoryTag(build.resolution.key.uppercase())
+                HistoryTag(build.resolution.label)
                 HistoryTag(presetName)
                 HistoryTag("${build.monitorHz} Hz")
                 Spacer(Modifier.weight(1f))

@@ -139,7 +139,7 @@ class DerivedParityTest {
     }
 
     @Test
-    fun `comparacao por resolucao cobre as tres e respeita o estado`() {
+    fun `comparacao por resolucao cobre todas e respeita o estado`() {
         val state = BuildState(
             gameId = db.games.first().id,
             cpuId = db.cpus.first().id,

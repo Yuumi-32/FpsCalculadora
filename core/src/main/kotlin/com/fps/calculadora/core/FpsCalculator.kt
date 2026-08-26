@@ -88,7 +88,7 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
         var base = game.referenceFps(state.resolution, rt)
         steps += Step(
             title = "Benchmark base — ${game.name}",
-            detail = "${state.resolution.key.uppercase()} · ${game.rtLabelFor(rt)} · referência RTX 5070",
+            detail = "${state.resolution.label} · ${game.rtLabelFor(rt)} · referência RTX 5070",
             mult = null, fps = base,
         )
 

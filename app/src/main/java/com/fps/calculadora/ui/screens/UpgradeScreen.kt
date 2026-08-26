@@ -57,7 +57,7 @@ fun UpgradeScreen(vm: CalcViewModel, modifier: Modifier = Modifier) {
     ) {
         ScreenTitle("O que trocar primeiro?")
         Text(
-            "Ganhos estimados em ${game.name} · ${state.resolution.key.uppercase()} " +
+            "Ganhos estimados em ${game.name} · ${state.resolution.label} " +
                 "— trocando só a peça indicada.",
             color = FpsColors.Tx3,
             fontSize = 11.5.sp,

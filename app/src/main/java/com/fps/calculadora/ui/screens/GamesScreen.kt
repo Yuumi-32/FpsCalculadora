@@ -59,7 +59,7 @@ fun GamesScreen(vm: CalcViewModel, onOpenGame: () -> Unit, modifier: Modifier = 
     ) {
         ScreenTitle("Seu PC em todos os jogos")
         Text(
-            "${shortCpuName(cpu.name)} · ${gpu.name} · ${state.resolution.key.uppercase()} $presetName " +
+            "${shortCpuName(cpu.name)} · ${gpu.name} · ${state.resolution.label} $presetName " +
                 "— toque num jogo para abrir na calculadora.",
             color = FpsColors.Tx3,
             fontSize = 11.5.sp,

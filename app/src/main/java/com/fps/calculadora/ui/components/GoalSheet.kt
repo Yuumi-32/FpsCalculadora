@@ -53,7 +53,7 @@ fun GoalSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var target by remember { mutableIntStateOf(initialTarget) }
     val advice = remember(target) { goalAdvice(target) }
-    val targets = remember(monitorHz) { setOf(60, 90, 120, 144, 240, monitorHz).sorted() }
+    val targets = remember(monitorHz) { setOf(60, 90, 120, 144, 165, 240, 360, monitorHz).sorted() }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

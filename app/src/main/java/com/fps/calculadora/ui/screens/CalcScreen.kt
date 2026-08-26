@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -55,7 +57,6 @@ import com.fps.calculadora.ui.components.PickerSheet
 import com.fps.calculadora.ui.components.PresetBuildsCarousel
 import com.fps.calculadora.ui.components.PsuCard
 import com.fps.calculadora.ui.components.SectionLabel
-import com.fps.calculadora.ui.components.SegmentedControl
 import com.fps.calculadora.ui.components.SelectionRow
 import com.fps.calculadora.ui.components.StatsRow
 import com.fps.calculadora.ui.components.SvgIcon
@@ -72,6 +73,9 @@ private enum class Picker { NONE, CPU, MOBO, RAM, GPU, GAME }
 
 /** Qual folha informativa do hero está aberta. */
 private enum class InfoSheet { NONE, HOW, GOAL }
+
+/** Taxas de atualização de monitor oferecidas no seletor "Monitor · taxa de atualização". */
+private val MONITOR_HZ_OPTIONS = listOf(60, 75, 100, 120, 144, 165, 180, 210, 240, 300, 360)
 
 /**
  * A tela Calcular — o `#panel-calc` do `index.html` (:890-1069).
@@ -145,7 +149,7 @@ fun CalcScreen(
             }
             Text(
                 "${shortCpuName(cpu.name)} · ${gpu.name} · " +
-                    "${state.resolution.key.uppercase()} ${db.preset(state.preset)?.name.orEmpty()}",
+                    "${state.resolution.label} ${db.preset(state.preset)?.name.orEmpty()}",
                 color = FpsColors.Tx3,
                 fontSize = 11.sp,
                 maxLines = 1,
@@ -217,8 +221,8 @@ fun CalcScreen(
             )
             SelectionRow(Icons.GPU, "Placa de vídeo", "${gpu.name} · ${gpu.vram.toInt()} GB", { picker = Picker.GPU })
             LabeledBlock("Monitor · taxa de atualização", showDivider = false) {
-                SegmentedControl(
-                    options = listOf(60 to "60 Hz", 144 to "144 Hz", 210 to "210 Hz", 300 to "300 Hz"),
+                ChipRow(
+                    options = MONITOR_HZ_OPTIONS.map { it to "$it Hz" },
                     selected = state.monitorHz,
                     onSelect = { hz -> vm.update { it.copy(monitorHz = hz) } },
                 )
@@ -229,8 +233,8 @@ fun CalcScreen(
         FpsCard {
             SelectionRow(Icons.GAME, "Jogo", game.name, { picker = Picker.GAME })
             LabeledBlock("Resolução") {
-                SegmentedControl(
-                    options = Resolution.entries.map { it to it.key.uppercase() },
+                ChipRow(
+                    options = Resolution.entries.map { it to it.label },
                     selected = state.resolution,
                     onSelect = { resolution -> vm.update { it.copy(resolution = resolution) } },
                 )
@@ -352,7 +356,7 @@ fun CalcScreen(
             initialTarget = state.monitorHz,
             monitorHz = state.monitorHz,
             gameName = game.name,
-            resolutionLabel = state.resolution.key.uppercase(),
+            resolutionLabel = state.resolution.label,
             goalAdvice = { target -> vm.goalAdvice(target) },
             onApply = { option -> vm.applyGoalOption(option) },
             onGoToUpgrade = onGoToUpgrade,
@@ -432,7 +436,7 @@ private fun HeroCard(content: @Composable androidx.compose.foundation.layout.Col
     )
 }
 
-/** `.rescmp` — a mesma build nas três resoluções, tocável para trocar. */
+/** `.rescmp` — a mesma build em todas as resoluções, tocável para trocar. */
 @Composable
 private fun ResolutionCompare(
     byResolution: Map<Resolution, CalcResult>,
@@ -449,20 +453,23 @@ private fun ResolutionCompare(
             .padding(14.dp),
     ) {
         Text(
-            "NAS TRÊS RESOLUÇÕES — TOQUE PARA TROCAR",
+            "EM TODAS AS RESOLUÇÕES — TOQUE PARA TROCAR",
             color = FpsColors.Tx3,
             fontSize = 10.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.1.em,
             modifier = Modifier.padding(bottom = 9.dp),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             for (resolution in Resolution.entries) {
                 val cell = byResolution[resolution] ?: continue
                 val on = resolution == current
                 Column(
                     Modifier
-                        .weight(1f)
+                        .width(84.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(if (on) FpsColors.AccSoft else FpsColors.Bg2)
                         .border(
@@ -476,10 +483,12 @@ private fun ResolutionCompare(
                     verticalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
                     Text(
-                        resolution.key.uppercase(),
+                        resolution.label,
                         color = if (on) FpsColors.Acc else FpsColors.Tx3,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         "${cell.avg}",

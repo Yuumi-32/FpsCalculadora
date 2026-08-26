@@ -15,5 +15,5 @@ fun formatHistoryDate(epochMs: Long): String =
 fun buildHwLine(db: GameDatabase, state: BuildState): String {
     val cpu = db.cpu(state.cpuId)
     val gpu = db.gpu(state.gpuId)
-    return "${shortCpuName(cpu.name)} · ${gpu.name} · ${state.resolution.key.uppercase()}"
+    return "${shortCpuName(cpu.name)} · ${gpu.name} · ${state.resolution.label}"
 }

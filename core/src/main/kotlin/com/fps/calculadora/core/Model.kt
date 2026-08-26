@@ -4,10 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** Resolução de tela. A `key` é a mesma usada nas tabelas JSON. */
-enum class Resolution(val key: String) {
-    @SerialName("1080p") FHD("1080p"),
-    @SerialName("1440p") QHD("1440p"),
-    @SerialName("4k") UHD("4k");
+enum class Resolution(val key: String, val label: String) {
+    @SerialName("1080p") FHD("1080p", "1080P"),
+    @SerialName("2560x1080") UWFHD("2560x1080", "2560×1080"),
+    @SerialName("1440p") QHD("1440p", "1440P"),
+    @SerialName("3440x1440") UWQHD("3440x1440", "3440×1440"),
+    @SerialName("4k") UHD("4k", "4K");
 
     companion object {
         fun fromKey(key: String): Resolution =

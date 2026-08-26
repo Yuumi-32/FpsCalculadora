@@ -8,7 +8,7 @@ import java.util.Base64
 private const val CODE_PREFIX = "FPS1."
 private val CODE_PATTERN = Regex("FPS1\\.([A-Za-z0-9+/=]+)")
 private val codeJson = Json { ignoreUnknownKeys = true }
-private val VALID_RESOLUTION_KEYS = setOf("1080p", "1440p", "4k")
+private val VALID_RESOLUTION_KEYS = Resolution.entries.map { it.key }.toSet()
 
 /**
  * O payload do código de texto — mesmas chaves curtas do `buildCode()`

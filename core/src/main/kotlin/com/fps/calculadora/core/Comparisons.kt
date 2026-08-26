@@ -1,8 +1,8 @@
 package com.fps.calculadora.core
 
 /**
- * A mesma build nas três resoluções — alimenta o card "Nas três resoluções"
- * (`renderResCmp()`, `index.html:3145`).
+ * A mesma build em todas as resoluções — alimenta o card "Em todas as
+ * resoluções" (`renderResCmp()`, `index.html:3145`).
  *
  * Normaliza cada variação antes de calcular, como o original faz. Trocar de
  * resolução não invalida nenhuma escolha hoje, mas manter a normalização deixa
