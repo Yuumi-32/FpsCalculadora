@@ -61,8 +61,8 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
 
         val noRt = !gpu.gen.hasRtCores
         val canRr = gpu.gen.hasRayReconstruction
-        val isRtx2030 = gpu.gen == GpuGen.RTX20 || gpu.gen == GpuGen.RTX30
         val radeon = gpu.gen.isRadeon
+        val arc = gpu.gen.isArc
 
         // O modo de RT pedido nem sempre é o que roda: o hardware pode não dar conta.
         val rt = when {
@@ -76,7 +76,7 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
         var gpuWarning = when {
             state.rt != RtSetting.OFF && noRt && game.rtMode != RtMode.NONE ->
                 "${gpu.name} não tem RT cores — usando rasterização pura."
-            game.rtMode == RtMode.PATH_TRACING && state.rt == RtSetting.FULL && (isRtx2030 || radeon) ->
+            game.rtMode == RtMode.PATH_TRACING && state.rt == RtSetting.FULL && !canRr ->
                 "${gpu.name} não suporta Path Tracing completo — usando Ray Tracing padrão."
             else -> ""
         }
@@ -118,9 +118,14 @@ class FpsCalculator(val db: GameDatabase = GameDatabase.default) {
 
         val upscalerMult = if (state.upscaler != 0.0) state.upscaler else 1.0
         base *= upscalerMult
+        val upscalerLabel = when {
+            radeon -> "upscaling FSR"
+            arc -> "upscaling XeSS"
+            else -> "upscaling DLSS"
+        }
         steps += Step(
             db.upscalerName(gpu, upscalerMult).ifEmpty { "Upscaler" },
-            if (radeon) "upscaling FSR" else "upscaling DLSS",
+            upscalerLabel,
             upscalerMult, fps = base,
         )
 

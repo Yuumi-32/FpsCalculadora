@@ -166,5 +166,45 @@
     "name": "Z890",
     "socket": "LGA1851",
     "mult": 1.01
+  },
+  {
+    "id": "h410-sem-oc",
+    "index": 21,
+    "group": "LGA1200 · Série 400/500",
+    "name": "H410 (sem OC)",
+    "socket": "LGA1200",
+    "mult": 0.95
+  },
+  {
+    "id": "b460",
+    "index": 22,
+    "group": "LGA1200 · Série 400/500",
+    "name": "B460",
+    "socket": "LGA1200",
+    "mult": 0.97
+  },
+  {
+    "id": "z490",
+    "index": 23,
+    "group": "LGA1200 · Série 400/500",
+    "name": "Z490",
+    "socket": "LGA1200",
+    "mult": 1
+  },
+  {
+    "id": "b560",
+    "index": 24,
+    "group": "LGA1200 · Série 400/500",
+    "name": "B560",
+    "socket": "LGA1200",
+    "mult": 0.98
+  },
+  {
+    "id": "z590",
+    "index": 25,
+    "group": "LGA1200 · Série 400/500",
+    "name": "Z590",
+    "socket": "LGA1200",
+    "mult": 1
   }
 ]

@@ -77,10 +77,10 @@ function sandbox() {
  * um trecho final exporta os símbolos que interessam.
  */
 const EXPORTED = [
-  'G', 'C', 'GP', 'MB', 'HZ_MARKERS', 'PRESETS', 'DLSS', 'FSR', 'DB_META',
+  'G', 'C', 'GP', 'MB', 'HZ_MARKERS', 'PRESETS', 'DLSS', 'FSR', 'XESS', 'DB_META',
   'VRAM_PRE', 'RAM_LABELS', 'PRESETS_BUILD', 'SYSTEM_W',
   'calc', 'calcPSU', 'vramRT', 'normalizeS', 'st', 'badge',
-  'isRadeon', 'hasRTHW', 'canRRHW', 'hasFGHW',
+  'isRadeon', 'isArc', 'hasRTHW', 'canRRHW', 'hasFGHW',
   'ramOptionsFor', 'rtOptionsFor', 'fgOptionsFor', 'dlssOptionsFor', 'upscalerName',
 ];
 

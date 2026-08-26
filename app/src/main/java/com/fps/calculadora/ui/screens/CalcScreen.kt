@@ -270,7 +270,11 @@ fun CalcScreen(
             }
 
             LabeledBlock(
-                if (gpu.gen.isRadeon) "Upscaling / FSR" else "Upscaling / DLSS",
+                when {
+                    gpu.gen.isRadeon -> "Upscaling / FSR"
+                    gpu.gen.isArc -> "Upscaling / XeSS"
+                    else -> "Upscaling / DLSS"
+                },
                 showDivider = false,
             ) {
                 ChipRow(
@@ -394,7 +398,7 @@ private fun TopBar() {
     Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 12.dp)) {
         Text("Estimador de FPS", color = FpsColors.Tx1, fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Text(
-            "Ryzen · Core · GeForce · Radeon",
+            "Ryzen · Core · GeForce · Radeon · Arc",
             color = FpsColors.Tx3,
             fontSize = 11.sp,
             modifier = Modifier.padding(top = 3.dp),
@@ -514,7 +518,7 @@ private fun ResolutionCompare(
 private fun Footer(dbVersion: String, modifier: Modifier = Modifier) {
     Text(
         "Referência: RTX 5070 + Ryzen 7 5700X + B550 + DDR4 32GB @ DLSS Balanceado = 1.00×\n" +
-            "Base de dados $dbVersion · Ryzen & Intel Core · GeForce & Radeon\n" +
+            "Base de dados $dbVersion · Ryzen & Intel Core · GeForce, Radeon & Arc\n" +
             "Valores estimados — desempenho real varia por jogo e drivers.",
         modifier.fillMaxWidth(),
         color = FpsColors.Tx3,

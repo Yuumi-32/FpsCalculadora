@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Estimador de FPS — PC Gaming</title>
 <meta name="theme-color" content="#0d0c0a" />
-<meta name="description" content="Calculadora de FPS para PCs — Ryzen, Intel Core, GeForce e Radeon" />
+<meta name="description" content="Calculadora de FPS para PCs — Ryzen, Intel Core, GeForce, Radeon e Arc" />
 <style>
 /* ============================================================
    ESTIMADOR DE FPS — redesign mobile dark
@@ -887,7 +887,7 @@ footer {
       <div class="topbar">
         <div>
           <div class="topbar-tt">Estimador de FPS</div>
-          <div class="topbar-sub"><span class="topbar-dot"></span>Ryzen · Core · GeForce · Radeon</div>
+          <div class="topbar-sub"><span class="topbar-dot"></span>Ryzen · Core · GeForce · Radeon · Arc</div>
         </div>
         <div class="hero-acts">
           <button class="icbtn" id="btnPresets" title="Builds prontos" aria-label="Builds prontos">
@@ -1055,7 +1055,7 @@ footer {
 
       <footer>
         Referência: RTX 5070 + Ryzen 7 5700X + B550 + DDR4 32GB @ DLSS Balanceado = 1.00×<br/>
-        Base de dados <b id="dbv">v2.0</b> · Ryzen &amp; Intel Core · GeForce &amp; Radeon<br/>
+        Base de dados <b id="dbv">v2.1</b> · Ryzen &amp; Intel Core · GeForce, Radeon &amp; Arc<br/>
         Valores estimados — desempenho real varia por jogo e drivers.
       </footer>
     </div>
@@ -1482,9 +1482,9 @@ const G = [
 ];
 
 /* ─────────────────────────────────────────────────────────────
-   2. BASE DE DADOS DE CPUs (AMD Ryzen AM4 / AM5)
+   2. BASE DE DADOS DE CPUs (AMD Ryzen AM4/AM5 · Intel Core LGA1200/1700/1851)
    m  : multiplicador de gaming relativo ao Ryzen 7 5700X = 1.00
-   s  : socket ('AM4' | 'AM5')
+   s  : socket ('AM4' | 'AM5' | 'LGA1200' | 'LGA1700' | 'LGA1851')
    ───────────────────────────────────────────────────────────── */
 const C = [
   // AM4 · Zen (1000)
@@ -1549,13 +1549,27 @@ const C = [
   { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 5 245K', m: 1.10, s: 'LGA1851', w: 110 },
   { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 7 265K', m: 1.15, s: 'LGA1851', w: 125 },
   { g: 'LGA1851 · Core Ultra 200S', n: 'Core Ultra 9 285K', m: 1.20, s: 'LGA1851', w: 145 },
+  // Adicionadas ao final (não entre as gerações mais novas) para não
+  // deslocar os índices que builds salvos e códigos compartilhados guardam.
+  // LGA1200 · Intel 10ª geração (Comet Lake)
+  { g: 'LGA1200 · Intel 10ª ger.', n: 'Core i3-10100F', m: 0.68, s: 'LGA1200', w: 58 },
+  { g: 'LGA1200 · Intel 10ª ger.', n: 'Core i5-10400F', m: 0.74, s: 'LGA1200', w: 68 },
+  { g: 'LGA1200 · Intel 10ª ger.', n: 'Core i5-10600K', m: 0.80, s: 'LGA1200', w: 105 },
+  { g: 'LGA1200 · Intel 10ª ger.', n: 'Core i7-10700K', m: 0.86, s: 'LGA1200', w: 135 },
+  { g: 'LGA1200 · Intel 10ª ger.', n: 'Core i9-10900K', m: 0.90, s: 'LGA1200', w: 165 },
+  // LGA1200 · Intel 11ª geração (Rocket Lake)
+  { g: 'LGA1200 · Intel 11ª ger.', n: 'Core i5-11400F', m: 0.82, s: 'LGA1200', w: 68 },
+  { g: 'LGA1200 · Intel 11ª ger.', n: 'Core i5-11600K', m: 0.86, s: 'LGA1200', w: 110 },
+  { g: 'LGA1200 · Intel 11ª ger.', n: 'Core i7-11700K', m: 0.90, s: 'LGA1200', w: 140 },
+  { g: 'LGA1200 · Intel 11ª ger.', n: 'Core i9-11900K', m: 0.93, s: 'LGA1200', w: 170 },
 ];
 
 /* ─────────────────────────────────────────────────────────────
    3. BASE DE DADOS DE GPUs
    m   : multiplicador relativo ao RTX 5070 = 1.00
    v   : VRAM em GB
-   gen : geração ('gtx10'|'gtx16'|'rtx20'|'rtx30'|'rtx40'|'rtx50')
+   gen : geração ('gtx10'|'gtx16'|'rtx20'|'rtx30'|'rtx40'|'rtx50'|
+                  'rdna2'|'rdna3'|'rdna4'|'arca'|'arcb')
    ───────────────────────────────────────────────────────────── */
 const GP = [
   // GTX 10 (Pascal) — sem RT cores
@@ -1636,13 +1650,23 @@ const GP = [
   { g: 'RX 9000 (RDNA 4)',       n: 'RX 9060 XT 16GB', m: 0.75, v: 16, gen: 'rdna4', w: 165 },
   { g: 'RX 9000 (RDNA 4)',       n: 'RX 9070',         m: 1.02, v: 16, gen: 'rdna4', w: 220 },
   { g: 'RX 9000 (RDNA 4)',       n: 'RX 9070 XT',      m: 1.15, v: 16, gen: 'rdna4', w: 304 },
+  // Adicionadas ao final (mesmo motivo do array de CPUs acima).
+  // Arc A-Series (Alchemist) — 1ª geração, RT cores próprios (Xe-cores)
+  { g: 'Arc A-Series (Alchemist)', n: 'Arc A380',       m: 0.13, v: 6,  gen: 'arca', w: 75 },
+  { g: 'Arc A-Series (Alchemist)', n: 'Arc A580',       m: 0.29, v: 8,  gen: 'arca', w: 185 },
+  { g: 'Arc A-Series (Alchemist)', n: 'Arc A750',       m: 0.37, v: 8,  gen: 'arca', w: 225 },
+  { g: 'Arc A-Series (Alchemist)', n: 'Arc A770 8GB',   m: 0.45, v: 8,  gen: 'arca', w: 225 },
+  { g: 'Arc A-Series (Alchemist)', n: 'Arc A770 16GB',  m: 0.46, v: 16, gen: 'arca', w: 225 },
+  // Arc B-Series (Battlemage) — 2ª geração, com XeSS Frame Generation
+  { g: 'Arc B-Series (Battlemage)', n: 'Arc B570',      m: 0.50, v: 10, gen: 'arcb', w: 150 },
+  { g: 'Arc B-Series (Battlemage)', n: 'Arc B580',      m: 0.58, v: 12, gen: 'arcb', w: 190 },
 ];
 
 
 /* ─────────────────────────────────────────────────────────────
    3b. BASE DE DADOS DE PLACAS-MÃE
    m : multiplicador de sustentação de boost (VRM quality)
-   s : socket compatível ('AM4' | 'AM5')
+   s : socket compatível ('AM4' | 'AM5' | 'LGA1200' | 'LGA1700' | 'LGA1851')
    ───────────────────────────────────────────────────────────── */
 const MB = [
   // AM4 · Série 400
@@ -1672,6 +1696,12 @@ const MB = [
   // LGA1851 · Intel série 800
   { g: 'LGA1851 · Série 800',     n: 'B860',            s: 'LGA1851', m: 1.00 },
   { g: 'LGA1851 · Série 800',     n: 'Z890',            s: 'LGA1851', m: 1.01 },
+  // LGA1200 · Intel série 400/500 (adicionada ao final, mesmo motivo acima)
+  { g: 'LGA1200 · Série 400/500', n: 'H410 (sem OC)',   s: 'LGA1200', m: 0.95 },
+  { g: 'LGA1200 · Série 400/500', n: 'B460',            s: 'LGA1200', m: 0.97 },
+  { g: 'LGA1200 · Série 400/500', n: 'Z490',            s: 'LGA1200', m: 1.00 },
+  { g: 'LGA1200 · Série 400/500', n: 'B560',            s: 'LGA1200', m: 0.98 },
+  { g: 'LGA1200 · Série 400/500', n: 'Z590',            s: 'LGA1200', m: 1.00 },
 ];
 
 // Marcadores por taxa de atualização (Hz) [intermediário, máximo]
@@ -1712,8 +1742,17 @@ const FSR = [
   { k: 'native', n: 'Nativo (sem FSR)', m: 0.60 },
 ];
 
+// Upscaling Intel (Arc) — mesmos multiplicadores dos níveis DLSS/FSR equivalentes
+const XESS = [
+  { k: 'qual',   n: 'XeSS Qualidade',    m: 0.92 },
+  { k: 'bal',    n: 'XeSS Balanceado',   m: 1.00 },
+  { k: 'perf',   n: 'XeSS Performance',  m: 1.12 },
+  { k: 'naa',    n: 'XeSS Native AA',    m: 0.65 },
+  { k: 'native', n: 'Nativo (sem XeSS)', m: 0.60 },
+];
+
 // Versão da base de dados — atualize ao mexer em G/C/GP/MB
-const DB_META = { v: '2.0', updated: 'julho de 2026' };
+const DB_META = { v: '2.1', updated: 'agosto de 2026' };
 
 // Ajuste de VRAM por preset (relativo ao Ultra como base)
 const VRAM_PRE = {
@@ -1778,9 +1817,10 @@ const shortCPU = n => n.replace('Ryzen ', 'R').replace('Core Ultra ', 'Ultra ').
 
 /* Capacidades por geração de GPU */
 const isRadeon = gp => gp.gen.indexOf('rdna') === 0;
+const isArc    = gp => gp.gen.indexOf('arc') === 0;
 const hasRTHW  = gp => gp.gen !== 'gtx10' && gp.gen !== 'gtx16';
 const canRRHW  = gp => gp.gen === 'rtx40' || gp.gen === 'rtx50';
-const hasFGHW  = gp => gp.gen === 'rtx40' || gp.gen === 'rtx50' || gp.gen === 'rdna3' || gp.gen === 'rdna4';
+const hasFGHW  = gp => gp.gen === 'rtx40' || gp.gen === 'rtx50' || gp.gen === 'rdna3' || gp.gen === 'rdna4' || gp.gen === 'arcb';
 
 let toastTimer = null;
 function toast(msg) {
@@ -1853,7 +1893,7 @@ function ramOptionsFor(sock) {
     { k: 'ddr5_32',      n: 'DDR5 32GB DC 5200', g: 'DDR5 padrão — 5200 MT/s' },
     { k: 'ddr5_64',      n: 'DDR5 64GB DC 5200', g: 'DDR5 padrão — 5200 MT/s' },
   ];
-  if (sock === 'AM4') return ddr4('DDR4 (AM4)');
+  if (sock === 'AM4' || sock === 'LGA1200') return ddr4(`DDR4 (${sock})`);
   if (sock === 'LGA1700') return ddr4('DDR4 (LGA1700)').concat(ddr5);
   return ddr5;
 }
@@ -1883,13 +1923,17 @@ function rtOptionsFor(s = st) {
 
 function fgOptionsFor(gpu) {
   const opts = [{ v: 1, n: 'Desativado' }];
-  if (hasFGHW(gpu)) opts.push({ v: 1.78, n: isRadeon(gpu) ? 'FSR 3 Frame Gen 2×' : '2× Frame Gen' });
+  if (hasFGHW(gpu)) {
+    const fgName = isRadeon(gpu) ? 'FSR 3 Frame Gen 2×' : isArc(gpu) ? 'XeSS Frame Gen 2×' : '2× Frame Gen';
+    opts.push({ v: 1.78, n: fgName });
+  }
   if (gpu.gen === 'rtx50') opts.push({ v: 3.15, n: '4× MFG (RTX 50)' });
   return opts;
 }
 
 function dlssOptionsFor(gpu) {
   if (isRadeon(gpu)) return FSR;
+  if (isArc(gpu)) return XESS;
   return hasRTHW(gpu) ? DLSS : DLSS.filter(o => !o.rtx);
 }
 function upscalerName(s) {
@@ -1900,7 +1944,7 @@ function upscalerName(s) {
 function normalizeS(s) {
   const cpu = C[s.cpu], gpu = GP[s.gpu];
   const ramOpts = ramOptionsFor(cpu.s);
-  if (!ramOpts.find(o => o.k === s.ram)) s.ram = cpu.s === 'AM4' ? 'ddr4_32' : 'ddr5_32';
+  if (!ramOpts.find(o => o.k === s.ram)) s.ram = (cpu.s === 'AM4' || cpu.s === 'LGA1200') ? 'ddr4_32' : 'ddr5_32';
   const mFilt = MB.map((m, i) => ({ ...m, idx: i })).filter(m => m.s === cpu.s);
   if (!mFilt.find(m => m.idx === s.mobo)) s.mobo = mFilt[0].idx;
   const ro = rtOptionsFor(s);
@@ -1938,8 +1982,8 @@ function calc(s = st) {
 
   const noRT      = !hasRTHW(gpu);
   const canRR     = canRRHW(gpu);
-  const isRTX2030 = gpu.gen === 'rtx20' || gpu.gen === 'rtx30';
   const radeon    = isRadeon(gpu);
+  const arc       = isArc(gpu);
 
   let rtKey = s.rt;
   if (game.rt === 'none') rtKey = 'off';
@@ -1950,7 +1994,7 @@ function calc(s = st) {
   let gpuWarn = '';
   if (s.rt !== 'off' && noRT && game.rt !== 'none') {
     gpuWarn = `${gpu.n} não tem RT cores — usando rasterização pura.`;
-  } else if (game.rt === 'pt' && s.rt === 'rr' && (isRTX2030 || radeon)) {
+  } else if (game.rt === 'pt' && s.rt === 'rr' && !canRR) {
     gpuWarn = `${gpu.n} não suporta Path Tracing completo — usando Ray Tracing padrão.`;
   }
   if (s.fg > 1 && !hasFGHW(gpu)) {
@@ -1975,7 +2019,7 @@ function calc(s = st) {
   const rtActive = rtKey !== 'off';
   const swLumen  = game.rt === 'lumen' && rtKey === 'rt';
   if (rtActive && !swLumen) {
-    const rtArch = { rtx20: 0.70, rtx30: 0.85, rdna2: 0.62, rdna3: 0.78, rdna4: 0.95 }[gpu.gen];
+    const rtArch = { rtx20: 0.70, rtx30: 0.85, rdna2: 0.62, rdna3: 0.78, rdna4: 0.95, arca: 0.72, arcb: 0.85 }[gpu.gen];
     if (rtArch) {
       base *= rtArch;
       steps.push({ t: 'Eficiência de RT da arquitetura', d: gpu.g, m: rtArch, fps: base });
@@ -1988,7 +2032,8 @@ function calc(s = st) {
 
   const dlssM = parseFloat(s.dlss) || 1;
   base *= dlssM;
-  steps.push({ t: upscalerName(s) || 'Upscaler', d: radeon ? 'upscaling FSR' : 'upscaling DLSS', m: dlssM, fps: base });
+  const upscalerLabel = radeon ? 'upscaling FSR' : arc ? 'upscaling XeSS' : 'upscaling DLSS';
+  steps.push({ t: upscalerName(s) || 'Upscaler', d: upscalerLabel, m: dlssM, fps: base });
 
   const vBase  = game.v[s.res] || 8;
   const vNeed  = vBase + (VRAM_PRE[s.preset] || 0) + vramRT(game.rt, rtKey);
@@ -2333,7 +2378,7 @@ function renderAll() {
   renderChips($('chipsFG'), fo.map(o => ({ v: o.v, n: o.n })), st.fg,
     v => { st.fg = parseFloat(v); renderAll(); });
 
-  $('lbUp').textContent = isRadeon(gpu) ? 'Upscaling / FSR' : 'Upscaling / DLSS';
+  $('lbUp').textContent = isRadeon(gpu) ? 'Upscaling / FSR' : isArc(gpu) ? 'Upscaling / XeSS' : 'Upscaling / DLSS';
   renderChips($('chipsDLSS'), dlssOptionsFor(gpu).map(o => ({ v: o.m, n: o.n })), st.dlss,
     v => { st.dlss = parseFloat(v); renderAll(); });
 

@@ -40,9 +40,10 @@ class GameDatabase(
     /** Placas-mãe compatíveis com o socket da CPU, na ordem do catálogo. */
     fun mobosFor(socket: Socket): List<Mobo> = mobos.filter { it.socket == socket }
 
-    /** Upscalers oferecidos pela GPU: FSR nas Radeon, DLSS nas GeForce (DLAA/DLSS só com RT cores). */
+    /** Upscalers oferecidos pela GPU: FSR nas Radeon, XeSS nas Arc, DLSS nas GeForce (DLAA/DLSS só com RT cores). */
     fun upscalersFor(gpu: Gpu): List<Upscaler> = when {
         gpu.gen.isRadeon -> constants.upscalersAmd
+        gpu.gen.isArc -> constants.upscalersIntel
         gpu.gen.hasRtCores -> constants.upscalersNvidia
         else -> constants.upscalersNvidia.filter { !it.needsRtx }
     }

@@ -688,5 +688,75 @@
     "vram": 16,
     "gen": "rdna4",
     "watts": 304
+  },
+  {
+    "id": "arc-a380",
+    "index": 69,
+    "group": "Arc A-Series (Alchemist)",
+    "name": "Arc A380",
+    "mult": 0.13,
+    "vram": 6,
+    "gen": "arca",
+    "watts": 75
+  },
+  {
+    "id": "arc-a580",
+    "index": 70,
+    "group": "Arc A-Series (Alchemist)",
+    "name": "Arc A580",
+    "mult": 0.29,
+    "vram": 8,
+    "gen": "arca",
+    "watts": 185
+  },
+  {
+    "id": "arc-a750",
+    "index": 71,
+    "group": "Arc A-Series (Alchemist)",
+    "name": "Arc A750",
+    "mult": 0.37,
+    "vram": 8,
+    "gen": "arca",
+    "watts": 225
+  },
+  {
+    "id": "arc-a770-8gb",
+    "index": 72,
+    "group": "Arc A-Series (Alchemist)",
+    "name": "Arc A770 8GB",
+    "mult": 0.45,
+    "vram": 8,
+    "gen": "arca",
+    "watts": 225
+  },
+  {
+    "id": "arc-a770-16gb",
+    "index": 73,
+    "group": "Arc A-Series (Alchemist)",
+    "name": "Arc A770 16GB",
+    "mult": 0.46,
+    "vram": 16,
+    "gen": "arca",
+    "watts": 225
+  },
+  {
+    "id": "arc-b570",
+    "index": 74,
+    "group": "Arc B-Series (Battlemage)",
+    "name": "Arc B570",
+    "mult": 0.5,
+    "vram": 10,
+    "gen": "arcb",
+    "watts": 150
+  },
+  {
+    "id": "arc-b580",
+    "index": 75,
+    "group": "Arc B-Series (Battlemage)",
+    "name": "Arc B580",
+    "mult": 0.58,
+    "vram": 12,
+    "gen": "arcb",
+    "watts": 190
   }
 ]

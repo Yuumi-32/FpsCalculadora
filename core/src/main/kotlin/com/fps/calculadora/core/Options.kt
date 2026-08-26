@@ -73,7 +73,12 @@ fun GameDatabase.rtOptionsFor(game: Game, gpu: Gpu): RtOptions {
 fun GameDatabase.frameGenOptionsFor(gpu: Gpu): List<FrameGenOption> = buildList {
     add(FrameGenOption(1.0, "Desativado"))
     if (gpu.gen.hasFrameGen) {
-        add(FrameGenOption(1.78, if (gpu.gen.isRadeon) "FSR 3 Frame Gen 2×" else "2× Frame Gen"))
+        val label = when {
+            gpu.gen.isRadeon -> "FSR 3 Frame Gen 2×"
+            gpu.gen.isArc -> "XeSS Frame Gen 2×"
+            else -> "2× Frame Gen"
+        }
+        add(FrameGenOption(1.78, label))
     }
     if (gpu.gen.hasMultiFrameGen) add(FrameGenOption(3.15, "4× MFG (RTX 50)"))
 }
@@ -89,7 +94,7 @@ fun GameDatabase.normalize(state: BuildState): BuildState {
     var result = state
 
     if (ramOptionsFor(cpu.socket).none { it.key == result.ram }) {
-        result = result.copy(ram = if (cpu.socket == Socket.AM4) "ddr4_32" else "ddr5_32")
+        result = result.copy(ram = if (cpu.socket.supportsDdr5) "ddr5_32" else "ddr4_32")
     }
 
     val compatibleMobos = mobosFor(cpu.socket)
