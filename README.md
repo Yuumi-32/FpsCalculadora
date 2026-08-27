@@ -95,6 +95,19 @@ Copie `keystore.properties.example` para `keystore.properties`, aponte `storeFil
 
 O AAB sai em `app/build/outputs/bundle/release/`. Sem `keystore.properties` completo o build ainda conclui, mas gera um pacote não assinado, que a Play recusa.
 
+## Publicação na Play Store
+
+O checklist do lançamento vive em [`docs/play/`](docs/play/): respostas prontas para o formulário de Segurança dos Dados, classificação indicativa, público-alvo e anúncios; título e descrições dentro dos limites de caractere; ícone, feature graphic e capturas; e os passos da conta de desenvolvedor e do teste fechado de 14 dias.
+
+A [política de privacidade](https://yuumi-32.github.io/FpsCalculadora/privacidade.html) e a [página do app](https://yuumi-32.github.io/FpsCalculadora/) são servidas pelo GitHub Pages a partir da pasta `docs/`.
+
+Os gráficos da loja são gerados por script, então acompanham qualquer mudança na interface:
+
+```bash
+python tools/gen-store-graphics.py
+python tools/gen-store-screenshots.py
+```
+
 ## Aviso
 
 Os valores exibidos são estimativas para referência rápida na hora de montar ou planejar upgrade de um PC, não substituem benchmarks reais.
