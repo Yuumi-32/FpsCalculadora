@@ -115,6 +115,12 @@ data class Cpu(
     val mult: Double,
     val socket: Socket,
     val watts: Int,
+    /**
+     * Preço médio de mercado em reais, quando o catálogo remoto trouxe um.
+     * `null` no catálogo embutido no APK — preço envelhece rápido demais para
+     * viajar dentro de um APK. Ver [formatAveragePrice].
+     */
+    val averagePriceBrl: Double? = null,
 )
 
 @Serializable
@@ -126,6 +132,12 @@ data class Gpu(
     val vram: Double,
     val gen: GpuGen,
     val watts: Int,
+    /**
+     * Preço médio de mercado em reais, quando o catálogo remoto trouxe um.
+     * `null` no catálogo embutido no APK — preço envelhece rápido demais para
+     * viajar dentro de um APK. Ver [formatAveragePrice].
+     */
+    val averagePriceBrl: Double? = null,
 )
 
 @Serializable
