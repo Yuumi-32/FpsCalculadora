@@ -1,7 +1,13 @@
 /* Gera os JSON canônicos da base a partir do index.html.
    Reexecute sempre que mexer nas tabelas do HTML (enquanto a UI web existir).
-   Uso: node tools/extract-data.mjs                                          */
-import { writeFileSync, mkdirSync } from 'node:fs';
+   Uso: node tools/extract-data.mjs
+
+   CUIDADO: nem tudo que está nos JSON veio do index.html. Houve dados
+   acrescentados direto no Kotlin sem correspondência no HTML — resoluções
+   ultrawide interpoladas em games.json, hzMarkers estendidos em
+   constants.json. Regenerar por cima apaga esses campos sem erro nenhum.
+   Por isso existe a trava de encolhimento no fim deste arquivo.           */
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadAppContext, ROOT } from './lib-extract.mjs';
 
@@ -84,6 +90,56 @@ const constants = {
 };
 
 const files = { games, cpus, gpus, mobos, constants };
+
+/* ── Trava contra apagamento silencioso ──────────────────────────────────
+   Regenerar em cima de um JSON que tem dados fora do index.html apaga esses
+   dados sem falhar: o script escreve um arquivo válido, só que menor, e a
+   perda só aparece quando alguém repara que sumiu uma resolução.
+
+   Encolher passa a exigir --force explícito.
+
+   A contagem é recursiva de propósito. Contar só o topo não pega o caso
+   real: games.json continua com os mesmos 36 jogos, e o que some são as
+   resoluções *dentro* de cada um. Medir a profundidade inteira é o que
+   torna a perda visível.                                                 */
+const medir = valor => {
+  if (Array.isArray(valor)) return valor.reduce((n, item) => n + medir(item), 0);
+  if (valor && typeof valor === 'object') {
+    return Object.keys(valor).reduce((n, k) => n + 1 + medir(valor[k]), 0);
+  }
+  return 0;
+};
+
+const encolhimentos = [];
+for (const [name, data] of Object.entries(files)) {
+  const path = resolve(OUT, `${name}.json`);
+  if (!existsSync(path)) continue;
+  try {
+    const antes = medir(JSON.parse(readFileSync(path, 'utf8')));
+    const depois = medir(data);
+    if (depois < antes) encolhimentos.push({ name, antes, depois });
+  } catch {
+    console.warn(`! ${name}.json ilegível, seguindo sem comparar`);
+  }
+}
+
+if (encolhimentos.length && !process.argv.includes('--force')) {
+  console.error('\nABORTADO: regenerar encolheria arquivos que já existem.\n');
+  for (const { name, antes, depois } of encolhimentos) {
+    console.error(`  ${name}.json: ${antes} → ${depois} campos (perderia ${antes - depois})`);
+  }
+  console.error([
+    '',
+    'Quase sempre isso quer dizer que os JSON têm dados que o index.html não',
+    'tem — e não que o index.html perdeu alguma coisa. Confira com git diff',
+    'antes de insistir.',
+    '',
+    'Se a redução for mesmo intencional:  node tools/extract-data.mjs --force',
+    '',
+  ].join('\n'));
+  process.exit(1);
+}
+
 for (const [name, data] of Object.entries(files)) {
   const path = resolve(OUT, `${name}.json`);
   writeFileSync(path, JSON.stringify(data, null, 2) + '\n', 'utf8');
