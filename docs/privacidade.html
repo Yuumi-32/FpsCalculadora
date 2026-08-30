@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Política de Privacidade — FPS Calculadora</title>
-<meta name="description" content="Política de privacidade do app FPS Calculadora: nenhum dado pessoal é coletado, o app funciona offline e não pede permissões." />
+<meta name="description" content="Política de privacidade do app FPS Calculadora: nenhum dado pessoal é coletado. O cálculo roda no aparelho e a internet é usada só para baixar o catálogo público de peças e jogos." />
 <meta name="theme-color" content="#0d0c0a" />
 <link rel="stylesheet" href="assets/site.css" />
 </head>
@@ -19,11 +19,11 @@
     </div>
   </header>
 
-  <p class="stamp">Última atualização: 27 de agosto de 2026</p>
+  <p class="stamp">Última atualização: 30 de agosto de 2026</p>
   <p class="langs"><a href="privacy.html">Read this policy in English</a></p>
 
   <div class="card">
-    <p class="lead"><strong>Resumo:</strong> o FPS Calculadora não coleta, não transmite e não compartilha nenhum dado pessoal. O app funciona inteiramente offline, não declara nenhuma permissão do Android, não exibe anúncios e não usa ferramentas de análise ou rastreamento.</p>
+    <p class="lead"><strong>Resumo:</strong> o FPS Calculadora não coleta, não transmite e não compartilha nenhum dado pessoal. Todo o cálculo acontece no seu aparelho. O app usa a internet para uma coisa só: baixar a versão mais recente do catálogo público de peças, jogos e preços. Não exibe anúncios e não usa ferramentas de análise ou rastreamento.</p>
   </div>
 
   <h2>1. Quem somos</h2>
@@ -41,7 +41,14 @@
   <p>Não há SDK de anúncios, de análise (analytics), de atribuição ou de crash reporting embutido no app.</p>
 
   <h2>3. Permissões do Android</h2>
-  <p>O app <strong>não declara nenhuma permissão</strong> no seu <code>AndroidManifest.xml</code> — nem mesmo acesso à internet. Todo o cálculo, a base de jogos e as peças de hardware ficam embutidos no pacote do app e são processados no próprio aparelho.</p>
+  <p>O app declara duas permissões no seu <code>AndroidManifest.xml</code>, as duas a serviço da mesma função — manter o catálogo atualizado:</p>
+  <ul>
+    <li><code>INTERNET</code> — baixar a versão mais recente do catálogo de peças, jogos e preços, publicado pelo próprio projeto em <a href="https://yuumi-32.github.io/FpsCalculadora/">yuumi-32.github.io/FpsCalculadora</a>;</li>
+    <li><code>ACCESS_NETWORK_STATE</code> — verificar se o aparelho está conectado, para não tentar o download à toa.</li>
+  </ul>
+  <p>Nenhuma outra permissão é pedida: sem localização, sem contatos, sem câmera, sem microfone, sem acesso aos seus arquivos.</p>
+  <p><strong>O que sai do seu aparelho nesse download: nada seu.</strong> É o pedido de um arquivo público e estático — o mesmo que o seu navegador faria ao abrir uma página. Não vai junto nome, identificador, as suas builds nem qualquer parâmetro sobre você. Como em qualquer acesso à internet, o servidor que hospeda o arquivo (o GitHub Pages) registra o endereço IP de onde veio o pedido; o app não envia nada além disso, e o desenvolvedor não tem acesso a esses registros.</p>
+  <p>O cálculo, a base de jogos e o catálogo de peças continuam embutidos no pacote do app — <strong>ele funciona inteiro sem internet</strong>. O download apenas substitui esses dados por uma versão mais recente, quando houver.</p>
 
   <h2>4. Dados guardados no seu aparelho</h2>
   <p>Para funcionar, o app guarda algumas informações <strong>localmente, no armazenamento privado do próprio app</strong>. Esses dados nunca são enviados para fora do aparelho:</p>
@@ -63,7 +70,7 @@
   </ul>
 
   <h2>7. Compartilhamento com terceiros</h2>
-  <p>Nenhum dado é compartilhado, vendido ou cedido a terceiros, por um motivo simples: o app não coleta dados nem se conecta à internet.</p>
+  <p>Nenhum dado é compartilhado, vendido ou cedido a terceiros, por um motivo simples: o app não coleta dados. A única conexão que ele faz é buscar um arquivo de catálogo público, e esse pedido não leva nada seu junto.</p>
 
   <h2>8. Crianças</h2>
   <p>O app não é direcionado a crianças menores de 13 anos e não coleta intencionalmente nenhuma informação delas — nem delas nem de qualquer outra pessoa.</p>
@@ -78,7 +85,7 @@
   <p>Não existe um pedido de exclusão a ser feito ao desenvolvedor, porque não há dado nenhum do seu lado de cá.</p>
 
   <h2>10. Segurança</h2>
-  <p>Os dados ficam no armazenamento privado do app, isolado pelo próprio Android de outros aplicativos. Como nada trafega em rede, não há transmissão a ser interceptada.</p>
+  <p>Os dados ficam no armazenamento privado do app, isolado pelo próprio Android de outros aplicativos. Nada do que você guarda no app trafega em rede. O download do catálogo é feito exclusivamente por HTTPS: o app recusa conexões em texto claro, e a WebView interna fica restrita aos arquivos que vieram no pacote.</p>
 
   <h2>11. Alterações nesta política</h2>
   <p>Se uma versão futura do app passar a coletar qualquer informação, esta política será atualizada antes do lançamento dessa versão, com a nova data no topo da página, e a mudança será descrita nas notas da versão na Google Play.</p>

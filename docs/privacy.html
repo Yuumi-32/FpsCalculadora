@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Privacy Policy — FPS Calculadora</title>
-<meta name="description" content="Privacy policy for the FPS Calculadora Android app: no personal data is collected, the app works offline and declares no permissions." />
+<meta name="description" content="Privacy policy for the FPS Calculadora Android app: no personal data is collected. Calculation runs on the device and the internet is used only to download the public catalog of parts and games." />
 <meta name="theme-color" content="#0d0c0a" />
 <link rel="stylesheet" href="assets/site.css" />
 </head>
@@ -23,7 +23,7 @@
   <p class="langs"><a href="privacidade.html">Leia esta política em português</a></p>
 
   <div class="card">
-    <p class="lead"><strong>In short:</strong> FPS Calculadora collects no personal data, transmits nothing and shares nothing. The app runs entirely offline, declares no Android permissions, shows no ads and contains no analytics or tracking.</p>
+    <p class="lead"><strong>In short:</strong> FPS Calculadora collects no personal data, transmits nothing and shares nothing. All calculation happens on your device. The app uses the internet for one thing only: downloading the latest version of the public catalog of parts, games and prices. It shows no ads and contains no analytics or tracking.</p>
   </div>
 
   <h2>1. Who we are</h2>
@@ -41,7 +41,14 @@
   <p>No advertising, analytics, attribution or crash-reporting SDK is bundled in the app.</p>
 
   <h2>3. Android permissions</h2>
-  <p>The app <strong>declares no permissions</strong> in its <code>AndroidManifest.xml</code> — not even internet access. All calculations, the game database and the hardware catalog ship inside the app package and are processed on the device.</p>
+  <p>The app declares two permissions in its <code>AndroidManifest.xml</code>, both serving the same purpose — keeping the catalog current:</p>
+  <ul>
+    <li><code>INTERNET</code> — to download the latest version of the catalog of parts, games and prices, published by the project itself at <a href="https://yuumi-32.github.io/FpsCalculadora/">yuumi-32.github.io/FpsCalculadora</a>;</li>
+    <li><code>ACCESS_NETWORK_STATE</code> — to check whether the device is connected, so the download is not attempted pointlessly.</li>
+  </ul>
+  <p>No other permission is requested: no location, no contacts, no camera, no microphone, no access to your files.</p>
+  <p><strong>What leaves your device in that download: nothing of yours.</strong> It is a request for a public, static file — the same one your browser would make when opening a page. No name, no identifier, none of your builds and no parameter about you travels with it. As with any internet access, the server hosting the file (GitHub Pages) records the IP address the request came from; the app sends nothing beyond that, and the developer has no access to those logs.</p>
+  <p>The calculation, the game database and the hardware catalog still ship inside the app package — <strong>it works fully without internet</strong>. The download merely replaces that data with a newer version when one exists.</p>
 
   <h2>4. Data stored on your device</h2>
   <p>To work, the app stores some information <strong>locally, in the app's private storage</strong>. This data never leaves the device:</p>
@@ -63,7 +70,7 @@
   </ul>
 
   <h2>7. Sharing with third parties</h2>
-  <p>No data is shared, sold or transferred to third parties, for a simple reason: the app collects no data and does not connect to the internet.</p>
+  <p>No data is shared, sold or transferred to third parties, for a simple reason: the app collects no data. The only connection it makes is fetching a public catalog file, and that request carries nothing of yours.</p>
 
   <h2>8. Children</h2>
   <p>The app is not directed to children under 13 and does not knowingly collect any information from them — nor from anyone else.</p>
@@ -78,7 +85,7 @@
   <p>There is no deletion request to send to the developer, because there is no data on our side.</p>
 
   <h2>10. Security</h2>
-  <p>Data is kept in the app's private storage, isolated from other applications by Android itself. Since nothing travels over the network, there is no transmission to intercept.</p>
+  <p>Data is kept in the app's private storage, isolated from other applications by Android itself. Nothing you store in the app travels over the network. The catalog download uses HTTPS exclusively: the app refuses cleartext connections, and its internal WebView is restricted to files that shipped in the package.</p>
 
   <h2>11. Changes to this policy</h2>
   <p>If a future version of the app starts collecting any information, this policy will be updated before that version is released, with a new date at the top of the page, and the change will be described in the Google Play release notes.</p>
