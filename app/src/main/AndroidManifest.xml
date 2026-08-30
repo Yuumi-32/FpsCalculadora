@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--
+      Usada pelo catálogo remoto: o app busca a base de hardware, jogos e
+      preços publicada em https://yuumi-32.github.io/FpsCalculadora/, para os
+      dados não envelhecerem junto com o APK instalado.
+
+      Só o código Kotlin faz esse pedido. A WebView continua trancada nos
+      assets locais (ver shouldInterceptRequest na MainActivity) — ela tem
+      JavaScript e DOM storage ligados, e não há motivo para dar rede a ela.
+
+      Nada do usuário sai do aparelho: é um GET de arquivo estático público,
+      sem corpo, sem query e sem identificador.
+    -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Evita a tentativa de download quando o aparelho está sabidamente offline. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -10,6 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FpsCalculadora.Splash"
         android:hardwareAccelerated="true"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:enableOnBackInvokedCallback="false">
 
         <activity

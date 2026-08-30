@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  O único destino de rede do app é o GitHub Pages do próprio projeto, que é
+  https puro. Nada de texto claro em lugar nenhum — o targetSdk já faria isso
+  por padrão, mas deixar explícito impede que um debug futuro reabra http://
+  sem querer.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
