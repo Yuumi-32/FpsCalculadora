@@ -24,6 +24,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fps.calculadora.core.CpuUpgrade
+import com.fps.calculadora.core.formatAveragePrice
+import com.fps.calculadora.core.formatBrlPerFps
 import com.fps.calculadora.core.GpuUpgrade
 import com.fps.calculadora.core.RamUpgrade
 import com.fps.calculadora.core.UpgradeAdvice
@@ -96,12 +98,35 @@ fun UpgradeScreen(vm: CalcViewModel, modifier: Modifier = Modifier) {
         }
 
         Text(
-            advice.footer,
+            advice.footer + precoRodape(vm),
             color = FpsColors.Tx3,
             fontSize = 10.5.sp,
             lineHeight = 15.sp,
             modifier = Modifier.padding(top = 16.dp, bottom = 20.dp),
         )
+    }
+}
+
+/**
+ * A procedência do preço, colada no rodapé que já existia.
+ *
+ * Sem isto, "≈ R$ 4.200" na linha da peça é lido como o preço de hoje. A data
+ * de amostragem é o que transforma o número em "era isso quando medimos", e é
+ * a única coisa que o app pode honestamente prometer sobre preço.
+ *
+ * Devolve vazio quando não há preço nenhum no catálogo — sem número na tela,
+ * não há nada a ressalvar.
+ */
+private fun precoRodape(vm: CalcViewModel): String {
+    val prices = vm.catalog.prices?.takeIf { it.byId.isNotEmpty() } ?: return ""
+    val quando = prices.sampledOn.takeIf { it.isNotBlank() }
+    val como = prices.method.takeIf { it.isNotBlank() }
+    return buildString {
+        append("\n\nOs preços são média de mercado, nunca cotação")
+        if (quando != null) append(", levantada em $quando")
+        append(".")
+        if (como != null) append(" $como.")
+        append(" Confira o valor atual antes de comprar.")
     }
 }
 
@@ -156,6 +181,7 @@ private fun GpuUpgradeRow(up: GpuUpgrade, currentPsuRecommended: Int, showDivide
         gainFps = up.gainFps,
         newAvg = up.result.avg,
         gainPercent = up.gainPercent,
+        price = up.gpu.averagePriceBrl,
         showDivider = showDivider,
     )
 }
@@ -170,6 +196,7 @@ private fun CpuUpgradeRow(up: CpuUpgrade, showDivider: Boolean) {
         gainFps = up.gainFps,
         newAvg = up.result.avg,
         gainPercent = up.gainPercent,
+        price = up.cpu.averagePriceBrl,
         showDivider = showDivider,
     )
 }
@@ -182,6 +209,8 @@ private fun HardwareUpgradeRow(
     gainFps: Int,
     newAvg: Int,
     gainPercent: Int,
+    /** Média de mercado da peça, quando o catálogo remoto trouxe uma. */
+    price: Double?,
     showDivider: Boolean,
 ) {
     Column(Modifier.fillMaxWidth()) {
@@ -224,6 +253,18 @@ private fun HardwareUpgradeRow(
                     fontSize = 10.sp,
                     fontFamily = RobotoMono,
                 )
+                // Só aparece com preço no catálogo. Sem ele a linha some
+                // inteira em vez de virar um traço — a tela continua útil
+                // sem preço, que é como ela funcionava até agora.
+                val custo = formatBrlPerFps(gainFps, price)
+                if (custo != null) {
+                    Text(
+                        "${formatAveragePrice(price)} · $custo",
+                        color = FpsColors.Tx3,
+                        fontSize = 10.sp,
+                        fontFamily = RobotoMono,
+                    )
+                }
             }
         }
         if (showDivider) {

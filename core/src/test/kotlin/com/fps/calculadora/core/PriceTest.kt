@@ -77,6 +77,19 @@ class PriceTest {
     }
 
     @Test
+    fun `custo por fps sai arredondado na dezena`() {
+        // Dezena, não centena: a diferença entre R$ 180 e R$ 240 por FPS é o
+        // que decide entre duas peças, e a centena apagaria a comparação.
+        assertEquals("R$ 180/FPS", formatBrlPerFps(20, 3_600.0))
+        assertEquals("R$ 210/FPS", formatBrlPerFps(20, 4_187.0))
+        assertEquals("R$ 1.050/FPS", formatBrlPerFps(4, 4_200.0))
+        // Peça baratíssima por FPS não pode virar "R$ 0/FPS".
+        assertEquals("R$ <10/FPS", formatBrlPerFps(500, 1_200.0))
+        assertNull(formatBrlPerFps(0, 3_600.0))
+        assertNull(formatBrlPerFps(20, null))
+    }
+
+    @Test
     fun `custo por fps ganho recusa ganho inexistente`() {
         assertEquals(180.0, brlPerFpsGained(20, 3_600.0)!!, 0.001)
         // Sem ganho não há custo-benefício a calcular: dividir por zero daria

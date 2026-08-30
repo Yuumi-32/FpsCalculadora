@@ -97,3 +97,22 @@ fun brlPerFpsGained(gainFps: Int, price: Double?): Double? {
     if (price == null || price <= 0 || gainFps <= 0) return null
     return price / gainFps
 }
+
+/**
+ * O custo por FPS pronto para a tela: `R$ 210/FPS`.
+ *
+ * Arredonda para a dezena — mais fino que o preço em si (que vai para a
+ * centena) porque aqui a escala é outra: a diferença entre R$ 180 e R$ 240 por
+ * FPS é exatamente o que decide entre duas peças, e arredondar isso para a
+ * centena apagaria a comparação que a linha existe para mostrar.
+ *
+ * `null` quando não dá para calcular — a tela omite a linha em vez de mostrar
+ * um traço sem sentido.
+ */
+fun formatBrlPerFps(gainFps: Int, price: Double?): String? {
+    val value = brlPerFpsGained(gainFps, price) ?: return null
+    val rounded = (value / 10).roundToLong() * 10
+    // Abaixo de R$ 10 por FPS o arredondamento zeraria a linha inteira.
+    if (rounded <= 0) return "R$ <10/FPS"
+    return "R$ " + groupThousands(rounded) + "/FPS"
+}
