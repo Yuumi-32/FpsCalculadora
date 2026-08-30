@@ -26,15 +26,23 @@ desta pasta.
 Publicar uma correção é só commitar em `main` — o Pages reconstrói sozinho em
 menos de um minuto.
 
-## O que ainda precisa ser trocado
+## Contato: por que não há e-mail nas páginas
 
-- [ ] `SEU-NOME-AQUI` → o nome que vai aparecer como responsável (o mesmo do
-      "nome de desenvolvedor" na Play, para não confundir quem lê)
-- [ ] `SEU-EMAIL@exemplo.com` → o e-mail de contato, nos **três** arquivos
+As páginas publicadas não trazem endereço de e-mail. O responsável aparece como
+**Yuumi-32** e o contato é feito pelas
+[issues do repositório](https://github.com/Yuumi-32/FpsCalculadora/issues).
 
-```bash
-grep -rn "SEU-EMAIL\|SEU-NOME" docs/
-```
+Foi decisão deliberada: e-mail pessoal numa página pública é indexado por
+buscador e colhido por robô de spam, e para um app sem coleta de dados as
+issues dão conta do que aparece — erro nos números, jogo ou peça faltando.
+
+**Isso não dispensa o e-mail no Play Console.** A Play exige um endereço de
+contato do desenvolvedor na ficha da loja, e ele fica público lá. É o único
+lugar que ainda pede um — ver a tabela da ficha em
+[03-ficha-da-loja.md](03-ficha-da-loja.md).
+
+Se algum dia for preciso pôr e-mail nas páginas também, são quatro lugares:
+seções 1 e 12 de `docs/privacidade.html` e as mesmas de `docs/privacy.html`.
 
 ## O que o texto afirma (e que precisa continuar verdade)
 

@@ -65,7 +65,7 @@ O app parte de uma configuração de referência medida em cada jogo e aplica mu
 
 São estimativas de referência para orientar uma compra ou um upgrade, não benchmarks. O desempenho real varia com o jogo, a versão dos drivers, a memória, a temperatura e a configuração específica de cada PC. Use como ponto de partida, não como promessa.
 
-Sugestão de jogo ou de peça que faltou? Escreva para SEU-EMAIL@exemplo.com.
+Sugestão de jogo ou de peça que faltou? Abra uma issue em github.com/Yuumi-32/FpsCalculadora/issues.
 ```
 (2471 caracteres)
 
@@ -139,6 +139,9 @@ São telas reais do app com dados de exemplo semeados, não montagens.
 
 ## Ainda falta você fazer
 
-- [ ] Trocar `SEU-EMAIL@exemplo.com` no fim da descrição completa
+- [ ] Preencher o **e-mail de contato do desenvolvedor** no Play Console. A
+      Play exige um endereço ali, e é o único lugar que ainda pede um: as
+      páginas publicadas usam as issues do GitHub. Esse e-mail aparece na
+      ficha pública do app.
 - [ ] Decidir se o nome do launcher deixa de ser "Fps"
 - [ ] Conferir as capturas em um aparelho de verdade antes de subir — as fontes do Android podem quebrar linha em lugar diferente

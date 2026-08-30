@@ -24,9 +24,11 @@ da atualização subir.**
 |---|---|
 | URL da política de privacidade | `https://yuumi-32.github.io/FpsCalculadora/privacidade.html` |
 
-Fonte da página: [`docs/privacidade.html`](../privacidade.html). Antes de colar a
-URL na Play Console, troque `SEU-NOME-AQUI` e `SEU-EMAIL@exemplo.com` pelos
-dados reais e confirme que a página abre no navegador.
+Fonte da página: [`docs/privacidade.html`](../privacidade.html). A página já
+está completa — responsável identificado e contato pelas issues do GitHub, sem
+e-mail pessoal exposto (o porquê está em
+[01-politica-de-privacidade.md](01-politica-de-privacidade.md)). Antes de colar
+a URL, confirme que ela abre numa aba anônima.
 
 ---
 
@@ -174,7 +176,7 @@ Coerente com o manifesto: o app não declara
 | Tipo de app | App (não é jogo) |
 | Categoria | **Ferramentas** (alternativa: Estilo de vida — Ferramentas descreve melhor) |
 | Tags | Calculadora, Utilitários, Hardware/PC |
-| E-mail de contato (público) | `SEU-EMAIL@exemplo.com` |
+| E-mail de contato (público) | **preencher** — a Play exige, e fica visível na ficha. É o único e-mail do projeto: as páginas usam issues do GitHub |
 | Site (opcional) | `https://yuumi-32.github.io/FpsCalculadora/` |
 | Telefone (opcional) | deixar em branco |
 | Preço | **Gratuito** — atenção: gratuito → pago é um caminho sem volta na Play |
@@ -186,7 +188,8 @@ Coerente com o manifesto: o app não declara
 
 ## Antes de enviar, confira
 
-- [ ] `SEU-EMAIL@exemplo.com` e `SEU-NOME-AQUI` trocados em `docs/privacidade.html`, `docs/privacy.html` e `docs/index.html`
+- [ ] E-mail de contato preenchido **no Play Console** (as páginas publicadas
+      não usam e-mail — o contato delas são as issues do GitHub)
 - [ ] A URL da política abre sem erro em uma aba anônima
 - [ ] O AAB enviado é o de release assinado (`./gradlew bundleRelease`)
 - [ ] A versão enviada não ganhou permissão nova além de `INTERNET` e
