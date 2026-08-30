@@ -28,6 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.webkit.WebViewAssetLoader;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -35,6 +36,9 @@ public class MainActivity extends Activity {
 
     /** Domínio reservado do Google para servir assets locais como se fossem https:// de verdade. */
     private static final String APP_ORIGIN = "https://appassets.androidplatform.net";
+
+    /** O host do APP_ORIGIN — o único que a WebView tem permissão de buscar. */
+    private static final String APP_HOST = "appassets.androidplatform.net";
 
     private WebView webView;
 
@@ -95,7 +99,32 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                return assetLoader.shouldInterceptRequest(request.getUrl());
+                Uri url = request.getUrl();
+                WebResourceResponse local = assetLoader.shouldInterceptRequest(url);
+                if (local != null) {
+                    return local;
+                }
+
+                // O app voltou a declarar a permissão INTERNET (catálogo remoto),
+                // mas ela é para o código Kotlin — não para cá. O assetLoader
+                // devolve null para tudo que não é /assets/, e null significa
+                // "carregue normalmente", ou seja: pela rede.
+                //
+                // Enquanto não havia permissão, esse pedido morria sozinho. Agora
+                // ele sairia de verdade, num contexto com JavaScript e DOM storage
+                // ligados — então a recusa precisa ser explícita. shouldOverrideUrl
+                // Loading() abaixo cobre só a navegação de página; imagem, fetch e
+                // XHR não passam por lá.
+                String scheme = url.getScheme();
+                boolean web = "https".equals(scheme) || "http".equals(scheme);
+                if (web && !APP_HOST.equals(url.getHost())) {
+                    Log.w("FpsWebView", "pedido de rede bloqueado: " + url);
+                    return blocked();
+                }
+
+                // data:, blob: e afins seguem o caminho normal — é por aí que sai
+                // o PNG do card de resultado.
+                return null;
             }
 
             // Só o próprio app navega dentro da WebView. Qualquer URL de fora
@@ -133,6 +162,12 @@ public class MainActivity extends Activity {
 
         // Carrega o HTML da pasta assets/www/, servido pelo WebViewAssetLoader.
         webView.loadUrl(APP_ORIGIN + "/assets/www/index.html");
+    }
+
+    /** Resposta vazia para o que a WebView não tem o direito de buscar. */
+    private static WebResourceResponse blocked() {
+        // Stream novo a cada chamada: um InputStream só pode ser lido uma vez.
+        return new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream(new byte[0]));
     }
 
     private void saveDataUriToGallery(String dataUri, String mimeType) {
