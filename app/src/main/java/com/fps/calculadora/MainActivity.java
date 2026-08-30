@@ -128,10 +128,13 @@ public class MainActivity extends Activity {
             }
 
             // Só o próprio app navega dentro da WebView. Qualquer URL de fora
-            // (não existe nenhuma hoje, mas o app tem allowFileAccess + JS
-            // ligados) abre no navegador do aparelho em vez de carregar aqui —
-            // sem isso, um link externo herdaria o acesso a arquivo local do
-            // app.
+            // abre no navegador do aparelho em vez de carregar aqui.
+            //
+            // O motivo original era o allowFileAccess, que foi desligado desde
+            // então. O que sustenta a regra hoje é o JavaScript ligado somado à
+            // permissão de internet que o app voltou a declarar: sem esta
+            // trava, uma página externa carregada aqui rodaria script no mesmo
+            // contexto do app.
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url != null && url.startsWith(APP_ORIGIN)) {

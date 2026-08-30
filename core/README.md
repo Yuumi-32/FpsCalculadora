@@ -32,8 +32,21 @@ node tools/extract-data.mjs && node tools/gen-golden.mjs && ./gradlew :core:test
 - `gen-golden.mjs` → reescreve os vetores em `src/test/resources/`
 - o teste falha se o Kotlin não acompanhar
 
-Quando a UI nativa assumir, os JSON viram a fonte, o extrator é aposentado e os
-vetores golden congelam como teste de regressão histórico.
+A UI nativa já assumiu — a Compose é o que se publica, e o `index.html` ficou
+só no build de debug. Mas o extrator **não** foi aposentado junto: o HTML segue
+sendo a fonte de onde os JSON e os vetores golden saem, e enquanto for assim é
+nele que se acrescenta hardware.
+
+Uma ressalva que já custou dados: nem tudo que está nos JSON veio do HTML.
+Resoluções ultrawide em `games.json` e `hzMarkers` estendidos em
+`constants.json` foram acrescentados direto aqui, sem correspondência no
+`index.html`. Regenerar por cima apagaria esses campos — por isso o
+`extract-data.mjs` aborta quando o resultado encolheria, e só passa por cima
+com `--force`.
+
+Aposentar o extrator de verdade significa promover os JSON a fonte e mover
+esses acréscimos para dentro deles. Enquanto isso não acontece, os vetores
+golden continuam sendo gerados do JS, não congelados.
 
 ## O que está nos dados e o que está no código
 

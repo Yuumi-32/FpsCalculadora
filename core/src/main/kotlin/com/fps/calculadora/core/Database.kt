@@ -5,10 +5,13 @@ import kotlinx.serialization.json.Json
 /**
  * Catálogo de hardware e jogos, carregado dos JSON em `resources/data/`.
  *
- * Os JSON são gerados a partir do `index.html` por `tools/extract-data.mjs` —
- * enquanto a UI WebView existir, ela continua sendo a fonte da verdade e este
- * módulo é o espelho verificado. Depois que a UI nativa assumir, os JSON viram
- * a fonte e o extrator é aposentado.
+ * Os JSON são gerados a partir do `index.html` por `tools/extract-data.mjs`.
+ * A UI Compose já é a publicada e o HTML ficou só no build de debug, mas ele
+ * continua sendo a fonte da verdade dos dados: é lá que se acrescenta hardware,
+ * e daqui sai o espelho verificado pelos testes de paridade.
+ *
+ * [default] é a base que veio no APK. Desde o catálogo remoto ela deixou de ser
+ * a única — ver [merge], que produz uma segunda a partir dela.
  */
 class GameDatabase(
     val games: List<Game>,
