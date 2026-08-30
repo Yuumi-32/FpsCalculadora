@@ -41,6 +41,7 @@ import com.fps.calculadora.core.frameGenOptionsFor
 import com.fps.calculadora.core.ramOptionsFor
 import com.fps.calculadora.core.rtOptionsFor
 import com.fps.calculadora.core.shortCpuName
+import com.fps.calculadora.ui.components.NewPartsNotice
 import com.fps.calculadora.ui.components.BalanceCard
 import com.fps.calculadora.ui.components.ChipRow
 import com.fps.calculadora.ui.components.EnergyCard
@@ -126,6 +127,11 @@ fun CalcScreen(
             .padding(horizontal = 16.dp),
     ) {
         TopBar()
+
+        // Só aparece quando o catálogo remoto trouxe hardware que não existia
+        // neste APK. Fica antes do card principal porque é contexto sobre as
+        // opções disponíveis, não sobre o resultado do cálculo.
+        NewPartsNotice(vm.catalog.newPartNames)
 
         HeroCard {
             Row(
