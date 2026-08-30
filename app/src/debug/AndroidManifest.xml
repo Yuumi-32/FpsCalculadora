@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Só na variante debug: expõe a UI Compose da Fase 2 como um segundo ícone,
-  ao lado do app WebView, para comparar as duas telas no mesmo aparelho.
-  O release continua abrindo apenas a MainActivity.
+  Só na variante debug: mantém a UI WebView acessível como um segundo ícone,
+  ao lado do app Compose, para comparar a tela publicada com a original no
+  mesmo aparelho.
+
+  A relação era a inversa até a Fase 2 terminar — a WebView era o release e a
+  Compose o ícone extra. O release agora abre apenas a ComposeMainActivity, e
+  esta Activity não existe no manifesto de produção.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
         <activity
-            android:name=".ComposeMainActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:label="FPS Compose"
+            android:label="FPS WebView (antigo)"
             android:screenOrientation="portrait"
-            android:configChanges="screenSize|keyboardHidden"
+            android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode"
             android:windowSoftInputMode="adjustResize">
 
             <intent-filter>

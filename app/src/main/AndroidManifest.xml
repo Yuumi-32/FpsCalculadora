@@ -6,9 +6,9 @@
       preços publicada em https://yuumi-32.github.io/FpsCalculadora/, para os
       dados não envelhecerem junto com o APK instalado.
 
-      Só o código Kotlin faz esse pedido. A WebView continua trancada nos
-      assets locais (ver shouldInterceptRequest na MainActivity) — ela tem
-      JavaScript e DOM storage ligados, e não há motivo para dar rede a ela.
+      Só o código Kotlin faz esse pedido. A WebView (que sobrou apenas no
+      build de debug) continua trancada nos assets locais — ver
+      shouldInterceptRequest na MainActivity.
 
       Nada do usuário sai do aparelho: é um GET de arquivo estático público,
       sem corpo, sem query e sem identificador.
@@ -28,8 +28,13 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:enableOnBackInvokedCallback="false">
 
+        <!--
+          A UI nativa em Compose é o app publicado desde a Fase 2. A WebView
+          que ocupava este lugar continua no repositório e no build de debug,
+          como referência de comparação — ver src/debug/AndroidManifest.xml.
+        -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ComposeMainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode"
