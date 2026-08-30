@@ -25,16 +25,32 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 ## Tecnologia
 
-A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. O cálculo, a base de jogos e o histórico rodam localmente no aparelho.
+A interface é nativa, em Jetpack Compose. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. O cálculo, a base de jogos e o histórico rodam no aparelho.
 
-O app declara `INTERNET` e `ACCESS_NETWORK_STATE` para baixar o catálogo publicado em <https://yuumi-32.github.io/FpsCalculadora/> e não depender da base congelada no APK. Esse pedido sai do código Kotlin, nunca da WebView: o `shouldInterceptRequest` da `MainActivity` recusa qualquer subrecurso que não venha de `appassets.androidplatform.net`, e o `network_security_config` proíbe texto claro. **O download em si ainda não está implementado**: a permissão e o cerco de segurança estão prontos, o cliente HTTP e o catálogo publicado não.
+A UI antiga — uma WebView carregando `app/src/main/assets/www/index.html`, com dados e lógica em JavaScript — continua no repositório e no build de debug, como referência de comparação lado a lado. Ela não é publicada: o manifesto de release declara apenas a `ComposeMainActivity`. O `index.html` também segue sendo a fonte de onde `tools/extract-data.mjs` gera os JSON do `:core` e `tools/gen-golden.mjs` gera os vetores de teste.
 
-O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. As 5 telas (Calcular, Seu PC em todos os jogos, O que trocar primeiro, Comparar builds, Histórico) já existem em Compose e convivem com o WebView — no build de debug as duas aparecem como ícones separados. Ver [`core/README.md`](core/README.md).
+### Catálogo remoto
+
+O app declara `INTERNET` e `ACCESS_NETWORK_STATE` para baixar
+[`docs/catalogo.json`](docs/catalogo.json), servido pelo GitHub Pages do projeto, e não depender da base congelada no APK. Ele resolve as duas coisas que envelhecem sozinhas depois de publicar: **preço das peças** e **peça nova no mercado**.
+
+A ordem de preferência é rede → cache → base embutida, e a queda de um nível para o outro é silenciosa: este é um app offline que fica melhor com internet, não um app online que tolera ficar sem. `CatalogUpdater` nunca lança, e uma falha de rede não tem efeito além de a tela continuar mostrando o que já mostrava.
+
+Cuidados que valem conhecer antes de mexer:
+
+- **peça nova é anexada ao fim da lista, nunca inserida no meio.** Builds salvas e códigos compartilhados referenciam hardware por índice de array, então inserir no meio converteria a máquina guardada de alguém em outra — sem erro nenhum aparecer. Tem teste próprio;
+- **o catálogo remoto não mexe no miolo do cálculo.** Multiplicadores de peças existentes, jogos, placas-mãe e constantes ficam de fora: são o que os testes de paridade cobrem, e permitir troca remota mudaria o resultado do cálculo sem passar por teste;
+- **preço é sempre média, nunca cotação.** `roundToAverage` joga a precisão fora antes de a UI ver o número, e `formatAveragePrice` sai sempre com `≈`. A regra é coberta por varredura em `PriceTest`, não por convenção;
+- **a rede é do código Kotlin, nunca da WebView.** O `shouldInterceptRequest` da `MainActivity` recusa qualquer subrecurso fora de `appassets.androidplatform.net`, e o `network_security_config` proíbe texto claro.
+
+Manutenção do arquivo publicado: [`docs/play/06-catalogo-remoto.md`](docs/play/06-catalogo-remoto.md).
+
+As 5 telas (Calcular, Seu PC em todos os jogos, O que trocar primeiro, Comparar builds, Histórico) estão em Compose. Ver [`core/README.md`](core/README.md).
 
 | | |
 |---|---|
-| Linguagem | Kotlin (core, UI Compose) · Java (Activity do WebView) |
-| UI | WebView + HTML/CSS/JS embutidos — Compose em migração |
+| Linguagem | Kotlin (core, UI Compose) · Java (Activity do WebView, só no debug) |
+| UI | Jetpack Compose — WebView antiga preservada no build de debug |
 | minSdk / targetSdk | 24 / 36 |
 | Android Gradle Plugin | 8.13.0 · Gradle 8.14.3 |
 
@@ -42,17 +58,23 @@ O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, e
 
 ```
 app/src/main/                                    # módulo Android
-├── java/com/fps/calculadora/MainActivity.java   # Activity: WebView em tela cheia
-├── assets/www/index.html                        # UI completa (HTML/CSS/JS, dados e lógica)
-├── res/                                          # ícones, layout, strings, tema
+├── java/…/ComposeMainActivity.kt                # Activity publicada: UI Compose
+├── java/…/MainActivity.java                     # WebView antiga (só no build de debug)
+├── java/…/ui/                                    # telas, componentes, tema
+├── java/…/data/CatalogRepository.kt             # cache + rede + base embutida
+├── assets/www/index.html                        # UI antiga e fonte dos dados do :core
+├── res/xml/network_security_config.xml          # proíbe texto claro
 └── AndroidManifest.xml
 
 core/                                            # módulo Kotlin puro, sem Android
 ├── src/main/resources/data/*.json               # jogos, CPUs, GPUs, placas-mãe
 ├── src/main/kotlin/…/FpsCalculator.kt           # o cálculo de FPS
-└── src/test/…                                   # testes de paridade contra o JS
+├── src/main/kotlin/…/RemoteCatalog.kt           # fusão do catálogo remoto com a base
+├── src/main/kotlin/…/Price.kt                   # média de mercado, nunca cotação
+└── src/test/…                                   # paridade contra o JS + catálogo e preço
 
-tools/*.mjs                                      # extraem os dados e os vetores de teste do index.html
+docs/catalogo.json                               # catálogo publicado no GitHub Pages
+tools/*.mjs                                      # extraem dados e vetores do index.html; geram o catálogo
 ```
 
 ## Como rodar
