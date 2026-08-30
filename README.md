@@ -1,6 +1,6 @@
 # FPS Calculadora
 
-App Android que estima o desempenho (FPS) de um PC gamer a partir da combinação de CPU e GPU escolhidas, para uma base com dezenas de jogos — sem precisar de internet.
+App Android que estima o desempenho (FPS) de um PC gamer a partir da combinação de CPU e GPU escolhidas, para uma base com dezenas de jogos. O cálculo roda inteiro no aparelho; a internet é usada apenas para atualizar o catálogo de peças, jogos e preços.
 
 <p align="center">
   <img src="docs/screenshots/onboarding.png" width="200" alt="Tela de boas-vindas com presets de PC" />
@@ -25,7 +25,9 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 ## Tecnologia
 
-A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. Não há chamadas de rede — todo o cálculo, a base de jogos e o histórico rodam localmente no aparelho.
+A interface é uma WebView em tela cheia carregando uma única página HTML/CSS/JS (`app/src/main/assets/www/index.html`), totalmente embutida no APK. O cálculo, a base de jogos e o histórico rodam localmente no aparelho.
+
+O app declara `INTERNET` e `ACCESS_NETWORK_STATE` para baixar o catálogo publicado em <https://yuumi-32.github.io/FpsCalculadora/> e não depender da base congelada no APK. Esse pedido sai do código Kotlin, nunca da WebView: o `shouldInterceptRequest` da `MainActivity` recusa qualquer subrecurso que não venha de `appassets.androidplatform.net`, e o `network_security_config` proíbe texto claro. **O download em si ainda não está implementado**: a permissão e o cerco de segurança estão prontos, o cliente HTTP e o catálogo publicado não.
 
 O app está **migrando para UI nativa em Jetpack Compose**. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. As 5 telas (Calcular, Seu PC em todos os jogos, O que trocar primeiro, Comparar builds, Histórico) já existem em Compose e convivem com o WebView — no build de debug as duas aparecem como ícones separados. Ver [`core/README.md`](core/README.md).
 
