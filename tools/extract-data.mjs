@@ -75,10 +75,11 @@ const constants = {
   presets: app.PRESETS.map(p => ({ key: p.k, name: p.n, mult: p.m })),
   upscalersNvidia: app.DLSS.map(o => ({ key: o.k, name: o.n, mult: o.m, needsRtx: o.rtx })),
   upscalersAmd: app.FSR.map(o => ({ key: o.k, name: o.n, mult: o.m })),
+  upscalersIntel: app.XESS.map(o => ({ key: o.k, name: o.n, mult: o.m })),
   // Espelhado de dentro de calc() no index.html: é catálogo de hardware
   // (eficiência de RT por geração), não regra de cálculo, então vive nos dados.
   // Qualquer divergência aqui quebra os testes golden imediatamente.
-  rtEfficiencyByGen: { rtx20: 0.70, rtx30: 0.85, rdna2: 0.62, rdna3: 0.78, rdna4: 0.95 },
+  rtEfficiencyByGen: { rtx20: 0.70, rtx30: 0.85, rdna2: 0.62, rdna3: 0.78, rdna4: 0.95, arca: 0.72, arcb: 0.85 },
   vramByPreset: app.VRAM_PRE,
   ramLabels: app.RAM_LABELS,
   hzMarkers: app.HZ_MARKERS,

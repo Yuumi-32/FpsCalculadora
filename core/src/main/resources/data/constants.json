@@ -1,7 +1,7 @@
 {
   "meta": {
-    "version": "2.0",
-    "updated": "julho de 2026"
+    "version": "2.1",
+    "updated": "agosto de 2026"
   },
   "systemWatts": 80,
   "presets": [
@@ -100,12 +100,41 @@
       "mult": 0.6
     }
   ],
+  "upscalersIntel": [
+    {
+      "key": "qual",
+      "name": "XeSS Qualidade",
+      "mult": 0.92
+    },
+    {
+      "key": "bal",
+      "name": "XeSS Balanceado",
+      "mult": 1
+    },
+    {
+      "key": "perf",
+      "name": "XeSS Performance",
+      "mult": 1.12
+    },
+    {
+      "key": "naa",
+      "name": "XeSS Native AA",
+      "mult": 0.65
+    },
+    {
+      "key": "native",
+      "name": "Nativo (sem XeSS)",
+      "mult": 0.6
+    }
+  ],
   "rtEfficiencyByGen": {
     "rtx20": 0.7,
     "rtx30": 0.85,
     "rdna2": 0.62,
     "rdna3": 0.78,
-    "rdna4": 0.95
+    "rdna4": 0.95,
+    "arca": 0.72,
+    "arcb": 0.85
   },
   "vramByPreset": {
     "max": 0,

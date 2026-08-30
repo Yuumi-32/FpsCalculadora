@@ -44,9 +44,12 @@ enum class GpuGen {
     @SerialName("gtx10") GTX10, @SerialName("gtx16") GTX16,
     @SerialName("rtx20") RTX20, @SerialName("rtx30") RTX30,
     @SerialName("rtx40") RTX40, @SerialName("rtx50") RTX50,
-    @SerialName("rdna2") RDNA2, @SerialName("rdna3") RDNA3, @SerialName("rdna4") RDNA4;
+    @SerialName("rdna2") RDNA2, @SerialName("rdna3") RDNA3, @SerialName("rdna4") RDNA4,
+    /** Arc A-Series. */ @SerialName("arca") ARCA,
+    /** Arc B-Series — primeira com XeSS Frame Generation. */ @SerialName("arcb") ARCB;
 
     val isRadeon: Boolean get() = this == RDNA2 || this == RDNA3 || this == RDNA4
+    val isArc: Boolean get() = this == ARCA || this == ARCB
 
     /** Pascal e Turing-sem-RT não têm núcleos de ray tracing. */
     val hasRtCores: Boolean get() = this != GTX10 && this != GTX16
@@ -54,7 +57,7 @@ enum class GpuGen {
     /** Path Tracing completo com Ray Reconstruction: só Ada e Blackwell. */
     val hasRayReconstruction: Boolean get() = this == RTX40 || this == RTX50
 
-    val hasFrameGen: Boolean get() = this == RTX40 || this == RTX50 || this == RDNA3 || this == RDNA4
+    val hasFrameGen: Boolean get() = this == RTX40 || this == RTX50 || this == RDNA3 || this == RDNA4 || this == ARCB
 
     /** Multi Frame Generation 4×, exclusivo da série RTX 50. */
     val hasMultiFrameGen: Boolean get() = this == RTX50
@@ -63,11 +66,12 @@ enum class GpuGen {
 @Serializable
 enum class Socket {
     @SerialName("AM4") AM4, @SerialName("AM5") AM5,
+    @SerialName("LGA1200") LGA1200,
     @SerialName("LGA1700") LGA1700, @SerialName("LGA1851") LGA1851;
 
     /** LGA1700 é a única plataforma que aceita DDR4 e DDR5. */
-    val supportsDdr4: Boolean get() = this == AM4 || this == LGA1700
-    val supportsDdr5: Boolean get() = this != AM4
+    val supportsDdr4: Boolean get() = this == AM4 || this == LGA1200 || this == LGA1700
+    val supportsDdr5: Boolean get() = this == AM5 || this == LGA1700 || this == LGA1851
 }
 
 @Serializable
@@ -187,6 +191,7 @@ data class Constants(
     val presets: List<Preset>,
     val upscalersNvidia: List<Upscaler>,
     val upscalersAmd: List<Upscaler>,
+    val upscalersIntel: List<Upscaler>,
     val rtEfficiencyByGen: Map<GpuGen, Double>,
     /** Ajuste de VRAM por preset, relativo ao Ultra. */
     val vramByPreset: Map<String, Double>,

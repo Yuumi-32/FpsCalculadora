@@ -475,5 +475,86 @@
     "mult": 1.2,
     "socket": "LGA1851",
     "watts": 145
+  },
+  {
+    "id": "core-i3-10100f",
+    "index": 53,
+    "group": "LGA1200 · Intel 10ª ger.",
+    "name": "Core i3-10100F",
+    "mult": 0.68,
+    "socket": "LGA1200",
+    "watts": 58
+  },
+  {
+    "id": "core-i5-10400f",
+    "index": 54,
+    "group": "LGA1200 · Intel 10ª ger.",
+    "name": "Core i5-10400F",
+    "mult": 0.74,
+    "socket": "LGA1200",
+    "watts": 68
+  },
+  {
+    "id": "core-i5-10600k",
+    "index": 55,
+    "group": "LGA1200 · Intel 10ª ger.",
+    "name": "Core i5-10600K",
+    "mult": 0.8,
+    "socket": "LGA1200",
+    "watts": 105
+  },
+  {
+    "id": "core-i7-10700k",
+    "index": 56,
+    "group": "LGA1200 · Intel 10ª ger.",
+    "name": "Core i7-10700K",
+    "mult": 0.86,
+    "socket": "LGA1200",
+    "watts": 135
+  },
+  {
+    "id": "core-i9-10900k",
+    "index": 57,
+    "group": "LGA1200 · Intel 10ª ger.",
+    "name": "Core i9-10900K",
+    "mult": 0.9,
+    "socket": "LGA1200",
+    "watts": 165
+  },
+  {
+    "id": "core-i5-11400f",
+    "index": 58,
+    "group": "LGA1200 · Intel 11ª ger.",
+    "name": "Core i5-11400F",
+    "mult": 0.82,
+    "socket": "LGA1200",
+    "watts": 68
+  },
+  {
+    "id": "core-i5-11600k",
+    "index": 59,
+    "group": "LGA1200 · Intel 11ª ger.",
+    "name": "Core i5-11600K",
+    "mult": 0.86,
+    "socket": "LGA1200",
+    "watts": 110
+  },
+  {
+    "id": "core-i7-11700k",
+    "index": 60,
+    "group": "LGA1200 · Intel 11ª ger.",
+    "name": "Core i7-11700K",
+    "mult": 0.9,
+    "socket": "LGA1200",
+    "watts": 140
+  },
+  {
+    "id": "core-i9-11900k",
+    "index": 61,
+    "group": "LGA1200 · Intel 11ª ger.",
+    "name": "Core i9-11900K",
+    "mult": 0.93,
+    "socket": "LGA1200",
+    "watts": 170
   }
 ]
