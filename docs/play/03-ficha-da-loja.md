@@ -34,7 +34,7 @@ Quantos FPS seu PC faz em cada jogo? Estimativa offline, sem anúncios.
 ## Descrição completa — máx. 4000 caracteres
 
 ```
-Vai montar um PC ou trocar uma peça e quer saber o que esperar de FPS antes de gastar? O FPS Calculadora estima o desempenho da sua máquina em dezenas de jogos, direto no celular, sem internet e sem cadastro.
+Vai montar um PC ou trocar uma peça e quer saber o que esperar de FPS antes de gastar? O FPS Calculadora estima o desempenho da sua máquina em dezenas de jogos, direto no celular, sem cadastro e sem anúncios.
 
 Escolha o processador, a placa de vídeo, a placa-mãe e a memória; ajuste a resolução, a taxa do monitor, o preset gráfico, o Ray Tracing, o Frame Generation e o upscaling (DLSS/FSR). O app calcula na hora o FPS médio, o 1% low e o FPS máximo estimados.
 
@@ -53,9 +53,11 @@ O CATÁLOGO
 
 Mais de 30 jogos, 69 placas de vídeo (GeForce GTX 10 até RTX 50 e Radeon RX 6000 até RX 9000), 53 processadores (Ryzen 1000 até 9000 e Intel Core 12ª geração até Core Ultra), 21 placas-mãe e as combinações usuais de memória DDR4 e DDR5.
 
-FUNCIONA OFFLINE, DE VERDADE
+FUNCIONA SEM INTERNET
 
-O app não pede nenhuma permissão do Android — nem acesso à internet. Toda a base de dados e todo o cálculo estão dentro do aplicativo: nada é enviado para lugar nenhum, não há anúncios, não há rastreamento e não existe conta para criar. As builds que você salva ficam apenas no seu aparelho.
+Toda a base de dados e todo o cálculo estão dentro do aplicativo: dá para usar o app inteiro no modo avião. A internet serve para uma coisa só — baixar a versão mais nova do catálogo de peças, jogos e preços, para os números não envelhecerem junto com a versão instalada.
+
+Nada é enviado para lugar nenhum: não há anúncios, não há rastreamento, não existe conta para criar e o app não pede acesso a localização, contatos, câmera ou aos seus arquivos. As builds que você salva ficam apenas no seu aparelho.
 
 COMO OS NÚMEROS SÃO CALCULADOS
 

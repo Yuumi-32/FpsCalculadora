@@ -41,7 +41,8 @@ grep -rn "SEU-EMAIL\|SEU-NOME" docs/
 A política diz, em pt-BR e em inglês, que o app:
 
 - não coleta, não transmite e não compartilha nenhum dado pessoal;
-- não declara **nenhuma** permissão no `AndroidManifest.xml`, nem internet;
+- declara só `INTERNET` e `ACCESS_NETWORK_STATE`, ambas para baixar o catálogo
+  público de peças, jogos e preços — nenhum dado do usuário sai do aparelho;
 - guarda builds, preferências e a marca de onboarding só no armazenamento
   privado do app;
 - permite o backup automático do Android, que pode copiar esses dados para o
@@ -49,8 +50,15 @@ A política diz, em pt-BR e em inglês, que o app:
 - salva o PNG do resultado na galeria e o código de build na área de
   transferência, sempre por ação do usuário.
 
-Isso é um retrato do app de hoje. **Qualquer versão futura que adicione rede,
+Isso é um retrato do app de hoje. **Qualquer versão futura que adicione
 anúncio, analytics ou uma permissão nova obriga a atualizar esta página antes
-de publicar** — e a refazer o formulário de Segurança dos Dados, que hoje está
+de publicar** — e a revisar o formulário de Segurança dos Dados, que segue
 respondido como "não coleta" em
 [02-declaracoes-play-console.md](02-declaracoes-play-console.md).
+
+> **Mudou em 30/08/2026:** o app voltou a declarar `INTERNET` (mais
+> `ACCESS_NETWORK_STATE`) para o catálogo remoto. A resposta "não coleta"
+> continua correta — a Play define coleta como *transmitir dados do usuário
+> para fora do aparelho*, e o download é um GET de arquivo público estático,
+> sem nada do usuário. Mas o texto da política mudou, então **a página
+> revisada precisa estar no ar antes de subir um build com a permissão**.

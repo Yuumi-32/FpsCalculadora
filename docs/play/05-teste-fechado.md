@@ -79,8 +79,9 @@ preciso de 12 pessoas testando por 14 dias.
 O que dá trabalho pra você: instalar, abrir de vez em quando e me dizer se
 algo ficou estranho. E deixar instalado por 2 semanas.
 
-O app é gratuito, funciona offline, não tem anúncio, não pede nenhuma
-permissão e não coleta nada.
+O app é gratuito, funciona sem internet, não tem anúncio e não coleta nada.
+A única permissão que ele pede é acesso à rede, para atualizar a tabela de
+peças e preços.
 
 Topa? Me manda o e-mail da sua Conta Google (o do Android) que eu te mando o
 link.

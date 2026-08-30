@@ -3,11 +3,18 @@
 Tudo o que a seção **Conteúdo do app** (*App content*) e o formulário de
 **Segurança dos dados** pedem, já respondido para o FPS Calculadora. É só copiar.
 
-As respostas abaixo valem para o app como ele está hoje: sem internet, sem
-permissões no manifesto, sem anúncios, sem login e sem SDK de terceiros
-(confirmado em `app/src/main/AndroidManifest.xml` e `app/build.gradle`).
+As respostas abaixo valem para o app como ele está hoje: sem anúncios, sem
+login e sem SDK de terceiros, e com duas permissões no manifesto — `INTERNET`
+e `ACCESS_NETWORK_STATE`, as duas a serviço do catálogo remoto (confirmado em
+`app/src/main/AndroidManifest.xml` e `app/build.gradle`).
 **Se qualquer uma dessas coisas mudar, o formulário precisa ser refeito antes
 da atualização subir.**
+
+> **Mudou em 30/08/2026:** até então o app não declarava permissão nenhuma, e
+> este documento usava isso como argumento. A permissão de internet voltou
+> para o catálogo remoto. **A resposta de Segurança dos dados não muda** — o
+> porquê está reescrito na seção 6 —, mas a política de privacidade publicada
+> foi revisada e precisa estar no ar antes do próximo envio.
 
 ---
 
@@ -110,9 +117,16 @@ criptografia em trânsito, exclusão de dados e tipos de dados só aparecem para
 quem coleta.
 
 **Por que "Não" está correto:** a Play define *coleta* como **transmitir dados
-para fora do aparelho**. O FPS Calculadora guarda builds e preferências no
-armazenamento privado do próprio app e nunca envia nada — o app não declara nem
-a permissão de internet. Dado que só existe no aparelho não é coleta.
+do usuário para fora do aparelho**. O FPS Calculadora guarda builds e
+preferências no armazenamento privado do próprio app e nunca envia nada. Dado
+que só existe no aparelho não é coleta.
+
+O app declara `INTERNET`, mas **declarar a permissão não é coletar dados** — o
+formulário pergunta o que o app *envia*, não o que ele *pode* enviar. O único
+tráfego é o download de um arquivo público e estático do catálogo, um GET sem
+corpo, sem query e sem identificador: nada do usuário sobe junto. O endereço IP
+que o GitHub Pages registra ao servir o arquivo é o mesmo de qualquer acesso
+web, não é acessível ao desenvolvedor e não entra no formulário.
 
 Pontos que costumam gerar dúvida, e por que nenhum deles vira "Sim":
 
@@ -175,4 +189,7 @@ Coerente com o manifesto: o app não declara
 - [ ] `SEU-EMAIL@exemplo.com` e `SEU-NOME-AQUI` trocados em `docs/privacidade.html`, `docs/privacy.html` e `docs/index.html`
 - [ ] A URL da política abre sem erro em uma aba anônima
 - [ ] O AAB enviado é o de release assinado (`./gradlew bundleRelease`)
-- [ ] A versão enviada não ganhou nenhuma permissão nova no manifesto
+- [ ] A versão enviada não ganhou permissão nova além de `INTERNET` e
+      `ACCESS_NETWORK_STATE` (as duas já cobertas pela política revisada)
+- [ ] A política revisada (que menciona a permissão de internet) já está no ar
+      **antes** de o AAB com a permissão ser enviado
