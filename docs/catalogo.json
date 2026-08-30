@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "version": "2.0",
+  "updated": "2026-08-30",
+  "prices": {
+    "currency": "BRL",
+    "sampledOn": "",
+    "method": "",
+    "byId": {}
+  },
+  "newCpus": [],
+  "newGpus": []
+}
