@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,11 @@ class ComposeMainActivity : ComponentActivity() {
                 FpsBackground {
                     val vm: CalcViewModel = viewModel()
                     val animated = animationsEnabled()
+
+                    // Uma tentativa por abertura. O repositório decide se vale
+                    // ir à rede (12h desde o último download, conexão de pé) e
+                    // devolve o estado atual sem custo quando não vale.
+                    LaunchedEffect(Unit) { vm.refreshCatalog() }
                     var tab by remember { mutableStateOf(AppTab.CALC) }
 
                     Column(Modifier.fillMaxSize().systemBarsPadding()) {

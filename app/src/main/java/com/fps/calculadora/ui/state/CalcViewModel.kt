@@ -43,6 +43,8 @@ import com.fps.calculadora.core.toBuildState
 import com.fps.calculadora.core.upgradeAdvice
 import com.fps.calculadora.core.warningsFor
 import com.fps.calculadora.core.withNewEntry
+import com.fps.calculadora.data.CatalogRepository
+import com.fps.calculadora.data.CatalogState
 import com.fps.calculadora.data.HistoryStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -71,8 +73,25 @@ enum class CompareMode { GAME, ALL_GAMES }
  */
 class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
-    val db: GameDatabase = GameDatabase.default
-    private val calculator = FpsCalculator(db)
+    private val catalogRepo = CatalogRepository(application)
+
+    /**
+     * O catálogo em uso. Começa com o que houver em cache (leitura de disco,
+     * rápida) e é trocado quando a rede traz coisa nova.
+     */
+    var catalog by mutableStateOf(catalogRepo.loadCached())
+        private set
+
+    /**
+     * A base atual. Deixou de ser constante quando o catálogo remoto entrou:
+     * as telas leem por aqui e recompõem sozinhas quando ele troca.
+     *
+     * A troca é segura no meio do uso porque peça nova só é anexada ao fim da
+     * lista — nenhum id que a `state` referencia deixa de existir.
+     */
+    val db: GameDatabase get() = catalog.database
+
+    private var calculator = FpsCalculator(catalog.database)
     private val historyStore = HistoryStore(application)
 
     var state by mutableStateOf(db.normalize(defaultState()))
@@ -152,6 +171,36 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
     fun clearPreviousFps() {
         previousFps = null
+    }
+
+    /**
+     * Tenta melhorar o catálogo pela rede — preços mais novos, peças que
+     * lançaram.
+     *
+     * Barato de chamar: o repositório devolve o estado atual sem tocar em
+     * socket quando não há conexão ou quando o cache ainda está dentro das 12
+     * horas. Por isso a tela pode chamar na abertura sem se preocupar em
+     * saber quando é hora.
+     *
+     * Não expõe carregamento nem erro na UI de propósito. O app calcula FPS
+     * sem depender disso; transformar uma falha de rede em algo que o usuário
+     * precise ver ou dispensar seria dar à atualização uma importância que ela
+     * não tem.
+     */
+    fun refreshCatalog(force: Boolean = false) {
+        viewModelScope.launch {
+            val next = catalogRepo.refresh(catalog, force)
+            if (next !== catalog) applyCatalog(next)
+        }
+    }
+
+    private fun applyCatalog(next: CatalogState) {
+        catalog = next
+        calculator = FpsCalculator(next.database)
+        // Renormaliza contra a base nova. A build atual continua válida —
+        // peça só é anexada, nunca removida —, mas o normalize é o que faz
+        // uma peça recém-chegada passar a ser oferecida nos seletores.
+        state = next.database.normalize(state)
     }
 
     /** Salva a build atual no histórico local — porta o `saveBuild()` (`index.html:2519`). */

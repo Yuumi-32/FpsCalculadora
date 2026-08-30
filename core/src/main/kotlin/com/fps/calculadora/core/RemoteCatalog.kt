@@ -97,6 +97,15 @@ const val MAX_PLAUSIBLE_PRICE_BRL = 100_000.0
 data class CatalogMergeResult(
     /** A base já com preços e peças novas aplicados. */
     val database: GameDatabase,
+    /**
+     * A procedência dos preços, que viaja junto até a tela.
+     *
+     * Sem `sampledOn` ao lado do número, o usuário lê "≈ R$ 4.200" como o
+     * preço de hoje. A data é o que transforma isso em "era isso quando
+     * medimos" — e é a diferença entre uma média honesta e uma cotação
+     * errada.
+     */
+    val prices: RemotePrices,
     /** Peças que não existiam na base embutida — o "tem peça nova no mercado". */
     val newCpus: List<Cpu>,
     val newGpus: List<Gpu>,
@@ -174,6 +183,7 @@ fun GameDatabase.merge(catalog: RemoteCatalog): CatalogMergeResult {
                 meta = DbMeta(version = catalog.version, updated = catalog.updated),
             ),
         ),
+        prices = catalog.prices,
         newCpus = addedCpus,
         newGpus = addedGpus,
         // Contados em separado: `mergedCpus + mergedGpus` colapsaria para
