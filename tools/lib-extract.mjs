@@ -7,7 +7,9 @@ import { dirname, resolve } from 'node:path';
 import vm from 'node:vm';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export const INDEX_HTML = resolve(ROOT, 'app/src/main/assets/www/index.html');
+// A UI WebView ficou só no build de debug quando a Compose foi publicada,
+// mas o HTML segue sendo a fonte da verdade dos dados e dos vetores golden.
+export const INDEX_HTML = resolve(ROOT, 'app/src/debug/assets/www/index.html');
 
 /** Devolve o conteúdo de cada bloco <script> sem atributos (os inline do app). */
 export function scriptBlocks(html = readFileSync(INDEX_HTML, 'utf8')) {

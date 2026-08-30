@@ -167,7 +167,7 @@ const badgeCases = (() => {
 })();
 
 const meta = {
-  generatedFrom: 'app/src/main/assets/www/index.html',
+  generatedFrom: 'app/src/debug/assets/www/index.html',
   dbVersion: app.DB_META.v,
   counts: { games: G.length, cpus: C.length, gpus: GP.length, mobos: MB.length },
 };

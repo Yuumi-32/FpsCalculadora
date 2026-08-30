@@ -63,8 +63,9 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    // Necessário para o arquivo HTML grande não ser comprimido duas vezes.
-    // Sai junto com o WebView no fim da Fase 2.
+    // O HTML da WebView antiga mora em src/debug/, então só o build de debug
+    // o carrega — o APK de release não leva asset nenhum. O noCompress evita
+    // comprimir duas vezes o arquivo grande no debug.
     androidResources {
         noCompress 'html', 'js', 'css'
     }

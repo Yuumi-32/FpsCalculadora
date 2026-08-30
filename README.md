@@ -27,7 +27,7 @@ Os números partem de uma configuração de referência (RTX 5070 + Ryzen 7 5700
 
 A interface é nativa, em Jetpack Compose. O módulo `:core`, em Kotlin puro, guarda a base de dados em JSON e o cálculo de FPS, coberto por testes de paridade que comparam 3.975 combinações de hardware contra a implementação original. O cálculo, a base de jogos e o histórico rodam no aparelho.
 
-A UI antiga — uma WebView carregando `app/src/main/assets/www/index.html`, com dados e lógica em JavaScript — continua no repositório e no build de debug, como referência de comparação lado a lado. Ela não é publicada: o manifesto de release declara apenas a `ComposeMainActivity`. O `index.html` também segue sendo a fonte de onde `tools/extract-data.mjs` gera os JSON do `:core` e `tools/gen-golden.mjs` gera os vetores de teste.
+A UI antiga — uma WebView carregando `app/src/debug/assets/www/index.html`, com dados e lógica em JavaScript — continua no repositório **apenas no build de debug**, como referência de comparação lado a lado. O arquivo mora em `src/debug/` justamente para não viajar no APK publicado. O `index.html` segue sendo a fonte de onde `tools/extract-data.mjs` gera os JSON do `:core` e `tools/gen-golden.mjs` gera os vetores de teste.
 
 ### Catálogo remoto
 

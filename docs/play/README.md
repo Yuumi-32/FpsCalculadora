@@ -51,5 +51,5 @@ python tools/gen-store-screenshots.py
 ```
 
 Precisa de Python com Pillow e do Chrome (ou Edge) instalado. As capturas saem
-do próprio `app/src/main/assets/www/index.html`, então elas acompanham qualquer
+do próprio `app/src/debug/assets/www/index.html`, então elas acompanham qualquer
 mudança na interface — vale rodar de novo antes de subir uma versão nova.
