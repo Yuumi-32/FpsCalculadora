@@ -69,6 +69,12 @@ android {
     androidResources {
         noCompress 'html', 'js', 'css'
     }
+
+    testOptions {
+        // Mesmo motor do :core, para os dois módulos rodarem com um
+        // `./gradlew test` só e com a mesma sintaxe de asserção.
+        unitTests.all { it.useJUnitPlatform() }
+    }
 }
 
 kotlin {
@@ -97,4 +103,10 @@ dependencies {
 
     debugImplementation 'androidx.compose.ui:ui-tooling'
     implementation 'androidx.compose.ui:ui-tooling-preview'
+
+    // Só o que roda na JVM. O resto do :app é Compose e Canvas do Android, que
+    // pede aparelho ou Robolectric — ver docs/play/README.md.
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
