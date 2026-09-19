@@ -168,7 +168,7 @@ Coerente com o manifesto: o app não declara
 | Recursos financeiros (empréstimo, cripto, investimento, seguro) | **Nenhum destes** |
 | Apps de saúde (pesquisa clínica, telemedicina, bem-estar) | **Nenhum destes** |
 | Permissões de serviço em primeiro plano | Nenhuma — o app não usa `foregroundService` |
-| Permissões sensíveis (SMS, chamadas, fotos/vídeos, arquivos) | Nenhuma — o manifesto não declara permissão alguma |
+| Permissões sensíveis (SMS, chamadas, fotos/vídeos, arquivos) | Nenhuma — o manifesto declara só `INTERNET` e `ACCESS_NETWORK_STATE`, que não entram nessa lista (ver a seção 6) |
 | Uso de APIs de acessibilidade | Não |
 | Conteúdo violento ou de ódio gerado por usuários | Não se aplica |
 
