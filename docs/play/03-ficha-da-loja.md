@@ -48,6 +48,8 @@ O QUE VOCÊ ENCONTRA
 • O que trocar primeiro — quanto cada upgrade de processador ou de placa de vídeo somaria de FPS no jogo escolhido.
 • Comparar builds — a configuração atual lado a lado com uma salva, jogo a jogo.
 • Histórico no aparelho — salve builds, dê nome e exporte por código de texto para levar a outro celular.
+• Perfis de PC — guarde mais de uma máquina (a sua, a do amigo, a que você pensa em montar) e troque entre elas; o app reabre onde você parou.
+• Compartilhar o resultado — uma imagem com a build e os números, para mandar no grupo ou salvar na galeria.
 • Fonte recomendada — potência mínima e recomendada, com o selo 80 Plus sugerido.
 • Builds prontos — pontos de partida Econômico, Médio e Máximo para 1080p, 1440p e 4K.
 
@@ -73,7 +75,7 @@ São estimativas de referência para orientar uma compra ou um upgrade, não ben
 
 Sugestão de jogo ou de peça que faltou? Abra uma issue em github.com/Yuumi-32/FpsCalculadora/issues.
 ```
-(2959 caracteres)
+(3211 caracteres)
 
 > **Marcas citadas** (Ryzen, Intel Core, GeForce, Radeon, DLSS, FSR e os nomes
 > dos jogos) aparecem só para descrever compatibilidade — uso nominativo, que a
@@ -93,11 +95,13 @@ Primeira versão pública.
 • O que trocar primeiro: o ganho de cada upgrade de CPU ou GPU
 • Comparação entre a build atual e uma salva
 • Histórico no aparelho com exportação por código
+• Perfis de PC: várias máquinas guardadas; reabre onde parou
+• Compartilhar o resultado como imagem, texto ou código
 • Recomendação de fonte com selo 80 Plus
 
 Tudo offline, sem anúncios e sem coletar dados.
 ```
-(380 caracteres)
+(497 caracteres)
 
 ---
 
