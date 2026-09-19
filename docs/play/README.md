@@ -5,15 +5,33 @@ arquivo que resolve cada um.
 
 | # | Item | Estado |
 |---|---|---|
-| 1 | Política de privacidade publicada numa URL | ✅ **no ar** — falta trocar nome e e-mail |
+| 1 | Política de privacidade publicada numa URL | ✅ **no ar** — responsável e contato resolvidos em [01](01-politica-de-privacidade.md) |
 | 2 | Segurança dos Dados, classificação indicativa, público-alvo, anúncios | ✅ **respondido** — falta colar na Play Console |
 | 3 | Ícone 512×512, feature graphic 1024×500, capturas, descrições | ✅ **pronto** — arquivos e textos gerados |
 | 4 | Conta de desenvolvedor (US$ 25) | ⬜ **só você pode fazer** — passo a passo pronto |
 | 5 | Teste fechado: 12 testadores por 14 dias | ⬜ **só você pode fazer** — kit de recrutamento pronto |
+| 6 | Keystore de release | ⬜ **só você pode fazer** — sem ele o AAB sai sem assinatura |
+| 7 | Preços das peças no catálogo publicado | ⬜ **levantamento manual** — ver [06](06-catalogo-remoto.md) |
 
-Os itens 4 e 5 exigem documento de identidade, cartão de crédito e pessoas de
-verdade instalando o app: não dá para adiantar por aqui além do que já está
-escrito.
+Os itens 4, 5 e 6 exigem documento de identidade, cartão de crédito, pessoas de
+verdade instalando o app e uma senha que só você pode guardar: não dá para
+adiantar por aqui além do que já está escrito.
+
+### 6 — assinatura
+
+`keystore.properties` não existe no repositório (e não deve existir). Sem ele o
+`./gradlew bundleRelease` gera um pacote **não assinado**, que a Play recusa.
+Copie `keystore.properties.example`, gere o `.jks` e guarde a senha em lugar de
+onde ela não se perca — keystore perdido significa não conseguir mais atualizar
+o app publicado.
+
+### 7 — preço das peças
+
+`docs/catalogo.json` está publicado com `prices.byId` vazio, então a tela de
+upgrade não mostra custo-benefício. O app lida bem com isso (a linha some), e é
+de propósito: preço chutado é pior que preço nenhum. Quando houver amostragem
+de verdade, [06-catalogo-remoto.md](06-catalogo-remoto.md) tem o procedimento —
+e não precisa de versão nova do app, só de um commit em `main`.
 
 ## Os arquivos
 
@@ -24,6 +42,7 @@ escrito.
 | [03-ficha-da-loja.md](03-ficha-da-loja.md) | Título, descrição curta, descrição completa, notas da versão e o inventário dos gráficos |
 | [04-conta-de-desenvolvedor.md](04-conta-de-desenvolvedor.md) | Cadastro de US$ 25, verificação de identidade e o que fazer logo depois |
 | [05-teste-fechado.md](05-teste-fechado.md) | Regras dos 14 dias, linha do tempo, mensagens de recrutamento e controle |
+| [06-catalogo-remoto.md](06-catalogo-remoto.md) | Como levantar preço de peça e publicar peça nova sem versão nova do app |
 | [graficos/](graficos/) · [screenshots/](screenshots/) | Ícone, feature graphic e as oito capturas 1080×1920 |
 
 ## Ordem sugerida
@@ -33,8 +52,8 @@ O caminho crítico é o teste fechado, então ele começa primeiro:
 1. **Hoje** — criar a conta de desenvolvedor ([04](04-conta-de-desenvolvedor.md))
    e começar a chamar testadores ([05](05-teste-fechado.md)). São ~3 semanas de
    relógio até poder publicar em produção.
-2. **Enquanto a verificação de identidade anda** — trocar nome e e-mail nas
-   páginas ([01](01-politica-de-privacidade.md)) e conferir a URL no ar.
+2. **Enquanto a verificação de identidade anda** — gerar o keystore (item 6) e
+   conferir as três URLs no ar.
 3. **Com a conta ativa** — criar o app, subir o AAB assinado
    (`./gradlew bundleRelease`) na trilha de teste fechado e mandar os convites.
 4. **Com o app criado** — preencher "Conteúdo do app" com as respostas de
