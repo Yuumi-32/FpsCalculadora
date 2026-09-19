@@ -7,7 +7,7 @@ arquivo que resolve cada um.
 |---|---|---|
 | 1 | Política de privacidade publicada numa URL | ✅ **no ar** — responsável e contato resolvidos em [01](01-politica-de-privacidade.md) |
 | 2 | Segurança dos Dados, classificação indicativa, público-alvo, anúncios | ✅ **respondido** — falta colar na Play Console |
-| 3 | Ícone 512×512, feature graphic 1024×500, capturas, descrições | ✅ **pronto** — arquivos e textos gerados |
+| 3 | Ícone 512×512, feature graphic 1024×500, capturas, descrições | ⚠️ **textos e gráficos prontos**, capturas a conferir — ver abaixo |
 | 4 | Conta de desenvolvedor (US$ 25) | ⬜ **só você pode fazer** — passo a passo pronto |
 | 5 | Teste fechado: 12 testadores por 14 dias | ⬜ **só você pode fazer** — kit de recrutamento pronto |
 | 6 | Keystore de release | ⬜ **só você pode fazer** — sem ele o AAB sai sem assinatura |
@@ -20,6 +20,14 @@ adiantar por aqui além do que já está escrito.
 
 > **7 e 8 são coisas diferentes.** O 7 é o preço das *peças* (para a tela de
 > upgrade mostrar custo-benefício); o 8 é quanto custa *baixar o app*.
+
+### 3 — as capturas saem da interface antiga
+
+`tools/gen-store-screenshots.py` fotografa o `index.html`, que desde a Fase 2 só
+existe no build de debug: o app publicado é a interface Compose. O desenho é o
+mesmo (os dois leem os mesmos tokens de cor e tamanho), mas não é a mesma tela.
+Antes de subir uma versão, abra as oito capturas ao lado do aparelho e refaça à
+mão as que tiverem divergido.
 
 ### 6 — assinatura
 
@@ -72,8 +80,8 @@ O caminho crítico é o teste fechado, então ele começa primeiro:
 1. **Hoje** — criar a conta de desenvolvedor ([04](04-conta-de-desenvolvedor.md))
    e começar a chamar testadores ([05](05-teste-fechado.md)). São ~3 semanas de
    relógio até poder publicar em produção.
-2. **Enquanto a verificação de identidade anda** — gerar o keystore (item 6) e
-   conferir as três URLs no ar.
+2. **Enquanto a verificação de identidade anda** — gerar o keystore (item 6),
+   conferir as três URLs no ar e revisar as capturas contra o aparelho (item 3).
 3. **Com a conta ativa** — criar o app, **definir o preço** ([07](07-preco-do-app.md))
    e gerar os códigos promocionais dos testadores, subir o AAB assinado
    (`./gradlew bundleRelease`) na trilha de teste fechado e mandar os convites
@@ -92,5 +100,6 @@ python tools/gen-store-screenshots.py
 ```
 
 Precisa de Python com Pillow e do Chrome (ou Edge) instalado. As capturas saem
-do próprio `app/src/debug/assets/www/index.html`, então elas acompanham qualquer
-mudança na interface — vale rodar de novo antes de subir uma versão nova.
+de `app/src/debug/assets/www/index.html` — a interface antiga, não a que é
+publicada. Vale rodar de novo antes de subir uma versão nova, e conferir o
+resultado contra o aparelho (ver o item 3 acima).

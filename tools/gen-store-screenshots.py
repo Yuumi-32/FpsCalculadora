@@ -5,6 +5,12 @@
 Saída: docs/play/screenshots/*.png, 1080x1920 (9:16, o limite da Play é o lado
 maior valer no máximo o dobro do menor).
 
+ATENÇÃO: estas capturas saem da UI antiga em HTML, que hoje só existe no build
+de debug — o app publicado é a interface Compose. O desenho é o mesmo (os dois
+leem os mesmos tokens), mas telas que só existem de um lado não aparecem do
+outro. Antes de subir uma versão para a Play, confira cada captura contra o
+aparelho e refaça à mão as que divergirem.
+
 Como funciona: o `index.html` do app é copiado para uma pasta temporária, uma
 vez por tela, com um script injetado que semeia o localStorage (estado da
 build, histórico, flag de onboarding) e clica na aba desejada. Um servidor
@@ -37,7 +43,8 @@ import tempfile
 import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "app", "src", "main", "assets", "www", "index.html")
+# O HTML mora em src/debug/ desde que ele deixou de viajar no APK publicado.
+SRC = os.path.join(ROOT, "app", "src", "debug", "assets", "www", "index.html")
 OUT = os.path.join(ROOT, "docs", "play", "screenshots")
 
 CHROME_CANDIDATES = [

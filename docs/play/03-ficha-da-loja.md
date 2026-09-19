@@ -151,4 +151,7 @@ São telas reais do app com dados de exemplo semeados, não montagens.
       ficha pública do app.
 - [x] ~~Decidir se o nome do launcher deixa de ser "Fps"~~ — agora é
       "FPS Calculadora"
+- [ ] Refazer as capturas **com o app pago em mente**: nada nas imagens promete
+      versão gratuita, mas a captura de boas-vindas é a primeira tela de quem
+      acabou de pagar e vale conferir se ela justifica o preço
 - [ ] Conferir as capturas em um aparelho de verdade antes de subir — as fontes do Android podem quebrar linha em lugar diferente
