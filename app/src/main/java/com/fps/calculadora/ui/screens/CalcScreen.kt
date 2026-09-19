@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.CalcResult
+import com.fps.calculadora.core.PcProfile
 import com.fps.calculadora.core.PerformanceTier
 import com.fps.calculadora.core.Resolution
 import com.fps.calculadora.core.RtSetting
@@ -56,6 +57,7 @@ import com.fps.calculadora.ui.components.MonitorBars
 import com.fps.calculadora.ui.components.PickerOption
 import com.fps.calculadora.ui.components.PickerSheet
 import com.fps.calculadora.ui.components.PresetBuildsCarousel
+import com.fps.calculadora.ui.components.ProfilesSheet
 import com.fps.calculadora.ui.components.PsuCard
 import com.fps.calculadora.ui.components.SectionLabel
 import com.fps.calculadora.ui.components.SelectionRow
@@ -88,7 +90,7 @@ private val MONITOR_HZ_OPTIONS = listOf(60, 75, 100, 120, 144, 165, 180, 210, 24
 fun CalcScreen(
     vm: CalcViewModel,
     animated: Boolean,
-    onGoToUpgrade: () -> Unit = {},
+    onGoToUpgrade: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snapshot = vm.snapshot
@@ -104,6 +106,7 @@ fun CalcScreen(
     var picker by remember { mutableStateOf(Picker.NONE) }
     var infoSheet by remember { mutableStateOf(InfoSheet.NONE) }
     var justSaved by remember { mutableStateOf(false) }
+    var profilesOpen by remember { mutableStateOf(false) }
 
     // A seta de variação some depois de 2,4 s, como o `deltaFade` do CSS.
     LaunchedEffect(vm.previousFps) {
@@ -127,6 +130,7 @@ fun CalcScreen(
             .padding(horizontal = 16.dp),
     ) {
         TopBar()
+        ProfileBar(name = vm.activeProfileName, onClick = { profilesOpen = true })
 
         // Só aparece quando o catálogo remoto trouxe hardware que não existia
         // neste APK. Fica antes do card principal porque é contexto sobre as
@@ -373,6 +377,31 @@ fun CalcScreen(
             onDismiss = { infoSheet = InfoSheet.NONE },
         )
     }
+
+    if (profilesOpen) {
+        ProfilesSheet(
+            book = vm.profiles,
+            subtitle = { profile -> profileSubtitle(vm, profile) },
+            onSwitch = { id -> vm.switchProfile(id) },
+            onRename = { id, name -> vm.renameProfile(id, name) },
+            onDelete = { id -> vm.deleteProfile(id) },
+            onNew = { vm.newProfile() },
+            onDismiss = { profilesOpen = false },
+        )
+    }
+}
+
+/**
+ * A linha embaixo do nome do perfil na folha — o `profSub()` do `index.html`
+ * (:3394). Perfil que aponta para peça que a base não conhece mais vira um
+ * travessão em vez de derrubar a folha.
+ */
+private fun profileSubtitle(vm: CalcViewModel, profile: PcProfile): String = try {
+    val db = vm.db
+    "${shortCpuName(db.cpu(profile.state.cpuId).name)} + ${db.gpu(profile.state.gpuId).name} · " +
+        Resolution.fromKey(profile.state.resolution).label
+} catch (e: IllegalStateException) {
+    "—"
 }
 
 /** `#btnHow` / `#btnGoal` — as duas pílulas embaixo do hero (`index.html:958`). */
@@ -409,6 +438,38 @@ private fun TopBar() {
             fontSize = 11.sp,
             modifier = Modifier.padding(top = 3.dp),
         )
+    }
+}
+
+/**
+ * `.profbar` — o nome do perfil ativo, que abre a troca de perfil
+ * (`index.html:900`). Fica acima do resultado porque responde "de qual PC é
+ * este número", que é a primeira coisa a saber ao olhar para ele.
+ */
+@Composable
+private fun ProfileBar(name: String, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .padding(top = 2.dp, bottom = 10.dp)
+            .clip(RoundedCornerShape(100.dp))
+            .background(FpsColors.Bg1)
+            .border(1.dp, FpsColors.Line2, RoundedCornerShape(100.dp))
+            .clickable(onClickLabel = "Trocar perfil de PC", onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        SvgIcon(Icons.PC, Modifier.size(13.dp), tint = FpsColors.Acc, strokeWidth = 1.8f)
+        Text(
+            name,
+            color = FpsColors.Tx1,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        SvgIcon(Icons.CARET, Modifier.size(11.dp), tint = FpsColors.Tx3, strokeWidth = 2f)
     }
 }
 

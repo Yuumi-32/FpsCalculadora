@@ -430,4 +430,11 @@ object Icons {
     const val IMPORT_CODE = "M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 20h14"
     const val LOAD = "M12 4v12m0 0 5-5m-5 5-5-5M5 20h14"
     const val TRASH = "M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5"
+    const val PENCIL = "M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3z"
+    const val CHECK = "m5 12.5 5 5L19 7"
+
+    // Perfis de PC: a torre e a setinha da barra que abre a troca de perfil.
+    const val PC = "M5 4.5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z" +
+        "M9 20h6M12 16.5V20"
+    const val CARET = "m7 10 5 5 5-5"
 }
