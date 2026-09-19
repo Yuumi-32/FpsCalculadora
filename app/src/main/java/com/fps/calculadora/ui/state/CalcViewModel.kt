@@ -44,6 +44,7 @@ import com.fps.calculadora.core.parseBuildCode
 import com.fps.calculadora.core.rankAllGames
 import com.fps.calculadora.core.renamed
 import com.fps.calculadora.core.repaired
+import com.fps.calculadora.core.shareText
 import com.fps.calculadora.core.switchedTo
 import com.fps.calculadora.core.toBuildState
 import com.fps.calculadora.core.toPersisted
@@ -276,6 +277,9 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     fun fpsFor(build: BuildState): Int = calculator.calc(build).avg
 
     fun exportCurrentBuildCode(): String = db.buildCode(state)
+
+    /** O resumo em texto da build atual — o que acompanha o PNG e o botão "Copiar texto". */
+    fun currentShareText(): String = db.shareText(state, calculator.calc(state), calculator.psu(state))
 
     /** `true` quando o código era válido e a build atual foi trocada por ele. */
     fun importBuildCode(code: String): Boolean {

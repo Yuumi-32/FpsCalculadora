@@ -46,6 +46,21 @@
             </intent-filter>
         </activity>
 
+        <!--
+          Publica só a pasta de cache do PNG do resultado (ver res/xml/file_paths.xml),
+          e só enquanto o app de destino estiver lendo o arquivo. É o que permite
+          compartilhar a imagem sem pedir permissão de armazenamento.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  O único caminho que o app publica para fora: a pasta de cache onde o PNG do
+  resultado é gravado antes de ir para o seletor de compartilhamento. Nada mais
+  do disco do app fica alcançável por outro aplicativo.
+-->
+<paths>
+    <cache-path name="compartilhados" path="compartilhados/" />
+</paths>

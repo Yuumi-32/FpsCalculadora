@@ -16,6 +16,8 @@ App Android que estima o desempenho (FPS) de um PC gamer a partir da combinaçã
 - **O que trocar primeiro?** — mostra se o gargalo é CPU ou GPU e quanto cada upgrade de peça ganharia em FPS.
 - **Comparar builds** — coloca a build atual lado a lado com uma build salva no histórico.
 - **Histórico local** — salva builds no aparelho e permite exportar/importar configurações por código de texto.
+- **Perfis de PC** — mais de uma máquina guardada (a sua, a do amigo, a que você pensa em montar); o perfil ativo guarda sozinho tudo o que você mudar, e o app reabre exatamente onde parou.
+- **Compartilhar o resultado** — gera um card 1080×1350 com a build e os números, para mandar pelo compartilhamento do Android ou salvar na galeria; também dá para copiar só o texto ou o código do build.
 - **Recomendação de fonte** — potência mínima e recomendada com selo 80 Plus sugerido para a build.
 - Onboarding com presets prontos (Econômico / Médio / Máximo) por resolução, para já sair vendo um resultado.
 
@@ -60,18 +62,23 @@ As 5 telas (Calcular, Seu PC em todos os jogos, O que trocar primeiro, Comparar 
 app/src/main/                                    # módulo Android
 ├── java/…/ComposeMainActivity.kt                # Activity publicada: UI Compose
 ├── java/…/MainActivity.java                     # WebView antiga (só no build de debug)
-├── java/…/ui/                                    # telas, componentes, tema
+├── java/…/ui/                                   # telas, componentes, tema
 ├── java/…/data/CatalogRepository.kt             # cache + rede + base embutida
-├── assets/www/index.html                        # UI antiga e fonte dos dados do :core
+├── java/…/data/PreferencesStore.kt              # perfis de PC (= a build atual) e boas-vindas
+├── java/…/share/                                # card PNG do resultado, galeria e compartilhamento
 ├── res/xml/network_security_config.xml          # proíbe texto claro
+├── res/xml/file_paths.xml                       # única pasta que o FileProvider publica
 └── AndroidManifest.xml
+
+app/src/debug/assets/www/index.html              # UI antiga e fonte dos dados do :core
 
 core/                                            # módulo Kotlin puro, sem Android
 ├── src/main/resources/data/*.json               # jogos, CPUs, GPUs, placas-mãe
 ├── src/main/kotlin/…/FpsCalculator.kt           # o cálculo de FPS
 ├── src/main/kotlin/…/RemoteCatalog.kt           # fusão do catálogo remoto com a base
 ├── src/main/kotlin/…/Price.kt                   # média de mercado, nunca cotação
-└── src/test/…                                   # paridade contra o JS + catálogo e preço
+├── src/main/kotlin/…/Profiles.kt                # perfis de PC: regras de ativo, exclusão e conserto
+└── src/test/…                                   # paridade contra o JS + catálogo, preço e perfis
 
 docs/catalogo.json                               # catálogo publicado no GitHub Pages
 tools/*.mjs                                      # extraem dados e vetores do index.html; geram o catálogo
