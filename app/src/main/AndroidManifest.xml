@@ -35,12 +35,21 @@
           que ocupava este lugar continua no repositório e no build de debug,
           como referência de comparação — ver src/debug/AndroidManifest.xml.
         -->
+        <!--
+          O screenOrientation="portrait" continua valendo em celular, e deixou
+          de valer em tela grande: a partir do Android 16 (targetSdk 36) o
+          sistema ignora restrição de orientação quando a menor largura passa de
+          600dp — tablet, dobrável aberto e janela do modo desktop. A UI é
+          desenhada para isso (ver CONTENT_MAX_WIDTH na ComposeMainActivity);
+          o atributo fica porque em celular ainda é ele que evita a rotação.
+        -->
         <activity
             android:name=".ComposeMainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

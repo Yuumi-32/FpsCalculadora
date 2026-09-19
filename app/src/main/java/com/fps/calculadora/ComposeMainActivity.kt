@@ -9,8 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,8 +21,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.fps.calculadora.core.shortCpuName
 import com.fps.calculadora.ui.components.AppTab
 import com.fps.calculadora.ui.components.BottomNav
@@ -71,32 +76,51 @@ class ComposeMainActivity : ComponentActivity() {
                     // mais comum do Android terminando a sessão por engano.
                     BackHandler(enabled = tab != AppTab.CALC) { tab = AppTab.CALC }
 
-                    Column(Modifier.fillMaxSize().systemBarsPadding()) {
-                        Box(Modifier.weight(1f)) {
-                            when (tab) {
-                                AppTab.CALC -> CalcScreen(
-                                    vm = vm,
-                                    animated = animated,
-                                    onGoToUpgrade = { tab = AppTab.UPGRADE },
-                                )
-                                AppTab.GAMES -> GamesScreen(vm = vm, onOpenGame = { tab = AppTab.CALC })
-                                AppTab.UPGRADE -> UpgradeScreen(vm = vm)
-                                AppTab.COMPARE -> CompareScreen(vm = vm)
-                                AppTab.HISTORY -> HistoryScreen(
-                                    vm = vm,
-                                    onOpenBuild = { tab = AppTab.CALC },
-                                    onCompareBuild = { tab = AppTab.COMPARE },
-                                )
+                    // As telas são desenhadas numa coluna de largura limitada e
+                    // centralizada. Em pé num celular isso não muda nada (a tela
+                    // é mais estreita que o teto); em paisagem, em tablet e na
+                    // janela do modo desktop é o que impede uma linha de card de
+                    // atravessar 20 cm de tela. O Android 16 ignora o
+                    // screenOrientation="portrait" em tela grande, então essa
+                    // situação deixou de ser hipotética.
+                    //
+                    // O recorte da câmera entra aqui junto das barras do sistema:
+                    // deitado, o furo fica na lateral, onde só o
+                    // displayCutoutPadding protege.
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .systemBarsPadding()
+                            .displayCutoutPadding(),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        Column(Modifier.fillMaxHeight().widthIn(max = CONTENT_MAX_WIDTH)) {
+                            Box(Modifier.weight(1f)) {
+                                when (tab) {
+                                    AppTab.CALC -> CalcScreen(
+                                        vm = vm,
+                                        animated = animated,
+                                        onGoToUpgrade = { tab = AppTab.UPGRADE },
+                                    )
+                                    AppTab.GAMES -> GamesScreen(vm = vm, onOpenGame = { tab = AppTab.CALC })
+                                    AppTab.UPGRADE -> UpgradeScreen(vm = vm)
+                                    AppTab.COMPARE -> CompareScreen(vm = vm)
+                                    AppTab.HISTORY -> HistoryScreen(
+                                        vm = vm,
+                                        onOpenBuild = { tab = AppTab.CALC },
+                                        onCompareBuild = { tab = AppTab.COMPARE },
+                                    )
+                                }
                             }
+                            BottomNav(selected = tab, onSelect = { tab = it })
                         }
-                        BottomNav(selected = tab, onSelect = { tab = it })
                     }
 
                     // Por cima de tudo, e só na primeira abertura.
                     if (vm.onboardingPending) {
                         BackHandler { vm.dismissOnboarding() }
                         OnboardingOverlay(
-                            modifier = Modifier.systemBarsPadding(),
+                            modifier = Modifier.systemBarsPadding().displayCutoutPadding(),
                             presets = vm.db.constants.buildPresets,
                             cpuName = { id -> shortCpuName(vm.db.cpu(id).name) },
                             gpuName = { id -> vm.db.gpu(id).name },
@@ -113,6 +137,13 @@ class ComposeMainActivity : ComponentActivity() {
         }
     }
 }
+
+/**
+ * Teto de largura do conteúdo. 560dp é pouco mais que a largura de um celular
+ * grande em pé (o Pixel 9 Pro XL tem 448dp), então em retrato nada muda: o
+ * limite só começa a valer deitado, em tablet e na janela do modo desktop.
+ */
+private val CONTENT_MAX_WIDTH = 560.dp
 
 /**
  * Equivalente Android do `prefers-reduced-motion`: quando o usuário zera a
