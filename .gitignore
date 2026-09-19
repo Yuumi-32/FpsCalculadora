@@ -1,6 +1,11 @@
 # Gradle
 .gradle/
 build/
+# Diretório de sessão do compilador Kotlin 2.x
+.kotlin/
+
+# Cache dos scripts de tools/ (um importa o outro)
+__pycache__/
 
 # Android Studio / IntelliJ
 .idea/
