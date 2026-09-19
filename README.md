@@ -86,7 +86,7 @@ tools/*.mjs                                      # extraem dados e vetores do in
 
 ## Como rodar
 
-Pré-requisitos: [Android Studio](https://developer.android.com/studio) (recomendado) ou JDK 17+ com Android SDK (`compileSdk 34`).
+Pré-requisitos: [Android Studio](https://developer.android.com/studio) (recomendado) ou JDK 17+ com Android SDK (`compileSdk 36`).
 
 ```bash
 git clone https://github.com/Yuumi-32/FpsCalculadora.git
@@ -102,11 +102,19 @@ Ou via linha de comando (o wrapper já vem no repositório, não precisa instala
 
 O APK debug é gerado em `app/build/outputs/apk/debug/` (`applicationId` com sufixo `.debug`).
 
-Para rodar os testes do cálculo de FPS:
+Para rodar os testes:
 
 ```bash
-./gradlew :core:test
+./gradlew test
 ```
+
+O grosso está no `:core` (cálculo, catálogo, preço, perfis); o `:app` cobre as
+duas funções de texto que ele tem fora do Compose — nome do PNG compartilhado e
+linha de hardware do histórico. O resto do `:app` é Compose e `Canvas`, que
+pedem aparelho ou Robolectric.
+
+Cada push e cada pull request em `main` rodam os testes, o lint do Android e o
+`assembleRelease` no GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
 
 ## Build de release
 
