@@ -51,7 +51,7 @@ O QUE VOCÊ ENCONTRA
 
 O CATÁLOGO
 
-Mais de 30 jogos, 69 placas de vídeo (GeForce GTX 10 até RTX 50 e Radeon RX 6000 até RX 9000), 53 processadores (Ryzen 1000 até 9000 e Intel Core 12ª geração até Core Ultra), 21 placas-mãe e as combinações usuais de memória DDR4 e DDR5.
+36 jogos, 76 placas de vídeo (GeForce GTX 10 até RTX 50, Radeon RX 6000 até RX 9000 e Intel Arc A e B), 62 processadores (Ryzen 1000 até 9000 e Intel Core da 10ª geração até Core Ultra), 26 placas-mãe e as combinações usuais de memória DDR4 e DDR5.
 
 FUNCIONA SEM INTERNET
 
@@ -67,7 +67,7 @@ São estimativas de referência para orientar uma compra ou um upgrade, não ben
 
 Sugestão de jogo ou de peça que faltou? Abra uma issue em github.com/Yuumi-32/FpsCalculadora/issues.
 ```
-(2471 caracteres)
+(2715 caracteres)
 
 > **Marcas citadas** (Ryzen, Intel Core, GeForce, Radeon, DLSS, FSR e os nomes
 > dos jogos) aparecem só para descrever compatibilidade — uso nominativo, que a
