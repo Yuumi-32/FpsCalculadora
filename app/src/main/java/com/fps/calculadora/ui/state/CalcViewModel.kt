@@ -131,6 +131,10 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     var restored by mutableStateOf(false)
         private set
 
+    /** `true` na primeira abertura, enquanto as boas-vindas não forem dispensadas. */
+    var onboardingPending by mutableStateOf(false)
+        private set
+
     /**
      * Os perfis com o ativo já refletindo o que está na tela — é assim que a
      * folha "Perfis de PC" mostra a build de agora embaixo do nome.
@@ -175,6 +179,7 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
             hoursPerDay = profile.hoursPerDay
             tariff = profile.tariff
         }
+        onboardingPending = stored?.onboarded == false
         restored = true
     }
 
@@ -213,6 +218,12 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteProfile(id: Long) {
         val next = syncedBook().without(id)
         if (next.activeId != book.activeId) activate(next) else book = next
+    }
+
+    /** Dispensa as boas-vindas — o `dismissOnboard()` do original (`index.html:3135`). */
+    fun dismissOnboarding() {
+        onboardingPending = false
+        viewModelScope.launch { preferencesStore.setOnboarded(true) }
     }
 
     /** Último FPS exibido, para o gauge mostrar de quanto foi o salto. */
