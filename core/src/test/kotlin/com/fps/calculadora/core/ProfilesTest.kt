@@ -144,4 +144,20 @@ class ProfilesTest {
         assertNull(db.normalizeOrNull(ok.copy(gpuId = "gpu-que-nunca-existiu")))
         assertNull(db.normalizeOrNull(ok.copy(resolution = "8k")))
     }
+
+    @Test
+    fun `o resumo em texto leva build, faixa e fonte`() {
+        val state = buildState()
+        val calculator = FpsCalculator(db)
+        val result = calculator.calc(state)
+
+        val texto = db.shareText(state, result, calculator.psu(state))
+
+        val linhas = texto.lines()
+        assertTrue(linhas[0].startsWith("🎮 ${db.game(state.gameId).name} — 1440P"))
+        assertEquals("${db.cpu(state.cpuId).name} + ${db.gpu(state.gpuId).name}", linhas[1])
+        assertTrue(texto.contains("▶ ${result.avg} FPS médio (${result.avgLow}–${result.avgHigh})"))
+        assertTrue(texto.contains("🔌 Fonte recomendada: ${calculator.psu(state).recommended} W"))
+        assertTrue(texto.endsWith("— Estimador de FPS"))
+    }
 }
