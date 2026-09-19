@@ -59,6 +59,10 @@ Toda a base de dados e todo o cálculo estão dentro do aplicativo: dá para usa
 
 Nada é enviado para lugar nenhum: não há anúncios, não há rastreamento, não existe conta para criar e o app não pede acesso a localização, contatos, câmera ou aos seus arquivos. As builds que você salva ficam apenas no seu aparelho.
 
+COMPRA ÚNICA
+
+Você paga uma vez e o app é seu, com todas as funções liberadas desde a primeira abertura. Não há assinatura, não há versão limitada, não há nada para desbloquear depois e não há anúncio nenhum — foi para isso que ele tem preço.
+
 COMO OS NÚMEROS SÃO CALCULADOS
 
 O app parte de uma configuração de referência medida em cada jogo e aplica multiplicadores de processador, placa de vídeo, resolução, preset gráfico, Ray Tracing, Frame Generation e upscaling. A tela "Como calculamos" explica o caminho do número que aparece.
@@ -67,7 +71,7 @@ São estimativas de referência para orientar uma compra ou um upgrade, não ben
 
 Sugestão de jogo ou de peça que faltou? Abra uma issue em github.com/Yuumi-32/FpsCalculadora/issues.
 ```
-(2715 caracteres)
+(2959 caracteres)
 
 > **Marcas citadas** (Ryzen, Intel Core, GeForce, Radeon, DLSS, FSR e os nomes
 > dos jogos) aparecem só para descrever compatibilidade — uso nominativo, que a
