@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Camada de frente do ícone adaptativo: o wordmark de mipmap/ic_launcher_mark
+  pintado com a cor de destaque do app.
+
+  O bitmap é cinza com alfa, e a cor vem daqui, porque o mesmo arquivo serve à
+  camada monocromática do Android 13+ — lá quem escolhe a cor é o sistema. Um
+  bitmap só evita guardar duas cópias do mesmo desenho em cinco densidades, e
+  evita as duas saírem de sincronia quando a arte mudar.
+-->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@mipmap/ic_launcher_mark"
+    android:tint="@color/ic_launcher_foreground"
+    android:gravity="fill" />

@@ -10,11 +10,17 @@
     </style>
 
     <!-- Tela de abertura via core-splashscreen: mesmo fundo escuro do app, o
-         ícone do launcher, e volta pro tema normal assim que a Activity chama
-         installSplashScreen(). -->
+         wordmark do ícone, e volta pro tema normal assim que a Activity chama
+         installSplashScreen().
+
+         O ícone aqui é a camada de frente do ícone adaptativo, e não o
+         @mipmap/ic_launcher: ela já nasce com a margem que a tela de abertura
+         exige (o sistema desenha o ícone dentro dos 2/3 centrais de um
+         círculo) e é transparente, então o quadrado do ícone não aparece
+         recortado por cima do fundo do splash. -->
     <style name="Theme.FpsCalculadora.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/colorBackground</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_icon</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.FpsCalculadora</item>
     </style>
 </resources>

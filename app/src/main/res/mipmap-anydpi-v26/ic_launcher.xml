@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Ícone adaptativo (API 26+). O launcher recorta as duas camadas na máscara do
+  aparelho — círculo, squircle, gota — e as desloca uma sobre a outra; é por
+  isso que o desenho não pode vir num PNG só.
+
+  Os bitmaps saem de tools/gen-launcher-icons.py. Os PNG de mipmap-*/ continuam
+  no lugar para o Android 7 e 8.0, que ignoram este arquivo.
+
+  monochrome: a silhueta que o Android 13+ usa quando o usuário liga os
+  "ícones temáticos" — sem ela o sistema mostra o ícone colorido no meio de uma
+  tela inteira de ícones tingidos.
+-->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@mipmap/ic_launcher_mark" />
+</adaptive-icon>

@@ -147,6 +147,8 @@ python tools/gen-store-graphics.py
 python tools/gen-store-screenshots.py
 ```
 
+Os ícones do launcher (o redondo e as camadas do ícone adaptativo) saem de `tools/gen-launcher-icons.py`, derivados do `ic_launcher.png` original.
+
 ## Aviso
 
 Os valores exibidos são estimativas para referência rápida na hora de montar ou planejar upgrade de um PC, não substituem benchmarks reais.
