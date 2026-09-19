@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,7 +60,16 @@ class ComposeMainActivity : ComponentActivity() {
                     // ir à rede (12h desde o último download, conexão de pé) e
                     // devolve o estado atual sem custo quando não vale.
                     LaunchedEffect(Unit) { vm.refreshCatalog() }
-                    var tab by remember { mutableStateOf(AppTab.CALC) }
+                    // `rememberSaveable`: a aba sobrevive a uma recriação da
+                    // Activity (rotação, mudança de tema, processo morto em
+                    // segundo plano), que é quando um `remember` perderia a
+                    // navegação sem que ninguém tivesse pedido nada.
+                    var tab by rememberSaveable { mutableStateOf(AppTab.CALC) }
+
+                    // Voltar leva à aba Calcular antes de sair do app. Sem isso
+                    // o botão fechava o app de dentro de qualquer aba — o gesto
+                    // mais comum do Android terminando a sessão por engano.
+                    BackHandler(enabled = tab != AppTab.CALC) { tab = AppTab.CALC }
 
                     Column(Modifier.fillMaxSize().systemBarsPadding()) {
                         Box(Modifier.weight(1f)) {
