@@ -46,7 +46,6 @@ import com.fps.calculadora.core.renamed
 import com.fps.calculadora.core.repaired
 import com.fps.calculadora.core.shareText
 import com.fps.calculadora.core.switchedTo
-import com.fps.calculadora.core.toBuildState
 import com.fps.calculadora.core.toPersisted
 import com.fps.calculadora.core.upgradeAdvice
 import com.fps.calculadora.core.warningsFor
@@ -340,9 +339,26 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Carrega um build salvo como a build atual — porta a ação "Carregar" do card de histórico. */
-    fun loadHistoryEntry(entry: HistoryEntry) {
-        applyState(db.normalize(entry.state.toBuildState()))
+    /**
+     * A build de uma entrada do histórico, normalizada contra a base atual —
+     * `null` quando ela cita peça que o catálogo não conhece (mais).
+     *
+     * O histórico é o único dado do app que atravessa uma troca de catálogo
+     * sem passar pelo `normalize`: as entradas vêm do disco com os ids de
+     * quando foram salvas. Ler por aqui é o que impede um id órfão de derrubar
+     * a tela dentro de `db.game()`/`db.cpu()`, que estouram em id desconhecido.
+     */
+    fun historyBuild(entry: HistoryEntry): BuildState? = db.normalizeOrNull(entry.state)
+
+    /**
+     * Carrega um build salvo como a build atual — porta a ação "Carregar" do
+     * card de histórico. Devolve `false` sem mexer em nada quando a build não
+     * é mais legível (ver [historyBuild]).
+     */
+    fun loadHistoryEntry(entry: HistoryEntry): Boolean {
+        val build = historyBuild(entry) ?: return false
+        applyState(build)
+        return true
     }
 
     /** Remove um build do histórico — porta a ação "Excluir" (`index.html:2570`). */
