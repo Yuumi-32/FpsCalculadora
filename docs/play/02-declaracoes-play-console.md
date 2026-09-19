@@ -10,6 +10,11 @@ e `ACCESS_NETWORK_STATE`, as duas a serviço do catálogo remoto (confirmado em
 **Se qualquer uma dessas coisas mudar, o formulário precisa ser refeito antes
 da atualização subir.**
 
+O app passou a ser **pago** (R$ 2,49), e isso **não muda nenhuma resposta deste
+documento**: cobrar pelo download é configuração da ficha, não recurso do app —
+não entra biblioteca de faturamento, não entra permissão e nada passa a ser
+enviado. O porquê de cada número está em [07-preco-do-app.md](07-preco-do-app.md).
+
 > **Mudou em 30/08/2026:** até então o app não declarava permissão nenhuma, e
 > este documento usava isso como argumento. A permissão de internet voltou
 > para o catálogo remoto. **A resposta de Segurança dos dados não muda** — o
@@ -76,7 +81,7 @@ Todas as perguntas do questionário: **Não**. Em detalhe:
 | Medo | Contém conteúdo assustador ou perturbador? | Não |
 | Diversos | Permite interação/comunicação entre usuários? | Não |
 | Diversos | Compartilha a localização do usuário? | Não |
-| Diversos | Permite compra de itens digitais? | Não |
+| Diversos | Permite compra de itens digitais? | Não — a pergunta é sobre compra *dentro* do app; o preço da loja não conta |
 | Diversos | Contém conteúdo gerado por usuários? | Não |
 | Diversos | É navegador ou mecanismo de busca? | Não |
 | Diversos | Coleta ou compartilha informações pessoais? | Não |
@@ -179,15 +184,21 @@ Coerente com o manifesto: o app não declara
 | E-mail de contato (público) | **preencher** — a Play exige, e fica visível na ficha. É o único e-mail do projeto: as páginas usam issues do GitHub |
 | Site (opcional) | `https://yuumi-32.github.io/FpsCalculadora/` |
 | Telefone (opcional) | deixar em branco |
-| Preço | **Gratuito** — atenção: gratuito → pago é um caminho sem volta na Play |
-| Países | Brasil (e o resto do mundo, se quiser; a ficha está em pt-BR) |
-| Compras no app | Não |
+| Preço | **Pago — R$ 2,49** (rende ~R$ 2,12 líquidos). A conta, as consequências e o que preencher em Monetizar estão em [07-preco-do-app.md](07-preco-do-app.md) |
+| Países | **Brasil** — a ficha está em pt-BR, e fora do Brasil a Play converte o preço sozinha |
+| Compras no app | Não — app pago não é compra no app; o app não vende nada por dentro |
 | Idioma padrão da ficha | Português (Brasil) |
 
 ---
 
 ## Antes de enviar, confira
 
+- [ ] **Preço definido antes da primeira publicação** — R$ 2,49, Brasil. Isso
+      inclui antes do teste fechado: app publicado de graça não pode virar pago
+      depois ([07](07-preco-do-app.md))
+- [ ] Moeda de recebimento em **BRL** — é o que evita o IRRF de 25%
+- [ ] Códigos promocionais gerados para os 12 testadores (num app pago, quem
+      entra em teste fechado precisa comprar)
 - [ ] E-mail de contato preenchido **no Play Console** (as páginas publicadas
       não usam e-mail — o contato delas são as issues do GitHub)
 - [ ] A URL da política abre sem erro em uma aba anônima

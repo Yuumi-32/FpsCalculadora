@@ -50,15 +50,20 @@ em paralelo.
    geral leva de 48 horas a alguns dias úteis.
 5. **Dados de contato** — e-mail e telefone, ambos verificados. O e-mail de
    contato do app é público na ficha; o e-mail da conta não.
-6. **Perfil de pagamentos** — só é necessário para app pago ou com compras no
-   app. O FPS Calculadora é gratuito e sem compras, então dá para pular.
+6. **Perfil de pagamentos** — **obrigatório**, porque o app é pago (R$ 2,49,
+   ver [07-preco-do-app.md](07-preco-do-app.md)). É aqui que se define a conta
+   que recebe e, principalmente, a **moeda de recebimento: deixe em BRL** —
+   receber em outra moeda faz incidir 25% de tributo retido brasileiro sobre as
+   vendas no Brasil.
 
 ---
 
 ## Depois que a conta estiver ativa
 
 1. **Criar o app** na Play Console: nome, idioma padrão (pt-BR), tipo "App",
-   gratuito. Cuidado: **gratuito → pago é uma via de mão única** na Play.
+   **pago**. Cuidado: **gratuito → pago é uma via de mão única** na Play — app
+   publicado de graça nunca mais pode ter preço, nem depois do teste fechado.
+   Pago → gratuito, sim. Por isso o preço entra agora e não depois.
 2. **Nome do pacote** — o `applicationId` `com.fps.calculadora` fica gravado
    para sempre no primeiro envio. Não dá para renomear depois; só publicando
    um app novo do zero, sem os usuários do antigo.
