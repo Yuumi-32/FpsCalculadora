@@ -136,7 +136,9 @@ O AAB sai em `app/build/outputs/bundle/release/`. Sem `keystore.properties` comp
 
 ## Publicação na Play Store
 
-O checklist do lançamento vive em [`docs/play/`](docs/play/): respostas prontas para o formulário de Segurança dos Dados, classificação indicativa, público-alvo e anúncios; título e descrições dentro dos limites de caractere; ícone, feature graphic e capturas; e os passos da conta de desenvolvedor e do teste fechado de 14 dias.
+O checklist do lançamento vive em [`docs/play/`](docs/play/): respostas prontas para o formulário de Segurança dos Dados, classificação indicativa, público-alvo e anúncios; título e descrições dentro dos limites de caractere; ícone, feature graphic e capturas; os passos da conta de desenvolvedor e do teste fechado de 14 dias; e o preço do app.
+
+O app é **pago: R$ 2,49**, que rendem ~R$ 2,12 depois da taxa de serviço da Play. A conta está em [`docs/play/07-preco-do-app.md`](docs/play/07-preco-do-app.md), junto das duas consequências que mudam o cronograma: o preço tem que existir antes da primeira publicação (gratuito → pago é proibido pela Play) e os testadores do teste fechado precisam de código promocional para instalar sem pagar.
 
 A [política de privacidade](https://yuumi-32.github.io/FpsCalculadora/privacidade.html) e a [página do app](https://yuumi-32.github.io/FpsCalculadora/) são servidas pelo GitHub Pages a partir da pasta `docs/`.
 
