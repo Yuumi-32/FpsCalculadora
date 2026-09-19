@@ -21,6 +21,11 @@ sendo recrutados.
 - **Cada testador precisa de uma Conta Google própria** e precisa **aceitar o
   convite pelo link de opt-in**. Instalar o APK por fora não conta — a Play só
   enxerga quem entrou pelo link.
+- **O app é pago, então o testador teria que comprar.** Essa é a regra da Play
+  para teste fechado (só o teste *interno* instala pago de graça, e ele não
+  conta para o prazo). A saída é mandar um **código promocional** junto do
+  convite — ver o passo 4 abaixo. Sem o código, ou a pessoa paga R$ 2,49 ou não
+  entra, e você perde testador por causa de dois reais.
 - **Deixe folga.** Recrute 15 ou 16 para terminar com 12. Sempre tem quem troca
   de celular, desinstala ou some.
 - **A Play pergunta como você coletou feedback** na hora de pedir produção.
@@ -37,8 +42,8 @@ O relógio só começa quando os 12 estiverem dentro. Contando a partir de hoje:
 
 | Quando | O quê |
 |---|---|
-| 27/08/2026 | Criar a conta de desenvolvedor e começar a chamar testador |
-| 27/08 – 02/09 | Recrutamento (meta: 15 confirmados) e envio dos convites |
+| 19/09/2026 | Criar a conta de desenvolvedor e começar a chamar testador |
+| 19/09 – 25/09 | Recrutamento (meta: 15 confirmados), geração dos códigos promocionais e envio dos convites |
 | **Dia 0 — quando o 12º aceitar** | Começa a contagem dos 14 dias |
 | Dia 0 + 14 | Fim do período mínimo — pedir acesso à produção |
 | +1 a 7 dias | Análise da Play para liberar produção |
@@ -56,12 +61,16 @@ Na prática, do zero até poder publicar: **três a quatro semanas**.
 3. **Testadores** — crie uma **lista de e-mails** na Play Console ou use um
    **Grupo do Google**. O grupo é mais fácil: você adiciona e remove gente sem
    mexer na trilha.
-4. **Copie o link de opt-in** (algo como
+4. **Gere os códigos promocionais** — *Monetizar → Promoções → Criar promoção*,
+   um código por testador (o Console dá até 500 por trimestre, sem custo). Cada
+   código resgata o app de graça, e é o que faz o app pago não virar barreira no
+   teste. Gere uns 16, para cobrir as desistências.
+5. **Copie o link de opt-in** (algo como
    `https://play.google.com/apps/testing/com.fps.calculadora`) e mande junto com
-   as instruções do fim deste arquivo.
-5. **Acompanhe o número de inscritos** na própria trilha, todo dia, até fechar
+   o código e as instruções do fim deste arquivo.
+6. **Acompanhe o número de inscritos** na própria trilha, todo dia, até fechar
    os 14. É aqui que se descobre cedo que alguém saiu.
-6. Ao completar os 14 dias: **Painel → Solicitar acesso à produção**, contando o
+7. Ao completar os 14 dias: **Painel → Solicitar acesso à produção**, contando o
    que os testadores relataram e o que você mudou por causa disso.
 
 ---
@@ -79,12 +88,14 @@ preciso de 12 pessoas testando por 14 dias.
 O que dá trabalho pra você: instalar, abrir de vez em quando e me dizer se
 algo ficou estranho. E deixar instalado por 2 semanas.
 
-O app é gratuito, funciona sem internet, não tem anúncio e não coleta nada.
-A única permissão que ele pede é acesso à rede, para atualizar a tabela de
-peças e preços.
+Funciona sem internet, não tem anúncio e não coleta nada. A única permissão
+que ele pede é acesso à rede, para atualizar a tabela de peças e preços.
+
+Na loja ele vai custar R$ 2,49, mas pra quem testar sai de graça: eu mando um
+código junto do link.
 
 Topa? Me manda o e-mail da sua Conta Google (o do Android) que eu te mando o
-link.
+link e o código.
 ```
 
 E, depois que a pessoa mandar o e-mail:
@@ -95,8 +106,11 @@ Valeu! Passo a passo:
 1. Abra este link no celular, com a mesma conta Google que você me passou:
    https://play.google.com/apps/testing/com.fps.calculadora
 2. Toque em "Tornar-se um testador"
-3. Instale o app pela Play Store pelo link que aparece ali
-4. Deixe instalado até DD/MM — se desinstalar antes, some da contagem
+3. Na Play Store, menu da sua foto → Pagamentos e assinaturas → Resgatar
+   código, e cole este:  XXXX-XXXX-XXXX
+4. Instale o app pelo link que aparece na página do teste — vai aparecer como
+   gratuito depois do código
+5. Deixe instalado até DD/MM — se desinstalar antes, some da contagem
 
 Qualquer coisa esquisita, me manda print. Um "abri e não achei nada errado"
 também ajuda.
@@ -109,7 +123,7 @@ também ajuda.
 Preencha conforme for confirmando. Meta: 15 nomes, para sobreviver a três
 desistências.
 
-| # | Nome | E-mail da Conta Google | Convite enviado | Aceitou (opt-in) | Deu retorno |
+| # | Nome | E-mail da Conta Google | Convite + código enviados | Aceitou (opt-in) | Deu retorno |
 |---|---|---|---|---|---|
 | 1 |  |  |  |  |  |
 | 2 |  |  |  |  |  |
@@ -144,14 +158,16 @@ pedido de acesso à produção:
 4. Teve alguma tela travada, texto cortado ou botão que não respondeu?
 5. Se fosse instalar de verdade, o que faltaria no app?
 
-A pergunta 2 é a mais valiosa: a lista de peças hoje tem 69 placas de vídeo, 53
-processadores e 31 jogos — o que os testadores sentirem falta é a fila de
+A pergunta 2 é a mais valiosa: a lista de peças hoje tem 76 placas de vídeo, 62
+processadores e 36 jogos — o que os testadores sentirem falta é a fila de
 trabalho da próxima versão.
 
 ---
 
 ## Antes de pedir produção, confira
 
+- [ ] Preço (R$ 2,49) já definido **antes** de a trilha ir ao ar — ver
+      [07-preco-do-app.md](07-preco-do-app.md)
 - [ ] 12 testadores inscritos, sem cair desse número, por 14 dias corridos
 - [ ] Pelo menos uma versão nova publicada na trilha durante o período
 - [ ] Retorno dos testadores anotado, com o que virou correção
