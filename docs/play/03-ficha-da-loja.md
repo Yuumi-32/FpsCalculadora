@@ -16,9 +16,11 @@ FPS Calculadora: PC Gamer
 Alternativas, se quiser testar outra: `FPS Calculadora` (15) · `Calculadora de
 FPS para PC` (26).
 
-> O nome dentro do app hoje é só **"Fps"** (`app/src/main/res/values/strings.xml`).
-> O título da loja pode ser diferente do nome do launcher, mas se quiser os dois
-> iguais é aí que se muda.
+> O nome embaixo do ícone é **"FPS Calculadora"**
+> (`app/src/main/res/values/strings.xml`) — era "Fps" até aqui. Não é igual ao
+> título da loja porque os limites são outros: a loja aceita 30 caracteres, o
+> launcher corta perto de 12 e a maioria quebra em duas linhas. "FPS
+> Calculadora" é o maior prefixo do título que ainda se lê inteiro.
 
 ---
 
@@ -147,5 +149,6 @@ São telas reais do app com dados de exemplo semeados, não montagens.
       Play exige um endereço ali, e é o único lugar que ainda pede um: as
       páginas publicadas usam as issues do GitHub. Esse e-mail aparece na
       ficha pública do app.
-- [ ] Decidir se o nome do launcher deixa de ser "Fps"
+- [x] ~~Decidir se o nome do launcher deixa de ser "Fps"~~ — agora é
+      "FPS Calculadora"
 - [ ] Conferir as capturas em um aparelho de verdade antes de subir — as fontes do Android podem quebrar linha em lugar diferente
