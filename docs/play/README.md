@@ -97,7 +97,13 @@ O caminho crítico é o teste fechado, então ele começa primeiro:
 ```bash
 python tools/gen-store-graphics.py
 python tools/gen-store-screenshots.py
+python tools/gen-launcher-icons.py
 ```
+
+O terceiro é o do ícone dentro do app, não o da loja: deriva o ícone redondo e
+as camadas do ícone adaptativo a partir do `mipmap-xxxhdpi/ic_launcher.png`, que
+é a arte original e não é redesenhada por script nenhum. Só precisa rodar de
+novo se essa arte mudar.
 
 Precisa de Python com Pillow e do Chrome (ou Edge) instalado. As capturas saem
 de `app/src/debug/assets/www/index.html` — a interface antiga, não a que é
