@@ -14,7 +14,7 @@ final class SplashScreenBridge {
     private SplashScreenBridge() {
     }
 
-    static void install(Activity activity) {
-        SplashScreen.installSplashScreen(activity);
+    static SplashScreen install(Activity activity) {
+        return SplashScreen.installSplashScreen(activity);
     }
 }

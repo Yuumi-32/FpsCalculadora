@@ -5,6 +5,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fps.calculadora.ui.components.AppTab
 import com.fps.calculadora.ui.components.BottomNav
 import com.fps.calculadora.ui.screens.CalcScreen
@@ -37,14 +37,19 @@ import com.fps.calculadora.ui.theme.FpsTheme
  * separados, para comparar a tela nova com a antiga no mesmo aparelho.
  */
 class ComposeMainActivity : ComponentActivity() {
+
+    private val vm: CalcViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        SplashScreenBridge.install(this)
+        // Segura a splash até o disco responder com o perfil salvo. Sem isso o
+        // app abriria na build padrão e trocaria para a do usuário meio segundo
+        // depois — um pisca que faz o app parecer ter esquecido o que ele sabe.
+        SplashScreenBridge.install(this).setKeepOnScreenCondition { !vm.restored }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
             FpsTheme {
                 FpsBackground {
-                    val vm: CalcViewModel = viewModel()
                     val animated = animationsEnabled()
 
                     // Uma tentativa por abertura. O repositório decide se vale

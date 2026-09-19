@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fps.calculadora.core.Balance
@@ -25,6 +26,7 @@ import com.fps.calculadora.core.GoalAdvice
 import com.fps.calculadora.core.GoalOption
 import com.fps.calculadora.core.HistoryEntry
 import com.fps.calculadora.core.PerformanceTier
+import com.fps.calculadora.core.ProfileBook
 import com.fps.calculadora.core.PsuEstimate
 import com.fps.calculadora.core.Resolution
 import com.fps.calculadora.core.RtSetting
@@ -37,16 +39,29 @@ import com.fps.calculadora.core.compareGame
 import com.fps.calculadora.core.energyFor
 import com.fps.calculadora.core.goalAdvice
 import com.fps.calculadora.core.normalize
+import com.fps.calculadora.core.normalizeOrNull
 import com.fps.calculadora.core.parseBuildCode
 import com.fps.calculadora.core.rankAllGames
+import com.fps.calculadora.core.renamed
+import com.fps.calculadora.core.repaired
+import com.fps.calculadora.core.switchedTo
 import com.fps.calculadora.core.toBuildState
+import com.fps.calculadora.core.toPersisted
 import com.fps.calculadora.core.upgradeAdvice
 import com.fps.calculadora.core.warningsFor
+import com.fps.calculadora.core.withActive
 import com.fps.calculadora.core.withNewEntry
+import com.fps.calculadora.core.withNewProfile
+import com.fps.calculadora.core.without
 import com.fps.calculadora.data.CatalogRepository
 import com.fps.calculadora.data.CatalogState
 import com.fps.calculadora.data.HistoryStore
+import com.fps.calculadora.data.PreferencesStore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** Tudo que a tela Calcular mostra para um estado — calculado de uma vez só. */
@@ -93,6 +108,7 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
     private var calculator = FpsCalculator(catalog.database)
     private val historyStore = HistoryStore(application)
+    private val preferencesStore = PreferencesStore(application)
 
     var state by mutableStateOf(db.normalize(defaultState()))
         private set
@@ -100,6 +116,104 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     var hoursPerDay by mutableIntStateOf(DEFAULT_HOURS_PER_DAY)
 
     var tariff by mutableDoubleStateOf(DEFAULT_TARIFF_BRL)
+
+    /**
+     * Os perfis de PC. O ativo é onde a build atual mora — ver [profiles], que
+     * é o que a tela lê, e [syncedBook], que é o que vai pro disco.
+     */
+    private var book by mutableStateOf(ProfileBook.of(state, 0L))
+
+    /**
+     * `false` até o disco responder. Segura a splash (ver `ComposeMainActivity`)
+     * e, principalmente, impede que o padrão seja gravado por cima do que estava
+     * salvo caso a leitura demore.
+     */
+    var restored by mutableStateOf(false)
+        private set
+
+    /**
+     * Os perfis com o ativo já refletindo o que está na tela — é assim que a
+     * folha "Perfis de PC" mostra a build de agora embaixo do nome.
+     */
+    val profiles: ProfileBook get() = syncedBook()
+
+    val activeProfileName: String get() = book.active.name
+
+    init {
+        viewModelScope.launch { restore() }
+        // Grava sozinho a cada mudança, com uma pausa antes: sem ela o arquivo
+        // seria reescrito a cada passo do slider de horas. O `restored` garante
+        // que nada seja gravado antes de sabermos o que já havia lá.
+        viewModelScope.launch {
+            snapshotFlow { if (restored) syncedBook() else null }
+                .filterNotNull()
+                // `collectLatest` + `delay` é o debounce: cada valor novo
+                // cancela a espera do anterior, e só o último chega ao disco.
+                .collectLatest { book ->
+                    delay(SAVE_DEBOUNCE_MS)
+                    preferencesStore.saveProfiles(book)
+                }
+        }
+    }
+
+    /**
+     * Devolve o app ao estado da última sessão. Qualquer falha de leitura vira
+     * "primeira abertura": perder o perfil salvo é ruim, não abrir é pior.
+     */
+    private suspend fun restore() {
+        val stored = try {
+            preferencesStore.preferences.first()
+        } catch (e: Exception) {
+            null
+        }
+        val restoredBook = stored?.profiles.repaired(state, System.currentTimeMillis())
+        book = restoredBook
+        // Direto, sem `applyState`: reabrir o app não é uma mudança de build, e
+        // a seta de variação do gauge não deve aparecer na abertura.
+        restoredBook.active.let { profile ->
+            db.normalizeOrNull(profile.state)?.let { state = it }
+            hoursPerDay = profile.hoursPerDay
+            tariff = profile.tariff
+        }
+        restored = true
+    }
+
+    private fun syncedBook(): ProfileBook = book.withActive {
+        it.copy(state = state.toPersisted(), hoursPerDay = hoursPerDay, tariff = tariff)
+    }
+
+    /** Aplica o perfil escolhido — troca build, horas e tarifa de uma vez. */
+    private fun activate(next: ProfileBook) {
+        book = next
+        val profile = next.active
+        db.normalizeOrNull(profile.state)?.let { applyState(it) }
+        hoursPerDay = profile.hoursPerDay
+        tariff = profile.tariff
+    }
+
+    /** Guarda o que está na tela no perfil atual antes de sair dele. */
+    fun switchProfile(id: Long) {
+        if (id == book.activeId) return
+        activate(syncedBook().switchedTo(id))
+    }
+
+    /** "+ Novo perfil (cópia do atual)" — o novo já entra ativo. */
+    fun newProfile() {
+        book = syncedBook().withNewProfile(System.currentTimeMillis())
+    }
+
+    fun renameProfile(id: Long, name: String) {
+        book = syncedBook().renamed(id, name)
+    }
+
+    /**
+     * Exclui um perfil. Excluir o ativo promove o primeiro que sobrar e troca a
+     * build na tela; o último perfil não é excluído (a folha nem oferece).
+     */
+    fun deleteProfile(id: Long) {
+        val next = syncedBook().without(id)
+        if (next.activeId != book.activeId) activate(next) else book = next
+    }
 
     /** Último FPS exibido, para o gauge mostrar de quanto foi o salto. */
     var previousFps by mutableStateOf<Int?>(null)
@@ -230,6 +344,9 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private companion object {
+        /** Quanto esperar antes de gravar no disco, em ms — ver o `init`. */
+        const val SAVE_DEBOUNCE_MS = 400L
+
         /** O mesmo estado inicial do `index.html:1822`, resolvido por índice. */
         fun defaultState(): BuildState {
             val db = GameDatabase.default
