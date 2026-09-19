@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.CompareRow
 import com.fps.calculadora.core.HistoryEntry
-import com.fps.calculadora.core.toBuildState
 import com.fps.calculadora.ui.components.FpsCard
 import com.fps.calculadora.ui.components.MonoLabel
 import com.fps.calculadora.ui.components.PickerOption
@@ -56,7 +55,10 @@ import com.fps.calculadora.ui.theme.RobotoMono
 @Composable
 fun CompareScreen(vm: CalcViewModel, modifier: Modifier = Modifier) {
     val entries by vm.historyEntries.collectAsState(initial = emptyList())
-    val entryB = entries.firstOrNull { it.id == vm.compareBuildId }
+    // Só os builds que a base atual ainda sabe abrir — o resto some da lista
+    // em vez de estourar em `db.game()`. Ver `historyBuild` no ViewModel.
+    val readable = entries.mapNotNull { entry -> vm.historyBuild(entry)?.let { entry to it } }
+    val selected = readable.firstOrNull { (entry, _) -> entry.id == vm.compareBuildId }
     var pickerOpen by remember { mutableStateOf(false) }
 
     val db = vm.db
@@ -87,18 +89,18 @@ fun CompareScreen(vm: CalcViewModel, modifier: Modifier = Modifier) {
             Text("VS", color = FpsColors.Tx3, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             SlotCard(
                 tag = "B · Salvo",
-                name = entryB?.let { db.game(it.state.gameId).name } ?: "Escolher do histórico",
-                hw = entryB?.let { buildHwLine(db, it.state.toBuildState()) }
-                    ?: if (entries.isEmpty()) "Nenhum build salvo ainda" else "Toque para selecionar",
+                name = selected?.let { (_, build) -> db.game(build.gameId).name } ?: "Escolher do histórico",
+                hw = selected?.let { (_, build) -> buildHwLine(db, build) }
+                    ?: if (readable.isEmpty()) "Nenhum build salvo ainda" else "Toque para selecionar",
                 modifier = Modifier.weight(1f),
                 onClick = { pickerOpen = true },
             )
         }
 
-        if (entryB == null) {
-            EmptyCompareState(hasHistory = entries.isNotEmpty(), modifier = Modifier.padding(top = 14.dp))
+        if (selected == null) {
+            EmptyCompareState(hasHistory = readable.isNotEmpty(), modifier = Modifier.padding(top = 14.dp))
         } else {
-            val buildB = entryB.state.toBuildState()
+            val (entryB, buildB) = selected
             SegmentedControl(
                 options = listOf(CompareMode.GAME to "Jogo atual", CompareMode.ALL_GAMES to "Todos os jogos"),
                 selected = vm.compareMode,
@@ -118,8 +120,7 @@ fun CompareScreen(vm: CalcViewModel, modifier: Modifier = Modifier) {
     if (pickerOpen) {
         PickerSheet(
             title = "Escolher do histórico",
-            options = entries.map { entry ->
-                val build = entry.state.toBuildState()
+            options = readable.map { (entry, build) ->
                 PickerOption(
                     id = entry.id.toString(),
                     name = "${db.game(build.gameId).name} — ${vm.fpsFor(build)} FPS",

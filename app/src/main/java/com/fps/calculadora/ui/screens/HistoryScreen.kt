@@ -38,9 +38,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.HistoryEntry
 import com.fps.calculadora.core.PerformanceTier
-import com.fps.calculadora.core.toBuildState
 import com.fps.calculadora.ui.components.FpsCard
 import com.fps.calculadora.ui.components.Icons
 import com.fps.calculadora.ui.components.MonoLabel
@@ -68,6 +68,10 @@ fun HistoryScreen(
     modifier: Modifier = Modifier,
 ) {
     val entries by vm.historyEntries.collectAsState(initial = emptyList())
+    // Um build salvo antes de o catálogo mudar pode citar peça que não existe
+    // mais. Ele continua no disco — some da lista em vez de derrubar a tela.
+    val readable = entries.mapNotNull { entry -> vm.historyBuild(entry)?.let { entry to it } }
+    val hidden = entries.size - readable.size
     val clipboard = LocalClipboardManager.current
     var importOpen by remember { mutableStateOf(false) }
     var copyFeedback by remember { mutableStateOf<String?>(null) }
@@ -108,20 +112,37 @@ fun HistoryScreen(
             Text(it, color = FpsColors.Ok, fontSize = 10.5.sp, modifier = Modifier.padding(bottom = 10.dp))
         }
 
+        // `entries` e não `readable`: quem tem build salvo, mesmo ilegível, não
+        // deve ler "nenhum build ainda" — o aviso logo abaixo explica o caso.
         if (entries.isEmpty()) {
             EmptyHistoryState()
-        } else {
+        } else if (readable.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 20.dp)) {
-                for (entry in entries) {
+                for ((entry, build) in readable) {
                     HistoryCard(
                         vm = vm,
                         entry = entry,
-                        onLoad = { vm.loadHistoryEntry(entry); onOpenBuild() },
+                        build = build,
+                        onLoad = { if (vm.loadHistoryEntry(entry)) onOpenBuild() },
                         onCompare = { vm.compareBuildId = entry.id; onCompareBuild() },
                         onDelete = { vm.deleteHistoryEntry(entry.id) },
                     )
                 }
             }
+        }
+
+        if (hidden > 0) {
+            Text(
+                if (hidden == 1) {
+                    "1 build salvo usa uma peça que saiu do catálogo e não pode ser aberto. Ele continua guardado."
+                } else {
+                    "$hidden builds salvos usam peça que saiu do catálogo e não podem ser abertos. Eles continuam guardados."
+                },
+                color = FpsColors.Tx3,
+                fontSize = 10.5.sp,
+                lineHeight = 15.sp,
+                modifier = Modifier.padding(bottom = 20.dp),
+            )
         }
     }
 
@@ -178,12 +199,12 @@ private fun EmptyHistoryState() {
 private fun HistoryCard(
     vm: CalcViewModel,
     entry: HistoryEntry,
+    build: BuildState,
     onLoad: () -> Unit,
     onCompare: () -> Unit,
     onDelete: () -> Unit,
 ) {
     val db = vm.db
-    val build = entry.state.toBuildState()
     val game = db.game(build.gameId)
     val fps = vm.fpsFor(build)
     val tier = PerformanceTier.forFps(fps)

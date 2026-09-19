@@ -1,5 +1,7 @@
 package com.fps.calculadora.ui.screens
 
+import android.graphics.Bitmap
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,11 +23,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,6 +41,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.fps.calculadora.core.BuildState
 import com.fps.calculadora.core.CalcResult
+import com.fps.calculadora.core.PcProfile
 import com.fps.calculadora.core.PerformanceTier
 import com.fps.calculadora.core.Resolution
 import com.fps.calculadora.core.RtSetting
@@ -41,6 +49,10 @@ import com.fps.calculadora.core.frameGenOptionsFor
 import com.fps.calculadora.core.ramOptionsFor
 import com.fps.calculadora.core.rtOptionsFor
 import com.fps.calculadora.core.shortCpuName
+import com.fps.calculadora.share.renderShareCard
+import com.fps.calculadora.share.saveCardToGallery
+import com.fps.calculadora.share.shareCard
+import com.fps.calculadora.share.shareCardFileName
 import com.fps.calculadora.ui.components.NewPartsNotice
 import com.fps.calculadora.ui.components.BalanceCard
 import com.fps.calculadora.ui.components.ChipRow
@@ -56,9 +68,11 @@ import com.fps.calculadora.ui.components.MonitorBars
 import com.fps.calculadora.ui.components.PickerOption
 import com.fps.calculadora.ui.components.PickerSheet
 import com.fps.calculadora.ui.components.PresetBuildsCarousel
+import com.fps.calculadora.ui.components.ProfilesSheet
 import com.fps.calculadora.ui.components.PsuCard
 import com.fps.calculadora.ui.components.SectionLabel
 import com.fps.calculadora.ui.components.SelectionRow
+import com.fps.calculadora.ui.components.ShareSheet
 import com.fps.calculadora.ui.components.StatsRow
 import com.fps.calculadora.ui.components.SvgIcon
 import com.fps.calculadora.ui.components.WarningList
@@ -67,7 +81,9 @@ import com.fps.calculadora.ui.state.CalcViewModel
 import com.fps.calculadora.ui.theme.FpsColors
 import com.fps.calculadora.ui.theme.FpsRadius
 import com.fps.calculadora.ui.theme.RobotoMono
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 /** Qual folha de seleção está aberta. */
 private enum class Picker { NONE, CPU, MOBO, RAM, GPU, GAME }
@@ -88,7 +104,7 @@ private val MONITOR_HZ_OPTIONS = listOf(60, 75, 100, 120, 144, 165, 180, 210, 24
 fun CalcScreen(
     vm: CalcViewModel,
     animated: Boolean,
-    onGoToUpgrade: () -> Unit = {},
+    onGoToUpgrade: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val snapshot = vm.snapshot
@@ -104,6 +120,22 @@ fun CalcScreen(
     var picker by remember { mutableStateOf(Picker.NONE) }
     var infoSheet by remember { mutableStateOf(InfoSheet.NONE) }
     var justSaved by remember { mutableStateOf(false) }
+    var profilesOpen by remember { mutableStateOf(false) }
+    var shareOpen by remember { mutableStateOf(false) }
+    var shareFeedback by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+
+    // O card é 1080×1350: desenhar no fio da UI trava a abertura da folha, e
+    // recalcular a cada recomposição seria desperdício. Sai de cena junto com
+    // a folha, que é quando o `produceState` é descartado.
+    val card by produceState<Bitmap?>(null, shareOpen, state) {
+        value = null
+        if (!shareOpen) return@produceState
+        value = withContext(Dispatchers.Default) {
+            renderShareCard(context, db, state, result, snapshot.psu)
+        }
+    }
 
     // A seta de variação some depois de 2,4 s, como o `deltaFade` do CSS.
     LaunchedEffect(vm.previousFps) {
@@ -127,6 +159,7 @@ fun CalcScreen(
             .padding(horizontal = 16.dp),
     ) {
         TopBar()
+        ProfileBar(name = vm.activeProfileName, onClick = { profilesOpen = true })
 
         // Só aparece quando o catálogo remoto trouxe hardware que não existia
         // neste APK. Fica antes do card principal porque é contexto sobre as
@@ -148,10 +181,16 @@ fun CalcScreen(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
-                SaveBuildButton(
-                    saved = justSaved,
-                    onClick = { vm.saveCurrentBuild(); justSaved = true },
-                )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    SaveBuildButton(
+                        saved = justSaved,
+                        onClick = { vm.saveCurrentBuild(); justSaved = true },
+                    )
+                    HeroIconButton(Icons.SHARE, "Compartilhar") {
+                        shareFeedback = null
+                        shareOpen = true
+                    }
+                }
             }
             Text(
                 "${shortCpuName(cpu.name)} · ${gpu.name} · " +
@@ -373,6 +412,72 @@ fun CalcScreen(
             onDismiss = { infoSheet = InfoSheet.NONE },
         )
     }
+
+    if (profilesOpen) {
+        ProfilesSheet(
+            book = vm.profiles,
+            subtitle = { profile -> profileSubtitle(vm, profile) },
+            onSwitch = { id -> vm.switchProfile(id) },
+            onRename = { id, name -> vm.renameProfile(id, name) },
+            onDelete = { id -> vm.deleteProfile(id) },
+            onNew = { vm.newProfile() },
+            onDismiss = { profilesOpen = false },
+        )
+    }
+
+    if (shareOpen) {
+        val bitmap = card
+        ShareSheet(
+            card = bitmap,
+            // Abaixo do Android 10 salvar exigiria permissão de armazenamento;
+            // o botão some em vez de pedir uma permissão que não se justifica.
+            canSaveToGallery = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q,
+            feedback = shareFeedback,
+            onShare = {
+                if (bitmap != null) {
+                    val ok = shareCard(
+                        context = context,
+                        bitmap = bitmap,
+                        fileName = shareCardFileName(db, state),
+                        text = vm.currentShareText(),
+                    )
+                    if (!ok) shareFeedback = "Não foi possível abrir o compartilhamento"
+                }
+            },
+            onSaveToGallery = {
+                if (bitmap != null) {
+                    val ok = saveCardToGallery(context, bitmap, shareCardFileName(db, state))
+                    shareFeedback = if (ok) {
+                        "PNG salvo em Imagens → FPS Calculadora"
+                    } else {
+                        "Não foi possível salvar na galeria"
+                    }
+                }
+            },
+            onCopyText = {
+                clipboard.setText(AnnotatedString(vm.currentShareText()))
+                shareFeedback = "Resumo copiado — cole onde quiser"
+            },
+            onCopyCode = {
+                clipboard.setText(AnnotatedString(vm.exportCurrentBuildCode()))
+                shareFeedback = "Código copiado — envie para um amigo"
+            },
+            onDismiss = { shareOpen = false },
+        )
+    }
+}
+
+/**
+ * A linha embaixo do nome do perfil na folha — o `profSub()` do `index.html`
+ * (:3394). Perfil que aponta para peça que a base não conhece mais vira um
+ * travessão em vez de derrubar a folha.
+ */
+private fun profileSubtitle(vm: CalcViewModel, profile: PcProfile): String = try {
+    val db = vm.db
+    "${shortCpuName(db.cpu(profile.state.cpuId).name)} + ${db.gpu(profile.state.gpuId).name} · " +
+        Resolution.fromKey(profile.state.resolution).label
+} catch (e: IllegalStateException) {
+    "—"
 }
 
 /** `#btnHow` / `#btnGoal` — as duas pílulas embaixo do hero (`index.html:958`). */
@@ -412,23 +517,68 @@ private fun TopBar() {
     }
 }
 
+/**
+ * `.profbar` — o nome do perfil ativo, que abre a troca de perfil
+ * (`index.html:900`). Fica acima do resultado porque responde "de qual PC é
+ * este número", que é a primeira coisa a saber ao olhar para ele.
+ */
+@Composable
+private fun ProfileBar(name: String, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .padding(top = 2.dp, bottom = 10.dp)
+            .clip(RoundedCornerShape(100.dp))
+            .background(FpsColors.Bg1)
+            .border(1.dp, FpsColors.Line2, RoundedCornerShape(100.dp))
+            .clickable(onClickLabel = "Trocar perfil de PC", onClick = onClick)
+            .padding(horizontal = 13.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        SvgIcon(Icons.PC, Modifier.size(13.dp), tint = FpsColors.Acc, strokeWidth = 1.8f)
+        Text(
+            name,
+            color = FpsColors.Tx1,
+            fontSize = 11.5.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        SvgIcon(Icons.CARET, Modifier.size(11.dp), tint = FpsColors.Tx3, strokeWidth = 2f)
+    }
+}
+
 /** `#btnSave` — salva a build atual no histórico local (`index.html:916`). */
 @Composable
 private fun SaveBuildButton(saved: Boolean, onClick: () -> Unit) {
+    HeroIconButton(
+        path = Icons.SAVE,
+        description = "Salvar no histórico",
+        tint = if (saved) FpsColors.Ok else FpsColors.Tx2,
+        background = if (saved) FpsColors.OkBg else FpsColors.Bg2,
+        onClick = onClick,
+    )
+}
+
+/** `.icbtn` — os botões quadrados do canto do hero. */
+@Composable
+private fun HeroIconButton(
+    path: String,
+    description: String,
+    tint: Color = FpsColors.Tx2,
+    background: Color = FpsColors.Bg2,
+    onClick: () -> Unit,
+) {
     Box(
         Modifier
             .size(30.dp)
             .clip(RoundedCornerShape(9.dp))
-            .background(if (saved) FpsColors.OkBg else FpsColors.Bg2)
-            .clickable(onClick = onClick),
+            .background(background)
+            .clickable(onClickLabel = description, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        SvgIcon(
-            Icons.SAVE,
-            Modifier.size(15.dp),
-            tint = if (saved) FpsColors.Ok else FpsColors.Tx2,
-            strokeWidth = 1.8f,
-        )
+        SvgIcon(path, Modifier.size(15.dp), tint = tint, strokeWidth = 1.8f)
     }
 }
 

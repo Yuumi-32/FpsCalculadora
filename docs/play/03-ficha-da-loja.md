@@ -16,9 +16,11 @@ FPS Calculadora: PC Gamer
 Alternativas, se quiser testar outra: `FPS Calculadora` (15) · `Calculadora de
 FPS para PC` (26).
 
-> O nome dentro do app hoje é só **"Fps"** (`app/src/main/res/values/strings.xml`).
-> O título da loja pode ser diferente do nome do launcher, mas se quiser os dois
-> iguais é aí que se muda.
+> O nome embaixo do ícone é **"FPS Calculadora"**
+> (`app/src/main/res/values/strings.xml`) — era "Fps" até aqui. Não é igual ao
+> título da loja porque os limites são outros: a loja aceita 30 caracteres, o
+> launcher corta perto de 12 e a maioria quebra em duas linhas. "FPS
+> Calculadora" é o maior prefixo do título que ainda se lê inteiro.
 
 ---
 
@@ -46,18 +48,24 @@ O QUE VOCÊ ENCONTRA
 • O que trocar primeiro — quanto cada upgrade de processador ou de placa de vídeo somaria de FPS no jogo escolhido.
 • Comparar builds — a configuração atual lado a lado com uma salva, jogo a jogo.
 • Histórico no aparelho — salve builds, dê nome e exporte por código de texto para levar a outro celular.
+• Perfis de PC — guarde mais de uma máquina (a sua, a do amigo, a que você pensa em montar) e troque entre elas; o app reabre onde você parou.
+• Compartilhar o resultado — uma imagem com a build e os números, para mandar no grupo ou salvar na galeria.
 • Fonte recomendada — potência mínima e recomendada, com o selo 80 Plus sugerido.
 • Builds prontos — pontos de partida Econômico, Médio e Máximo para 1080p, 1440p e 4K.
 
 O CATÁLOGO
 
-Mais de 30 jogos, 69 placas de vídeo (GeForce GTX 10 até RTX 50 e Radeon RX 6000 até RX 9000), 53 processadores (Ryzen 1000 até 9000 e Intel Core 12ª geração até Core Ultra), 21 placas-mãe e as combinações usuais de memória DDR4 e DDR5.
+36 jogos, 76 placas de vídeo (GeForce GTX 10 até RTX 50, Radeon RX 6000 até RX 9000 e Intel Arc A e B), 62 processadores (Ryzen 1000 até 9000 e Intel Core da 10ª geração até Core Ultra), 26 placas-mãe e as combinações usuais de memória DDR4 e DDR5.
 
 FUNCIONA SEM INTERNET
 
 Toda a base de dados e todo o cálculo estão dentro do aplicativo: dá para usar o app inteiro no modo avião. A internet serve para uma coisa só — baixar a versão mais nova do catálogo de peças, jogos e preços, para os números não envelhecerem junto com a versão instalada.
 
 Nada é enviado para lugar nenhum: não há anúncios, não há rastreamento, não existe conta para criar e o app não pede acesso a localização, contatos, câmera ou aos seus arquivos. As builds que você salva ficam apenas no seu aparelho.
+
+COMPRA ÚNICA
+
+Você paga uma vez e o app é seu, com todas as funções liberadas desde a primeira abertura. Não há assinatura, não há versão limitada, não há nada para desbloquear depois e não há anúncio nenhum — foi para isso que ele tem preço.
 
 COMO OS NÚMEROS SÃO CALCULADOS
 
@@ -67,7 +75,7 @@ São estimativas de referência para orientar uma compra ou um upgrade, não ben
 
 Sugestão de jogo ou de peça que faltou? Abra uma issue em github.com/Yuumi-32/FpsCalculadora/issues.
 ```
-(2471 caracteres)
+(3211 caracteres)
 
 > **Marcas citadas** (Ryzen, Intel Core, GeForce, Radeon, DLSS, FSR e os nomes
 > dos jogos) aparecem só para descrever compatibilidade — uso nominativo, que a
@@ -87,11 +95,13 @@ Primeira versão pública.
 • O que trocar primeiro: o ganho de cada upgrade de CPU ou GPU
 • Comparação entre a build atual e uma salva
 • Histórico no aparelho com exportação por código
+• Perfis de PC: várias máquinas guardadas; reabre onde parou
+• Compartilhar o resultado como imagem, texto ou código
 • Recomendação de fonte com selo 80 Plus
 
 Tudo offline, sem anúncios e sem coletar dados.
 ```
-(380 caracteres)
+(497 caracteres)
 
 ---
 
@@ -143,5 +153,9 @@ São telas reais do app com dados de exemplo semeados, não montagens.
       Play exige um endereço ali, e é o único lugar que ainda pede um: as
       páginas publicadas usam as issues do GitHub. Esse e-mail aparece na
       ficha pública do app.
-- [ ] Decidir se o nome do launcher deixa de ser "Fps"
+- [x] ~~Decidir se o nome do launcher deixa de ser "Fps"~~ — agora é
+      "FPS Calculadora"
+- [ ] Refazer as capturas **com o app pago em mente**: nada nas imagens promete
+      versão gratuita, mas a captura de boas-vindas é a primeira tela de quem
+      acabou de pagar e vale conferir se ela justifica o preço
 - [ ] Conferir as capturas em um aparelho de verdade antes de subir — as fontes do Android podem quebrar linha em lugar diferente

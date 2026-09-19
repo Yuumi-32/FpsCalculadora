@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fps.calculadora.core.Balance
@@ -25,6 +26,7 @@ import com.fps.calculadora.core.GoalAdvice
 import com.fps.calculadora.core.GoalOption
 import com.fps.calculadora.core.HistoryEntry
 import com.fps.calculadora.core.PerformanceTier
+import com.fps.calculadora.core.ProfileBook
 import com.fps.calculadora.core.PsuEstimate
 import com.fps.calculadora.core.Resolution
 import com.fps.calculadora.core.RtSetting
@@ -37,16 +39,29 @@ import com.fps.calculadora.core.compareGame
 import com.fps.calculadora.core.energyFor
 import com.fps.calculadora.core.goalAdvice
 import com.fps.calculadora.core.normalize
+import com.fps.calculadora.core.normalizeOrNull
 import com.fps.calculadora.core.parseBuildCode
 import com.fps.calculadora.core.rankAllGames
-import com.fps.calculadora.core.toBuildState
+import com.fps.calculadora.core.renamed
+import com.fps.calculadora.core.repaired
+import com.fps.calculadora.core.shareText
+import com.fps.calculadora.core.switchedTo
+import com.fps.calculadora.core.toPersisted
 import com.fps.calculadora.core.upgradeAdvice
 import com.fps.calculadora.core.warningsFor
+import com.fps.calculadora.core.withActive
 import com.fps.calculadora.core.withNewEntry
+import com.fps.calculadora.core.withNewProfile
+import com.fps.calculadora.core.without
 import com.fps.calculadora.data.CatalogRepository
 import com.fps.calculadora.data.CatalogState
 import com.fps.calculadora.data.HistoryStore
+import com.fps.calculadora.data.PreferencesStore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** Tudo que a tela Calcular mostra para um estado — calculado de uma vez só. */
@@ -93,6 +108,7 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
 
     private var calculator = FpsCalculator(catalog.database)
     private val historyStore = HistoryStore(application)
+    private val preferencesStore = PreferencesStore(application)
 
     var state by mutableStateOf(db.normalize(defaultState()))
         private set
@@ -100,6 +116,115 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     var hoursPerDay by mutableIntStateOf(DEFAULT_HOURS_PER_DAY)
 
     var tariff by mutableDoubleStateOf(DEFAULT_TARIFF_BRL)
+
+    /**
+     * Os perfis de PC. O ativo é onde a build atual mora — ver [profiles], que
+     * é o que a tela lê, e [syncedBook], que é o que vai pro disco.
+     */
+    private var book by mutableStateOf(ProfileBook.of(state, 0L))
+
+    /**
+     * `false` até o disco responder. Segura a splash (ver `ComposeMainActivity`)
+     * e, principalmente, impede que o padrão seja gravado por cima do que estava
+     * salvo caso a leitura demore.
+     */
+    var restored by mutableStateOf(false)
+        private set
+
+    /** `true` na primeira abertura, enquanto as boas-vindas não forem dispensadas. */
+    var onboardingPending by mutableStateOf(false)
+        private set
+
+    /**
+     * Os perfis com o ativo já refletindo o que está na tela — é assim que a
+     * folha "Perfis de PC" mostra a build de agora embaixo do nome.
+     */
+    val profiles: ProfileBook get() = syncedBook()
+
+    val activeProfileName: String get() = book.active.name
+
+    init {
+        viewModelScope.launch { restore() }
+        // Grava sozinho a cada mudança, com uma pausa antes: sem ela o arquivo
+        // seria reescrito a cada passo do slider de horas. O `restored` garante
+        // que nada seja gravado antes de sabermos o que já havia lá.
+        viewModelScope.launch {
+            snapshotFlow { if (restored) syncedBook() else null }
+                .filterNotNull()
+                // `collectLatest` + `delay` é o debounce: cada valor novo
+                // cancela a espera do anterior, e só o último chega ao disco.
+                .collectLatest { book ->
+                    delay(SAVE_DEBOUNCE_MS)
+                    preferencesStore.saveProfiles(book)
+                }
+        }
+    }
+
+    /**
+     * Devolve o app ao estado da última sessão. Qualquer falha de leitura vira
+     * "primeira abertura": perder o perfil salvo é ruim, não abrir é pior.
+     */
+    private suspend fun restore() {
+        val stored = try {
+            preferencesStore.preferences.first()
+        } catch (e: Exception) {
+            null
+        }
+        val restoredBook = stored?.profiles.repaired(state, System.currentTimeMillis())
+        book = restoredBook
+        // Direto, sem `applyState`: reabrir o app não é uma mudança de build, e
+        // a seta de variação do gauge não deve aparecer na abertura.
+        restoredBook.active.let { profile ->
+            db.normalizeOrNull(profile.state)?.let { state = it }
+            hoursPerDay = profile.hoursPerDay
+            tariff = profile.tariff
+        }
+        onboardingPending = stored?.onboarded == false
+        restored = true
+    }
+
+    private fun syncedBook(): ProfileBook = book.withActive {
+        it.copy(state = state.toPersisted(), hoursPerDay = hoursPerDay, tariff = tariff)
+    }
+
+    /** Aplica o perfil escolhido — troca build, horas e tarifa de uma vez. */
+    private fun activate(next: ProfileBook) {
+        book = next
+        val profile = next.active
+        db.normalizeOrNull(profile.state)?.let { applyState(it) }
+        hoursPerDay = profile.hoursPerDay
+        tariff = profile.tariff
+    }
+
+    /** Guarda o que está na tela no perfil atual antes de sair dele. */
+    fun switchProfile(id: Long) {
+        if (id == book.activeId) return
+        activate(syncedBook().switchedTo(id))
+    }
+
+    /** "+ Novo perfil (cópia do atual)" — o novo já entra ativo. */
+    fun newProfile() {
+        book = syncedBook().withNewProfile(System.currentTimeMillis())
+    }
+
+    fun renameProfile(id: Long, name: String) {
+        book = syncedBook().renamed(id, name)
+    }
+
+    /**
+     * Exclui um perfil. Excluir o ativo promove o primeiro que sobrar e troca a
+     * build na tela; o último perfil não é excluído (a folha nem oferece).
+     */
+    fun deleteProfile(id: Long) {
+        val next = syncedBook().without(id)
+        if (next.activeId != book.activeId) activate(next) else book = next
+    }
+
+    /** Dispensa as boas-vindas — o `dismissOnboard()` do original (`index.html:3135`). */
+    fun dismissOnboarding() {
+        onboardingPending = false
+        viewModelScope.launch { preferencesStore.setOnboarded(true) }
+    }
 
     /** Último FPS exibido, para o gauge mostrar de quanto foi o salto. */
     var previousFps by mutableStateOf<Int?>(null)
@@ -151,6 +276,9 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     fun fpsFor(build: BuildState): Int = calculator.calc(build).avg
 
     fun exportCurrentBuildCode(): String = db.buildCode(state)
+
+    /** O resumo em texto da build atual — o que acompanha o PNG e o botão "Copiar texto". */
+    fun currentShareText(): String = db.shareText(state, calculator.calc(state), calculator.psu(state))
 
     /** `true` quando o código era válido e a build atual foi trocada por ele. */
     fun importBuildCode(code: String): Boolean {
@@ -211,9 +339,26 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Carrega um build salvo como a build atual — porta a ação "Carregar" do card de histórico. */
-    fun loadHistoryEntry(entry: HistoryEntry) {
-        applyState(db.normalize(entry.state.toBuildState()))
+    /**
+     * A build de uma entrada do histórico, normalizada contra a base atual —
+     * `null` quando ela cita peça que o catálogo não conhece (mais).
+     *
+     * O histórico é o único dado do app que atravessa uma troca de catálogo
+     * sem passar pelo `normalize`: as entradas vêm do disco com os ids de
+     * quando foram salvas. Ler por aqui é o que impede um id órfão de derrubar
+     * a tela dentro de `db.game()`/`db.cpu()`, que estouram em id desconhecido.
+     */
+    fun historyBuild(entry: HistoryEntry): BuildState? = db.normalizeOrNull(entry.state)
+
+    /**
+     * Carrega um build salvo como a build atual — porta a ação "Carregar" do
+     * card de histórico. Devolve `false` sem mexer em nada quando a build não
+     * é mais legível (ver [historyBuild]).
+     */
+    fun loadHistoryEntry(entry: HistoryEntry): Boolean {
+        val build = historyBuild(entry) ?: return false
+        applyState(build)
+        return true
     }
 
     /** Remove um build do histórico — porta a ação "Excluir" (`index.html:2570`). */
@@ -230,6 +375,9 @@ class CalcViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private companion object {
+        /** Quanto esperar antes de gravar no disco, em ms — ver o `init`. */
+        const val SAVE_DEBOUNCE_MS = 400L
+
         /** O mesmo estado inicial do `index.html:1822`, resolvido por índice. */
         fun defaultState(): BuildState {
             val db = GameDatabase.default

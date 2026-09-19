@@ -121,3 +121,16 @@ fun GameDatabase.normalize(state: BuildState): BuildState {
 
     return result
 }
+
+/**
+ * [normalize] para o que veio do disco: devolve `null` quando a build salva
+ * referencia peça que a base não conhece (mais).
+ *
+ * Existe porque o catálogo remoto pode, em teoria, trocar a base debaixo de um
+ * perfil salvo — e um app que não abre é pior que um perfil perdido.
+ */
+fun GameDatabase.normalizeOrNull(persisted: PersistedBuildState): BuildState? = try {
+    normalize(persisted.toBuildState())
+} catch (e: IllegalStateException) {
+    null
+}

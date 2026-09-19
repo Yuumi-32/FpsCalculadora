@@ -69,6 +69,27 @@ android {
     androidResources {
         noCompress 'html', 'js', 'css'
     }
+
+    testOptions {
+        // Mesmo motor do :core, para os dois módulos rodarem com um
+        // `./gradlew test` só e com a mesma sintaxe de asserção.
+        unitTests.all { it.useJUnitPlatform() }
+    }
+
+    lint {
+        // O lint é parte do portão: erro dele derruba o build, e aviso novo
+        // aparece no log do CI em vez de acumular calado.
+        warningsAsErrors false
+        abortOnError true
+        checkReleaseBuilds true
+
+        // local.properties é gerado pelo Android Studio, está no .gitignore e
+        // não existe no CI. Em Windows ele sai com `sdk.dir=C:/...`, que o lint
+        // reclama por causa dos dois-pontos — um arquivo de máquina fazendo o
+        // build falhar em uma máquina só. Desativado para o resultado local ser
+        // o mesmo do CI.
+        disable 'PropertyEscape'
+    }
 }
 
 kotlin {
@@ -97,4 +118,10 @@ dependencies {
 
     debugImplementation 'androidx.compose.ui:ui-tooling'
     implementation 'androidx.compose.ui:ui-tooling-preview'
+
+    // Só o que roda na JVM. O resto do :app é Compose e Canvas do Android, que
+    // pede aparelho ou Robolectric — ver docs/play/README.md.
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

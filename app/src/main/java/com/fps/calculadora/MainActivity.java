@@ -214,7 +214,13 @@ public class MainActivity extends Activity {
         }
     }
 
-    // Botão Voltar navega no histórico em vez de fechar o app
+    // Botão Voltar navega no histórico em vez de fechar o app.
+    //
+    // Continua em onBackPressed() porque esta Activity opta por fora do back
+    // preditivo no manifesto de debug (enableOnBackInvokedCallback="false"),
+    // que é o que mantém o sistema chamando este método. O lint avisa sem
+    // olhar a opção por Activity, então o aviso é silenciado aqui.
+    @SuppressLint("GestureBackNavigation")
     @Override
     public void onBackPressed() {
         if (webView.canGoBack()) {

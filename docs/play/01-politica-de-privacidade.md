@@ -70,3 +70,11 @@ respondido como "não coleta" em
 > para fora do aparelho*, e o download é um GET de arquivo público estático,
 > sem nada do usuário. Mas o texto da política mudou, então **a página
 > revisada precisa estar no ar antes de subir um build com a permissão**.
+
+> **Mudou em 19/09/2026:** as duas páginas diziam que o app é "gratuito", e ele
+> passou a ser pago (R$ 2,49 — ver [07-preco-do-app.md](07-preco-do-app.md)).
+> Foi trocada a palavra e a data no topo das duas versões. **Não muda nada de
+> privacidade**: cobrar pelo download não faz o app coletar, enviar ou guardar
+> coisa nova — quem cobra é a Play, antes de a instalação acontecer. Ainda
+> assim, política que afirma o que o app não é fica errada do mesmo jeito, e
+> errada é como a Play encontra.

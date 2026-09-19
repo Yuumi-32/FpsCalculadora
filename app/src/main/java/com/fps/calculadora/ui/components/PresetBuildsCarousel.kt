@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -26,7 +27,11 @@ import com.fps.calculadora.ui.theme.FpsColors
 import com.fps.calculadora.ui.theme.FpsRadius
 import com.fps.calculadora.ui.theme.RobotoMono
 
-private val TIER_NAMES = mapOf("eco" to "Econômico", "mid" to "Médio", "max" to "Máximo")
+internal val TIER_NAMES = mapOf("eco" to "Econômico", "mid" to "Médio", "max" to "Máximo")
+
+/** Quebra a chave `1440p_mid` do catálogo em resolução e nível. */
+internal fun splitPresetKey(key: String): Pair<String, String> =
+    key.split("_", limit = 2).let { it.getOrElse(0) { "" } to it.getOrElse(1) { "" } }
 
 /**
  * "Builds prontos" — porta o `buildPresetCards()` do `index.html` (:2490): um
@@ -47,7 +52,7 @@ fun PresetBuildsCarousel(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         for ((key, preset) in presets) {
-            val (res, tier) = key.split("_", limit = 2).let { it.getOrElse(0) { "" } to it.getOrElse(1) { "" } }
+            val (res, tier) = splitPresetKey(key)
             PresetBuildCard(
                 resolution = res.uppercase(),
                 tierName = TIER_NAMES[tier] ?: tier,
@@ -59,17 +64,24 @@ fun PresetBuildsCarousel(
     }
 }
 
+/**
+ * Um card de build pronta. Público porque as boas-vindas usam os mesmos nove
+ * cards, só que numa grade em vez do carrossel — ver `OnboardingOverlay`.
+ */
 @Composable
-private fun PresetBuildCard(
+fun PresetBuildCard(
     resolution: String,
     tierName: String,
     cpuLabel: String,
     gpuLabel: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    minWidth: Dp = 138.dp,
+    hardwareWidth: Dp? = 114.dp,
 ) {
     Column(
-        Modifier
-            .widthIn(min = 138.dp)
+        modifier
+            .widthIn(min = minWidth)
             .clip(RoundedCornerShape(FpsRadius.Md))
             .background(FpsColors.Bg1)
             .border(1.dp, FpsColors.Line, RoundedCornerShape(FpsRadius.Md))
@@ -96,7 +108,11 @@ private fun PresetBuildCard(
             color = FpsColors.Tx3,
             fontSize = 9.5.sp,
             lineHeight = 13.sp,
-            modifier = Modifier.padding(top = 4.dp).width(114.dp),
+            modifier = Modifier
+                .padding(top = 4.dp)
+                // Largura fixa no carrossel (todos os cards do mesmo tamanho);
+                // livre na grade das boas-vindas, onde quem manda é a coluna.
+                .then(if (hardwareWidth != null) Modifier.width(hardwareWidth) else Modifier),
         )
     }
 }

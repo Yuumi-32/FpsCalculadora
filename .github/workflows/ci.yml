@@ -1,0 +1,62 @@
+# Portão de cada push e de cada pull request em main.
+#
+# Roda o que dá para rodar sem aparelho: os testes dos dois módulos, o lint do
+# Android e o build de release. O `assembleRelease` está aqui de propósito — é
+# o único passo que exercita o R8, e regra de ProGuard faltando não aparece em
+# nenhum teste, só num APK que abre e fecha na cara do usuário.
+#
+# O APK gerado aqui **não é publicável**: o keystore de release não está no
+# repositório (nem deve estar), então o pacote sai sem assinatura. Ele serve
+# para provar que o build passa; o AAB que vai para a Play sai da máquina de
+# quem tem a chave — ver docs/play/README.md, item 6.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Push em cima de push cancela a execução anterior do mesmo branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Testes (:core e :app)
+        run: ./gradlew test --stacktrace
+
+      - name: Lint do Android
+        run: ./gradlew :app:lintRelease --stacktrace
+
+      - name: Build de release
+        run: ./gradlew assembleRelease --stacktrace
+
+      # Sobem mesmo quando o passo anterior falha: relatório de teste só serve
+      # quando o teste quebrou.
+      - name: Guardar relatórios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios
+          path: |
+            core/build/reports/tests/
+            app/build/reports/
+          retention-days: 14
+          if-no-files-found: ignore

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
       Usada pelo catálogo remoto: o app busca a base de hardware, jogos e
@@ -26,25 +27,50 @@
         android:theme="@style/Theme.FpsCalculadora.Splash"
         android:hardwareAccelerated="true"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:enableOnBackInvokedCallback="false">
+        android:enableOnBackInvokedCallback="true"
+        tools:ignore="UnusedAttribute">
 
         <!--
           A UI nativa em Compose é o app publicado desde a Fase 2. A WebView
           que ocupava este lugar continua no repositório e no build de debug,
           como referência de comparação — ver src/debug/AndroidManifest.xml.
         -->
+        <!--
+          O screenOrientation="portrait" continua valendo em celular, e deixou
+          de valer em tela grande: a partir do Android 16 (targetSdk 36) o
+          sistema ignora restrição de orientação quando a menor largura passa de
+          600dp — tablet, dobrável aberto e janela do modo desktop. A UI é
+          desenhada para isso (ver CONTENT_MAX_WIDTH na ComposeMainActivity);
+          o atributo fica porque em celular ainda é ele que evita a rotação.
+        -->
         <activity
             android:name=".ComposeMainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden|density|uiMode"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+          Publica só a pasta de cache do PNG do resultado (ver res/xml/file_paths.xml),
+          e só enquanto o app de destino estiver lendo o arquivo. É o que permite
+          compartilhar a imagem sem pedir permissão de armazenamento.
+        -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 
