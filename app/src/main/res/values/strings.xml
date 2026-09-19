@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Fps</string>
+    <!--
+      O nome embaixo do ícone. Era "Fps", que não dizia o que o app faz para
+      quem abre a gaveta de aplicativos uma semana depois de instalar.
+
+      Não é igual ao título da loja ("FPS Calculadora: PC Gamer", em
+      docs/play/03-ficha-da-loja.md) porque os dois têm limites diferentes: a
+      loja aceita 30 caracteres, o launcher corta perto de 12 e a maioria
+      quebra em duas linhas. "FPS Calculadora" é o maior prefixo do título que
+      ainda se lê inteiro.
+    -->
+    <string name="app_name">FPS Calculadora</string>
 </resources>
